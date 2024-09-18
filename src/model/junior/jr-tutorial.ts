@@ -73,7 +73,7 @@ export type LearnerTaskCommitChangeHatBlock = {
 
 export type LearnerTaskCommit =
   | LearnerTaskCommitAddSprite
-  | LearnerTaskCommitAddMedialibAppearance
+  | LearnerTaskCommitAddMedialibAppearancesEntry
   | LearnerTaskCommitDeleteAppearance
   | LearnerTaskCommitAddScript
   | LearnerTaskCommitEditScript
