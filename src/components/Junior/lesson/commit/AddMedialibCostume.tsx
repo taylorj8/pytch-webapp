@@ -1,7 +1,7 @@
 import React from "react";
 import {
   ActorIdentifierOps,
-  LearnerTaskCommitAddMedialibAppearance,
+  LearnerTaskCommitAddMedialibAppearancesEntry,
 } from "../../../../model/junior/jr-tutorial";
 import { ActorKindOps } from "../../../../model/junior/structured-program";
 import { InlineAddSomethingButton } from "../../AddSomethingButton";
@@ -9,7 +9,7 @@ import { InlineAddSomethingButton } from "../../AddSomethingButton";
 // TODO: Include thumbnail of required costume?
 
 export const AddMedialibAppearance: React.FC<
-  LearnerTaskCommitAddMedialibAppearance
+  LearnerTaskCommitAddMedialibAppearancesEntry
 > = ({ actor, displayIdentifier }) => {
   const actorKindNames = ActorKindOps.names(actor.kind);
   const actorNounPhrase = ActorIdentifierOps.nounPhrase(actor);
