@@ -10,9 +10,10 @@ import { InlineAddSomethingButton } from "../../AddSomethingButton";
 
 export const AddMedialibAppearancesEntry: React.FC<
   LearnerTaskCommitAddMedialibAppearancesEntry
-> = ({ actor, displayIdentifier }) => {
+> = ({ actor, displayIdentifier, nItems }) => {
   const actorKindNames = ActorKindOps.names(actor.kind);
   const actorNounPhrase = ActorIdentifierOps.nounPhrase(actor);
+  const entryNoun = nItems === 1 ? "image" : "images";
 
   return (
     <div className="JrCommit Commit-AddMedialibAppearancesEntry">
@@ -32,9 +33,8 @@ export const AddMedialibAppearancesEntry: React.FC<
         button.
       </p>
       <p>
-        Find the <code>{displayIdentifier}</code>{" "}
-        {actorKindNames.appearanceDisplay}, and click the “Add 1 to project”
-        button.
+        Find the “<strong>{displayIdentifier}</strong>” {entryNoun}, and click
+        the “Add {nItems} to project” button.
       </p>
     </div>
   );
