@@ -35,11 +35,11 @@ export type LearnerTaskCommitAddSprite = {
   name: string;
 };
 
-export type LearnerTaskCommitAddMedialibAppearance = {
-  kind: "add-medialib-appearance";
+export type LearnerTaskCommitAddMedialibAppearancesEntry = {
+  kind: "add-medialib-appearances-entry";
   actor: ActorIdentifier;
   displayIdentifier: string;
-  appearanceFilename: string;
+  nItems: number;
 };
 
 export type LearnerTaskCommitDeleteAppearance = {
