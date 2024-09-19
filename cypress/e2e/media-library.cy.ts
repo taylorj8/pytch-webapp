@@ -120,6 +120,12 @@ context("Add clipart from library, handling errors", () => {
     cy.pytchShouldShowAssets(startTestAssets);
   });
 
+  it("can dismiss with keyboard", () => {
+    launchChooseClipArt();
+    cy.get(".modal").type("{esc}");
+    cy.get(".modal").should("not.exist");
+  });
+
   it("can add a single-item entry", () => {
     chooseClipArt(["bird.png"], 1);
     cy.pytchShouldShowAssets([...startTestAssets, "bird.png"]);
