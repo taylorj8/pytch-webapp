@@ -1,3 +1,4 @@
+@use "sass:map";
 @import "./pytch-jr-common.scss";
 @import "./pytch-mixins.scss";
 @import "./pytch-variables.scss";
@@ -215,6 +216,19 @@ $task-checkbox-not-done-colour: #999;
     align-items: center;
     button {
       padding: 2px 4px;
+    }
+  }
+
+  .DisplayDropdownButton {
+    background-color: map.get($theme-colors, "primary");
+    color: white;
+    padding: 2px 6px 2px 4px;
+    border-radius: 6px;
+
+    .down-triangle {
+      display: inline-block;
+      font-size: 0.8rem;
+      transform: translateY(-0.1rem);
     }
   }
 }

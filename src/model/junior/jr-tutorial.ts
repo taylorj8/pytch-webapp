@@ -42,6 +42,12 @@ export type LearnerTaskCommitAddMedialibAppearance = {
   appearanceFilename: string;
 };
 
+export type LearnerTaskCommitDeleteAppearance = {
+  kind: "delete-appearance";
+  actor: ActorIdentifier;
+  appearanceFilename: string;
+};
+
 export type LearnerTaskCommitAddScript = {
   kind: "add-script";
   path: ScriptPath;
@@ -68,6 +74,7 @@ export type LearnerTaskCommitChangeHatBlock = {
 export type LearnerTaskCommit =
   | LearnerTaskCommitAddSprite
   | LearnerTaskCommitAddMedialibAppearance
+  | LearnerTaskCommitDeleteAppearance
   | LearnerTaskCommitAddScript
   | LearnerTaskCommitEditScript
   | LearnerTaskCommitChangeHatBlock;
