@@ -373,8 +373,9 @@ $task-checkbox-not-done-colour: #999;
     }
     .python-snippet {
       background-color: white;
-      padding: 1rem;
-      margin: 0rem 2rem 1rem;
+      padding: 0.5rem;
+      margin: -0.25rem 2rem 1rem;
+      border-radius: 4px;
 
       pre {
         margin-bottom: 0px;
