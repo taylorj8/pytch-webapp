@@ -8,14 +8,14 @@ import { InlineAddSomethingButton } from "../../AddSomethingButton";
 
 // TODO: Include thumbnail of required costume?
 
-export const AddMedialibAppearance: React.FC<
+export const AddMedialibAppearancesEntry: React.FC<
   LearnerTaskCommitAddMedialibAppearancesEntry
 > = ({ actor, displayIdentifier }) => {
   const actorKindNames = ActorKindOps.names(actor.kind);
   const actorNounPhrase = ActorIdentifierOps.nounPhrase(actor);
 
   return (
-    <div className="JrCommit Commit-AddMedialibCostume">
+    <div className="JrCommit Commit-AddMedialibAppearancesEntry">
       <p>
         In the <i>Stage and Sprites</i> pane, select {actorNounPhrase}.
       </p>
