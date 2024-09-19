@@ -86,12 +86,16 @@ context("Add clipart from library, handling errors", () => {
     cy.get("button").contains(expLabel).click();
   };
 
+  const launchChooseClipArt = () => {
+    cy.contains("Choose from library").click();
+    cy.contains("Add to project").should("be.disabled");
+  };
+
   const attemptChooseClipArt = (
     clipArtNames: Array<string>,
     expAddN: number
   ) => {
-    cy.contains("Choose from library").click();
-    cy.contains("Add to project").should("be.disabled");
+    launchChooseClipArt();
     clipArtNames.forEach((clipArtName) =>
       cy.get(".clipart-card").contains(clipArtName).click()
     );
