@@ -38,7 +38,7 @@ export const entryMatchesTags = (
 /** **Update in place** the `url` properties of all items contained
  * within the given `entries`.  The `url` is computed by prefixing the
  * item's existing `relativeUrl` property with the given
- * `medialibRoot`.*/
+ * `basePath` (which should *not* end with a `/`).*/
 export const populateUrlOfItems = (
   entries: Array<ClipArtGalleryEntry>,
   basePath: string

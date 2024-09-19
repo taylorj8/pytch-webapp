@@ -14,7 +14,7 @@ const styleStringFromClass = (() => {
     ["constant.numeric", "#306998/"],
     ["entity.name.function", "#bb5300/bold"],
     ["function.support", "#bb5300/"],
-    ["identifier", "/"],
+    ["identifier", "black/"],
     ["keyword", "black/bold"],
     ["keyword.operator", "black/bold"],
     ["paren.lparen", "black/bold"],
@@ -22,7 +22,7 @@ const styleStringFromClass = (() => {
     ["punctuation", "black/bold"],
     ["string", "#b94887/"],
     ["support.function", "#bb5300/"],
-    ["text", "/"],
+    ["text", "black/"],
     ["variable.language", "#306998/"],
   ]);
 

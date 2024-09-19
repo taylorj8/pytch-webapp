@@ -679,6 +679,7 @@
   .key-content {
     display: inline-block;
     min-width: 2rem;
+    text-align: center;
     background-color: darken($secondary, 10);
     color: white;
     padding: 0px 0.5rem;
@@ -862,22 +863,22 @@ $key-chooser-width: 54rem;
     display: inline-block;
     margin: 0rem 0.25rem;
 
-    span.key-button,
-    span.edit-button {
+    span.key-button {
       display: inline-block;
       padding: 0rem 0.25rem;
       min-width: 2rem;
       text-align: center;
       border-radius: 6px;
-    }
 
-    span.key-button {
       background-color: $secondary;
       color: white;
       &:hover {
         background-color: $primary;
       }
       position: relative;
+      span.key-display-name {
+        margin-left: 0.25rem;
+      }
       span.dropdown-indicator {
         margin-left: 1rem;
       }
