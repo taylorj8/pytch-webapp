@@ -15,6 +15,7 @@ import { assertNever, discardReturnValue } from "../../utils";
 import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
 import { asyncFlowModal } from "../async-flow-modals/utils";
 import {
+  isInteractable,
   isSucceeded,
   maybeLastFailureMessage,
   settleFunctions,
@@ -234,8 +235,8 @@ export const AddClipArtModal = () => {
     };
 
     return (
-      <Modal animation={false} show={true} size="xl">
-        <Modal.Header>
+      <Modal onHide={settle.cancel} animation={false} show={true} size="xl">
+        <Modal.Header closeButton={isInteractable(activeState)}>
           <Modal.Title>Choose some images</Modal.Title>
         </Modal.Header>
         <Modal.Body className="clipart-body">
