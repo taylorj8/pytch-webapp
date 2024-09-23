@@ -110,19 +110,19 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
   const maybeButton =
     nStagesTotal > 0 &&
     (() => {
-  const label = (() => {
-    switch (nStagesStillHidden) {
-      case 0:
-        return "Hide help";
-      case 1:
-        return "Show me";
-      default:
-        return "Hint";
-    }
-  })();
+      const label = (() => {
+        switch (nStagesStillHidden) {
+          case 0:
+            return "Hide help";
+          case 1:
+            return "Show me";
+          default:
+            return "Hint";
+        }
+      })();
 
-  const onClick =
-    nStagesStillHidden === 0 ? hideAllHelpStages : showNextHelpStage;
+      const onClick =
+        nStagesStillHidden === 0 ? hideAllHelpStages : showNextHelpStage;
 
       return (
         <Button
