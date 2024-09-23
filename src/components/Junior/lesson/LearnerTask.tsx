@@ -107,6 +107,9 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
   hideAllHelpStages,
   onCheckboxClick,
 }) => {
+  const maybeButton =
+    nStagesTotal > 0 &&
+    (() => {
   const label = (() => {
     switch (nStagesStillHidden) {
       case 0:
@@ -121,6 +124,17 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
   const onClick =
     nStagesStillHidden === 0 ? hideAllHelpStages : showNextHelpStage;
 
+      return (
+        <Button
+          key={nStagesStillHidden}
+          variant="outline-success"
+          onClick={onClick}
+        >
+          {label}
+        </Button>
+      );
+    })();
+
   return (
     <div className="ShowNextHelpStageButton-container">
       <div className="to-do-checkbox-container">
@@ -131,13 +145,7 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
         />
         <CheckboxHelp interactivityKind={interactivityKind} />
       </div>
-      <Button
-        key={nStagesStillHidden}
-        variant="outline-success"
-        onClick={onClick}
-      >
-        {label}
-      </Button>
+      {maybeButton}
     </div>
   );
 };
