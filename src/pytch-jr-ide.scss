@@ -679,6 +679,7 @@
   .key-content {
     display: inline-block;
     min-width: 2rem;
+    text-align: center;
     background-color: darken($secondary, 10);
     color: white;
     padding: 0px 0.5rem;
@@ -878,6 +879,9 @@ $key-chooser-width: 54rem;
         background-color: $primary;
       }
       position: relative;
+      span.key-display-name {
+        margin-left: 0.25rem;
+      }
       span.dropdown-indicator {
         margin-left: 1rem;
       }
