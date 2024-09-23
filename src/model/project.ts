@@ -652,6 +652,14 @@ export const activeProject: IActiveProject = {
     const contentState = state.linkedContentLoadingState;
     assertLinkedContentSucceededOfKind(contentState, "jr-tutorial");
     contentState.content.content = content;
+
+    // During development of tutorial, we might add learner-tasks,
+    // leaving the interaction state "taskStates" array too short.  Fix
+    // if required.
+    let taskStates = contentState.content.interactionState.taskStates;
+    while (taskStates.length < content.nTasksTotal) {
+      taskStates.push({ nHelpStagesShown: 0 });
+    }
   }),
 
   _enqueueLinkedLessonDbSync: thunk((actions, _voidPayload, helpers) => {
