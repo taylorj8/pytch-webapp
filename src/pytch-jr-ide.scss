@@ -863,16 +863,13 @@ $key-chooser-width: 54rem;
     display: inline-block;
     margin: 0rem 0.25rem;
 
-    span.key-button,
-    span.edit-button {
+    span.key-button {
       display: inline-block;
       padding: 0rem 0.25rem;
       min-width: 2rem;
       text-align: center;
       border-radius: 6px;
-    }
 
-    span.key-button {
       background-color: $secondary;
       color: white;
       &:hover {
