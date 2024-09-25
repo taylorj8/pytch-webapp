@@ -40,3 +40,32 @@ export const RawOrCodeSnippet: React.FC<RawOrCodeSnippetProps> = ({
     return <RawElement element={element} />;
   }
 };
+
+export const withCodeSnippetsRendered = (element: HTMLElement): HTMLElement => {
+  if (elementIsScratchCode(element)) {
+    let div = document.createElement("div");
+    div.className = "display-scratchblocks";
+    div.appendChild(makeScratchSVG(element.innerText, 0.8));
+    return div;
+  }
+
+  if (elementIsPythonCode(element)) {
+    let div = document.createElement("div");
+    div.className = "python-snippet";
+    const codeText = element.innerText.trimEnd();
+    const codeElts = highlightedPreEltsFromCode(codeText);
+    codeElts.forEach((elt) => div.appendChild(elt));
+    return div;
+  }
+
+  let augElement = element.cloneNode() as HTMLElement;
+  element.childNodes.forEach((node) => {
+    augElement.appendChild(
+      node.nodeType === Node.ELEMENT_NODE
+        ? withCodeSnippetsRendered(node as HTMLElement)
+        : node.cloneNode()
+    );
+  });
+
+  return augElement;
+};
