@@ -26,19 +26,7 @@ type RawOrCodeSnippetProps = { element: HTMLElement };
 export const RawOrCodeSnippet: React.FC<RawOrCodeSnippetProps> = ({
   element,
 }) => {
-  if (elementIsScratchCode(element)) {
-    const sbSvg = makeScratchSVG(element.innerText, 0.8);
-    return <RawElement className="display-scratchblocks" element={sbSvg} />;
-  } else if (elementIsPythonCode(element)) {
-    const codeDiv = document.createElement("div");
-    codeDiv.classList.add("python-snippet");
-    const codeText = element.innerText.trimEnd();
-    const codeElts = highlightedPreEltsFromCode(codeText);
-    codeElts.forEach((elt) => codeDiv.appendChild(elt));
-    return <RawElement element={codeDiv} />;
-  } else {
-    return <RawElement element={element} />;
-  }
+  return <RawElement element={withCodeSnippetsRendered(element)} />;
 };
 
 export const withCodeSnippetsRendered = (element: HTMLElement): HTMLElement => {
