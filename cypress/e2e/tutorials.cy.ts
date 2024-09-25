@@ -92,8 +92,8 @@ context("Demo of a tutorial", () => {
   it("dismisses button tour when creating tutorial", () => {
     cy.contains("Click the green flag");
     cy.pytchHomeFromIDE();
-    cy.get(".NavBar").contains("Tutorials").click();
-    createProjectFollowingTutorial("Boing");
+    const createOptions = { resetDatabaseFirst: false };
+    cy.pytchProjectFollowingTutorial("boing", createOptions);
     cy.get(".pytch-static-tooltip.hidden").should("have.length", 1);
     cy.get(".pytch-static-tooltip.shown").should("not.exist");
   });
