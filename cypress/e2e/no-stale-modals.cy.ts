@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 import {
-  createProjectFollowingTutorial,
   initSpecimenIntercepts,
   setInstantDelays,
   launchCreateProjectModal,

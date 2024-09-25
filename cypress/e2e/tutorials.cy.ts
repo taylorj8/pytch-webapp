@@ -1,9 +1,6 @@
 /// <reference types="cypress" />
 
-import {
-  createProjectFollowingTutorial,
-  launchShareTutorialModal,
-} from "./utils";
+import { launchShareTutorialModal } from "./utils";
 
 context("Work with tutorials list", () => {
   it("shows list of tutorials", () => {
