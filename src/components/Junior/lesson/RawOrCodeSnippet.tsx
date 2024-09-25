@@ -20,7 +20,8 @@ const elementIsScratchCode = (elt: HTMLElement) =>
   elementIsCodeOfLanguage(elt, "scratch");
 
 const elementIsPythonCode = (elt: HTMLElement) =>
-  elementIsCodeOfLanguage(elt, "python");
+  elementIsCodeOfLanguage(elt, "python") ||
+  elementIsCodeOfLanguage(elt, "python-expression");
 
 type RawOrCodeSnippetProps = { element: HTMLElement };
 export const RawOrCodeSnippet: React.FC<RawOrCodeSnippetProps> = ({
@@ -38,8 +39,10 @@ export const withCodeSnippetsRendered = (element: HTMLElement): HTMLElement => {
   }
 
   if (elementIsPythonCode(element)) {
+    const isExpression = elementIsCodeOfLanguage(element, "python-expression");
     let div = document.createElement("div");
-    div.className = "python-snippet";
+    div.className =
+      "python-snippet" + (isExpression ? " python-expression" : "");
     const codeText = element.innerText.trimEnd();
     const codeElts = highlightedPreEltsFromCode(codeText);
     codeElts.forEach((elt) => div.appendChild(elt));

@@ -377,6 +377,10 @@ $task-checkbox-not-done-colour: #999;
       margin: -0.25rem 2rem 1rem;
       border-radius: 4px;
 
+      &.python-expression {
+        width: min-content;
+      }
+
       pre {
         margin-bottom: 0px;
       }
