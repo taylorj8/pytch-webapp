@@ -178,19 +178,13 @@ Cypress.Commands.add("pytchSwitchProject", (name: string) => {
   cy.pytchOpenProject(name);
 });
 
-const createTutorialProject = (
-  tutorialMatch: string,
-  tutorialSlug: string,
-  buttonContent: string
-) => {
+const createTutorialProject = (tutorialSlug: string, buttonContent: string) => {
   cy.pytchResetDatabase();
   cy.contains("My projects").click();
   cy.contains("Tutorials").click();
-  cy.contains(tutorialMatch)
-    .parent()
-    .within(() => {
-      cy.contains(buttonContent).click();
-    });
+  cy.get(`.TutorialCard[data-slug="${tutorialSlug}"]`).within(() => {
+    cy.contains(buttonContent).click();
+  });
 
   // More/less as per pytchOpenProject() above, except don't let it get
   // fooled by the buttons on the tutorials page:
