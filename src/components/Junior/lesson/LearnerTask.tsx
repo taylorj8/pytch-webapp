@@ -10,7 +10,7 @@ import RawElement from "../../RawElement";
 import classNames from "classnames";
 import { assertNever } from "../../../utils";
 import { LearnerTaskCommit } from "./LearnerTaskCommit";
-import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
+import { RawOrCodeSnippet, withCodeSnippetsRendered } from "./RawOrCodeSnippet";
 import { useStoreActions } from "../../../store";
 import { useMappedLinkedJrTutorial } from "./hooks";
 
@@ -217,7 +217,7 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
     <Alert key={keyPath} variant={alertVariant} className={classes}>
       <div className="task-outline">
         <div className="task-intro-content">
-          <RawElement element={task.intro} />
+          <RawElement element={withCodeSnippetsRendered(task.intro)} />
         </div>
       </div>
       {helpContent}
