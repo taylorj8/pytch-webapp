@@ -49,15 +49,11 @@ declare global {
 
       /** Reset the "pytch" storage database, then create and navigate to
        * a project following a sample tutorial. */
-      pytchProjectFollowingTutorial(
-        tutorialMatch?: string,
-        tutorialSlug?: string
-      ): Chainable<Element>;
+      pytchProjectFollowingTutorial(tutorialSlug?: string): Chainable<Element>;
 
       /** Reset the "pytch" storage database, then create and navigate to
        * a project created as a demo of a sample tutorial. */
       pytchProjectDemonstratingTutorial(
-        tutorialMatch?: string,
         tutorialSlug?: string
       ): Chainable<Element>;
 
