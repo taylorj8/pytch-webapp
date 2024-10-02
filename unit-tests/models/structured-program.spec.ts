@@ -167,6 +167,27 @@ describe("Structured programs", () => {
       assert.equal(handler.pythonCode, "");
       assert.equal(handler.event.kind, "green-flag");
     });
+
+    it("event-descriptor fingerprint", async () => {
+      assert.equal(await DescrOps.fingerprint(greenFlag), "green-flag:-");
+      assert.equal(await DescrOps.fingerprint(clicked), "clicked:-");
+
+      // echo -n b | sha256sum
+      const keyHash =
+        "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d";
+      assert.equal(
+        await DescrOps.fingerprint(keyPressed),
+        `key-pressed:${keyHash}`
+      );
+
+      // echo -n hello-world | sha256sum
+      const msgHash =
+        "afa27b44d43b02a9fea41d13cedc2e4016cfcf87c5dbf990e593669aa8ce286d";
+      assert.equal(
+        await DescrOps.fingerprint(msgReceived),
+        `message-received:${msgHash}`
+      );
+    });
   });
 
   describe("actors", () => {
