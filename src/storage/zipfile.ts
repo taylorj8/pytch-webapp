@@ -182,7 +182,8 @@ export class StandaloneProjectDescriptorOps {
       desc.assets
     );
     const assetsFingerprint = await AddAssetDescriptorOps.fingerprintArray(
-      orderedAssets
+      orderedAssets,
+      PytchProgramOps.assetFingerprintsNeedSorting(desc.program)
     );
 
     return `${programFingerprint}\n${assetsFingerprint}\n`;
