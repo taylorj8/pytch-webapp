@@ -159,11 +159,16 @@ export class AddAssetDescriptorOps {
     return [nameHash, mimeTypeHash, contentHash, transformHash].join("/");
   }
 
-  static async fingerprintArray(assets: Array<AddAssetDescriptor>) {
+  static async fingerprintArray(
+    assets: Array<AddAssetDescriptor>,
+    doSort: boolean
+  ) {
     let fingerprints = await Promise.all(
       assets.map((a) => AddAssetDescriptorOps.fingerprint(a))
     );
-    fingerprints.sort();
+    if (doSort) {
+      fingerprints.sort();
+    }
     return `assets=${fingerprints.join(",")}`;
   }
 }
