@@ -188,6 +188,18 @@ describe("Structured programs", () => {
         `message-received:${msgHash}`
       );
     });
+
+    it("event-handler fingerprint", async () => {
+      let handler = HandlerOps.newWithEmptyCode(greenFlag);
+      handler.pythonCode = "self.change_x(10)\n";
+
+      // echo 'self.change_x(10)' | sha256sum
+      const expPrint =
+        "green-flag:-" +
+        ":9316589606996b706bfc78937013a3b7a666e9834d2d2cc0808d3d7fb55d64c3";
+
+      assert.equal(await HandlerOps.fingerprint(handler), expPrint);
+    });
   });
 
   describe("actors", () => {
