@@ -289,7 +289,8 @@ export class DexieStorage extends Dexie {
     );
 
     const assetsFingerprint = await AddAssetDescriptorOps.fingerprintArray(
-      addAssetDescriptors
+      addAssetDescriptors,
+      PytchProgramOps.assetFingerprintsNeedSorting(p.program)
     );
 
     const fullFingerprintContent = `${programFingerprint}\n${assetsFingerprint}\n`;
