@@ -17,6 +17,7 @@ import {
   Uuid,
   PendingCursorWarp,
 } from "../../src/model/junior/structured-program";
+import { hexSHA256 } from "../../src/utils";
 
 describe("Structured programs", () => {
   describe("uuids", () => {
@@ -286,6 +287,33 @@ describe("Structured programs", () => {
           "found more than once"
         );
       });
+    });
+
+    it("fingerprint", async () => {
+      let sprite = Ops.newEmptySprite("Banana");
+
+      let handler = EventHandlerOps.newWithEmptyCode({ kind: "green-flag" });
+      handler.pythonCode = "self.change_x(10)\n";
+      sprite.handlers.push(handler);
+
+      const eventDescr: EventDescriptor = { kind: "key-pressed", keyName: "f" };
+      handler = EventHandlerOps.newWithEmptyCode(eventDescr);
+      handler.pythonCode = "self.change_y(4)\n";
+      sprite.handlers.push(handler);
+
+      const expPrintInput =
+        "sprite:Banana[" +
+        "green-flag:-" +
+        // echo 'self.change_x(10)' | sha256sum
+        ":9316589606996b706bfc78937013a3b7a666e9834d2d2cc0808d3d7fb55d64c3" +
+        ",key-pressed" +
+        // echo -n f | sha256sum
+        ":252f10c83610ebca1a059c0bae8255eba2f95be4d1d7bcfa89d7248a82d9f111" +
+        // echo 'self.change_y(4)' | sha256sum
+        ":19af915ddded349af3583511014954fbb4adea5f09788a9c82ce94afa3a876b8]";
+
+      const expPrint = await hexSHA256(expPrintInput);
+      assert.equal(await ActorOps.fingerprint(sprite), expPrint);
     });
   });
 
