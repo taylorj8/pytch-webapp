@@ -116,4 +116,15 @@ export class EventHandlerOps {
     const id = UuidOps.newRandom();
     return { id, ...noIdEventHandler };
   }
+
+  /** Return a fingerprint of the given `handler`, consisting of its
+   * event-descriptor fingerprint and a hash of the Python code,
+   * separated by `:`. */
+  static async fingerprint(handler: EventHandler): Promise<string> {
+    const eventFingerprint = await EventDescriptorOps.fingerprint(
+      handler.event
+    );
+    const codeHash = await hexSHA256(handler.pythonCode);
+    return `${eventFingerprint}:${codeHash}`;
+  }
 }
