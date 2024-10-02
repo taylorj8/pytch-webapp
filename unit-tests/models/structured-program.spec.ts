@@ -476,6 +476,30 @@ describe("Structured programs", () => {
         Ops.uniqueHandlerByIdGlobally(program, handler.id);
       }, "multiple handlers with id");
     });
+
+    it("fingerprint", async () => {
+      let program = threeSpriteProgram();
+
+      const handler0 = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
+      program.actors[2].handlers.push(handler0);
+      const h0 = await EventHandlerOps.fingerprint(handler0);
+
+      let handler1 = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
+      handler1.pythonCode = "self.switch_costume(3)";
+      program.actors[3].handlers.push(handler1);
+      const h1 = await EventHandlerOps.fingerprint(handler1);
+
+      const expPrintInput = [
+        await hexSHA256("stage:Stage[]"),
+        await hexSHA256("sprite:Sprite1[]"),
+        await hexSHA256(`sprite:Sprite2[${h0}]`),
+        await hexSHA256(`sprite:Sprite4[${h1}]`),
+      ].join(",");
+      const expPrint = await hexSHA256(expPrintInput);
+
+      let gotPrint = await StructuredProgramOps.fingerprint(program);
+      assert.equal(gotPrint, expPrint);
+    });
   });
 
   describe("source map", () => {
