@@ -1,7 +1,7 @@
 import { Actor, ActorOps, ActorSummary } from "./actor";
 import { Uuid } from "./core-types";
 import { EventDescriptor, EventHandler, EventHandlerOps } from "./event";
-import { assertNever } from "../../../utils";
+import { assertNever, hexSHA256 } from "../../../utils";
 import { IEmbodyContext, NoIdsStructuredProject } from "./skeleton";
 
 export type StructuredProgram = {
@@ -102,6 +102,17 @@ export class StructuredProgramOps {
       ActorOps.fromSkeleton(actor, embodyContext)
     );
     return { actors };
+  }
+
+  /** Return a fingerprint of the given `program`, of the form
+   *
+   * _stage-fingerprint_`,`_sprite-1-fingerprint_`,`_sprite-2-fingerprint_`,`_etc_
+   */
+  static async fingerprint(program: StructuredProgram): Promise<string> {
+    const fingerprintPromises = program.actors.map(ActorOps.fingerprint);
+    const actorFingerprints = await Promise.all(fingerprintPromises);
+    const hashInput = actorFingerprints.join(",");
+    return await hexSHA256(hashInput);
   }
 
   /** Return the unique `Actor` with the given `actorId` in the given
