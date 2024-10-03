@@ -58,10 +58,6 @@ the specimen project at, for this example, the URL
 
    https://pytch.org/lesson-specimens/course-1/week-1.zip
 
-This might, on the server side, be implemented with ``week-1.zip``
-being a symbolic link to a file whose name is based on the content
-hash of the project; see below.
-
 The lesson content is kept outside the main app deployment to allow
 independent development and updates.  For local development, yet
 another local HTTP server is required.
@@ -91,6 +87,17 @@ zip in response to a URL like
 as well as via whatever path such as
 ``lesson-specimens/course-1/week-1.zip`` the content was originally
 loaded from.
+
+On the server side, this is currently implemented by making the
+‘files’ under ``_by_content_hash_`` be symbolic links to the original
+files, e.g.,
+
+.. code-block:: text
+
+   _by_content_hash_
+   ├── 0f33⋯bb63.zip ⇒ ../course-1/week-5.zip
+   ├── 2065⋯4a9a.zip ⇒ ../course-1/week-2.zip
+   etc
 
 Currently the linked content is just the project, but in future we
 might combine this with metadata, such as suggested tasks or
