@@ -8,9 +8,18 @@ in some way, or answer some questions about how it works.
 A Pytch project, as stored in the user's project list, therefore has
 *linked content*, which can be of various kinds.  There is a
 ``"none"`` kind to represent the case where there is no linked
-content.  Currently the only other kind of linked content is
-``"specimen"``, although it's possible that tutorial content will be
-folded into this model in the future.
+content.  Other kinds of linked content are:
+
+``"specimen"``
+  The project is linked to a specimen project, usually as part of a
+  lesson which directs the student to make some changes to the project
+  or investigate it in some way.
+
+``"jr-tutorial"``
+  The project is following a script-by-script tutorial.
+
+It's possible that "flat" tutorial content will be folded into this
+model in the future.
 
 
 Linked specimen
