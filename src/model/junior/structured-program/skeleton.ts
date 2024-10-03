@@ -18,6 +18,8 @@ export type NoIdActor = {
   assets: Array<AssetDescriptor>;
 };
 
+// Name includes "project" not "program" because each actor includes its
+// assets (as well as its handlers).
 export type NoIdsStructuredProject = {
   actors: Array<NoIdActor>;
 };
