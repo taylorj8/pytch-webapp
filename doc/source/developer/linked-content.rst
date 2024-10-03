@@ -73,6 +73,12 @@ and has a drop-down for various actions relating to the specimen.  The
 linked content is loaded (asynchronously) as part of fetching the
 project from the IndexedDB store.
 
+.. note::
+   The script-by-script IDE shows a brief summary panel for
+   ``"specimen"`` linked content.  For linked ``"jr-tutorial"``
+   content, the IDE has a *lesson* tab in the activity bar at the
+   left.
+
 Specimen linked content
 ~~~~~~~~~~~~~~~~~~~~~~~
 
