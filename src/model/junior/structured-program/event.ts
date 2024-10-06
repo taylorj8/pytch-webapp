@@ -95,6 +95,11 @@ export class EventDescriptorOps {
 
     return `${event.kind}:${suffix}`;
   }
+
+  /** Return a deep clone of the given `event`. */
+  static clone(event: EventDescriptor): EventDescriptor {
+    return Object.assign({}, event);
+  }
 }
 
 export type EventHandler = {
