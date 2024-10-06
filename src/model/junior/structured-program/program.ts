@@ -56,6 +56,8 @@ type HandlerLocator = {
   handlerId: Uuid;
 };
 
+export type HandlerDuplicationDescriptor = HandlerLocator;
+
 export type HandlerDeletionDescriptor = HandlerLocator;
 
 export type HandlersReorderingDescriptor = {
