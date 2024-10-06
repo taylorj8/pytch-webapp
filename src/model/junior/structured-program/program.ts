@@ -51,6 +51,11 @@ export type HandlerUpsertionDescriptor = HandlerUpsertionOperation & {
   eventDescriptor: EventDescriptor;
 };
 
+type HandlerLocator = {
+  actorId: Uuid;
+  handlerId: Uuid;
+};
+
 export type HandlerDeletionDescriptor = {
   actorId: Uuid;
   handlerId: Uuid;
