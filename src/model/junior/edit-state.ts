@@ -11,8 +11,8 @@ import { UpsertHatBlockFlow, upsertHatBlockFlow } from "./upsert-hat-block";
 import { LinkedContentKind } from "../linked-content";
 import { DeleteSpriteFlow, deleteSpriteFlow } from "./user-flows/delete-sprite";
 import {
-  deleteHandlerFlow,
   DeleteHandlerFlow,
+  deleteHandlerFlow,
 } from "./user-flows/delete-handler";
 
 export type ActorPropertiesTabKey = "code" | "appearances" | "sounds";
