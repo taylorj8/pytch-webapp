@@ -394,6 +394,20 @@ export class StructuredProgramOps {
     }
   }
 
+  /** Mutate the given `program` in-place by duplicating the handler
+   * with the given `handlerId` within the actor having the given
+   * `actorId`. The new handler is inserted after the "source" handler.
+   * Return the `id` of the newly-created handler.  Throw an error if
+   * the specified actor or the specified handler cannot be found.
+   */
+  static duplicateHandler(
+    program: StructuredProgram,
+    { actorId, handlerId }: HandlerDuplicationDescriptor
+  ): Uuid {
+    let actor = StructuredProgramOps.uniqueActorById(program, actorId);
+    return ActorOps.duplicateHandlerById(actor, handlerId);
+  }
+
   /** Mutate the given `program` in-place by deleting the handler with
    * the given `handlerId` from the actor with the given `actorId`.
    * Throw an error if there is not exactly one such actor, or if there
