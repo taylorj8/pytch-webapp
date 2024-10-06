@@ -56,10 +56,7 @@ type HandlerLocator = {
   handlerId: Uuid;
 };
 
-export type HandlerDeletionDescriptor = {
-  actorId: Uuid;
-  handlerId: Uuid;
-};
+export type HandlerDeletionDescriptor = HandlerLocator;
 
 export type HandlersReorderingDescriptor = {
   actorId: Uuid;
