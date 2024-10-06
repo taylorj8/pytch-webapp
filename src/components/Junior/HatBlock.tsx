@@ -175,6 +175,8 @@ export const HatBlock: React.FC<HatBlockProps> = ({
     });
   };
 
+  const duplicateHandlerAction = useStoreActions(a=>a.activeProject.duplicateHandler);
+  const onDuplicate = () => duplicateHandlerAction({actorId, handlerId});
   const runDeleteFlow = useJrEditActions((a) => a.deleteHandlerFlow.run);
   const onDelete = () => runDeleteFlow({ actorId, handlerId });
 
@@ -198,6 +200,9 @@ export const HatBlock: React.FC<HatBlockProps> = ({
         >
           <Dropdown.Item onClick={onChangeHatBlock}>
             Change hat block
+          </Dropdown.Item>
+          <Dropdown.Item onClick={onDuplicate}>
+            Duplicate script
           </Dropdown.Item>
           <Dropdown.Divider />
           <Dropdown.Item className="danger" onClick={onDelete}>
