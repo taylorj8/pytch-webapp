@@ -355,6 +355,7 @@ export interface IActiveProject {
   _upsertHandler: Action<IActiveProject, HandlerUpsertionAugArgs>;
   upsertHandler: Thunk<IActiveProject, HandlerUpsertionDescriptor>;
   _duplicateHandler: Action<IActiveProject, HandlerDuplicationAugArgs>;
+  duplicateHandler: Thunk<IActiveProject, HandlerDuplicationDescriptor>;
   _setHandlerPythonCode: Action<IActiveProject, PythonCodeUpdateDescriptor>;
   setHandlerPythonCode: Thunk<IActiveProject, PythonCodeUpdateDescriptor>;
   _deleteHandler: Action<IActiveProject, HandlerDeletionDescriptor>;
@@ -614,6 +615,21 @@ export const activeProject: IActiveProject = {
       descriptor
     );
     duplicationAugArgs.handleHandlerId(handlerId);
+  }),
+
+  duplicateHandler: thunk((actions, descriptor) => {
+    let idCell = valueCell<Uuid>("");
+    actions._duplicateHandler({ descriptor, handleHandlerId: idCell.set });
+    const handlerId = idCell.get();
+
+    actions.noteCodeChange();
+    actions.pulseNotableChange({
+      kind: "script-upserted",
+      upsertKind: "insert",
+      handlerId: handlerId,
+    });
+
+    pendingCursorWarp.set({ handlerId, lineNo: 1, colNo: 0 });
   }),
 
   _setHandlerPythonCode: action((state, updateDescriptor) => {
