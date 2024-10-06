@@ -73,6 +73,7 @@ import {
   SpriteUpsertionArgs,
   StructuredProgram,
   StructuredProgramOps,
+  HandlerDuplicationDescriptor,
 } from "./junior/structured-program/program";
 import { AssetOperationContext } from "./asset";
 import { AssetMetaDataOps } from "./junior/structured-program";
@@ -222,6 +223,11 @@ type SpriteDeletionAugArgs = {
 
 type HandlerUpsertionAugArgs = {
   descriptor: HandlerUpsertionDescriptor;
+  handleHandlerId(uuid: Uuid): void;
+};
+
+type HandlerDuplicationAugArgs = {
+  descriptor: HandlerDuplicationDescriptor;
   handleHandlerId(uuid: Uuid): void;
 };
 
