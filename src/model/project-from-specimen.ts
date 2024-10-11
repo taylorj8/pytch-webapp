@@ -75,92 +75,67 @@ export let projectFromSpecimenFlow: ProjectFromSpecimenFlow = {
         kind: "specimen",
         specimenContentHash: lesson.specimenContentHash,
       });
-      const nExisting = existingProjects.length;
+
+      const augExistingProjects = await Promise.all(
+        existingProjects.map(async (projectSummary) => ({
+          projectSummary,
+          isIdenticalToSpecimen:
+            (await projectContentHash(projectSummary.id)) ===
+            lesson.specimenContentHash,
+        }))
+      );
+
+      const existingIdentical = augExistingProjects.filter(
+        (p) => p.isIdenticalToSpecimen
+      );
+      const nExistingIdentical = existingIdentical.length;
+
+      const existingChanged = augExistingProjects.filter(
+        (p) => !p.isIdenticalToSpecimen
+      );
+      const nExistingChanged = existingChanged.length;
 
       // The following case analysis is to try to be helpful to the user.
 
-      switch (nExisting) {
-        case 0: {
-          // No user projects linked to this specimen.
-
-          // Create one with no further user interaction.
+      if (nExistingChanged === 0) {
+        // The user does not have any projects which are linked to this specimen
+        // and which are not identical to the specimen.  Go directly to a
+        // project identical to the specimen.
+        if (nExistingIdentical === 0) {
           await actions.createFromSpecimen(lesson);
-          break;
+          return;
+        } else {
+          const mostRecentExistingId = existingIdentical[0].projectSummary.id;
+          actions.redirectToProject(mostRecentExistingId);
+          return;
         }
-        case 1: {
-          // Exactly one existing project linked to this specimen.
+      } else {
+        // User has at least one project linked to this specimen and changed
+        // from the specimen.  Offer a choice between starting afresh and
+        // opening an existing changed project.
 
-          // If it is identical in content to the specimen, open it with
-          // no further user interaction.
-          const soleExistingProject = existingProjects[0];
-          const soleExistingProjectId = soleExistingProject.id;
-          const projectHash = await projectContentHash(soleExistingProjectId);
-          if (projectHash === lesson.specimenContentHash) {
-            actions.redirectToProject(soleExistingProjectId);
-            break;
-          }
+        // "Starting afresh" can mean creating a new project or opening
+        // an existing identical one.
+        const startAfreshOption: StartAfreshOption =
+          nExistingIdentical === 0
+            ? { kind: "create", lesson }
+            : {
+                kind: "open-existing-identical",
+                projectId: existingIdentical[0].projectSummary.id,
+              };
 
-          // Otherwise, offer options: to genuinely create new project;
-          // to open the sole existing project.
-          actions.setState({
-            state: "awaiting-user-choice",
-            projectName: lesson.project.name,
-            startAfreshOption: { kind: "create", lesson },
-            existingProjectOptions: [soleExistingProject],
-          });
-          break;
-        }
-        default: {
-          // Augment the array of existing projects with a flag saying
-          // whether each is identical to the specimen.
-          const augExistingProjects = await Promise.all(
-            existingProjects.map(async (projectSummary) => ({
-              projectSummary,
-              isIdenticalToSpecimen:
-                (await projectContentHash(projectSummary.id)) ===
-                lesson.specimenContentHash,
-            }))
-          );
+        const existingProjectOptions = existingChanged.map(
+          (p) => p.projectSummary
+        );
 
-          const existingIdentical = augExistingProjects.filter(
-            (p) => p.isIdenticalToSpecimen
-          );
+        actions.setState({
+          state: "awaiting-user-choice",
+          projectName: lesson.project.name,
+          startAfreshOption,
+          existingProjectOptions,
+        });
 
-          const changedProjectSummaries = augExistingProjects
-            .filter((augProject) => !augProject.isIdenticalToSpecimen)
-            .map((augProject) => augProject.projectSummary);
-
-          // If no existing project is identical to the specimen, offer
-          // options: to genuinely create new project; to open an
-          // existing project.
-          if (existingIdentical.length === 0) {
-            actions.setState({
-              state: "awaiting-user-choice",
-              projectName: lesson.project.name,
-              startAfreshOption: { kind: "create", lesson },
-              existingProjectOptions: changedProjectSummaries,
-            });
-            break;
-          }
-
-          // Otherwise (i.e., at least one existing project is identical
-          // to the specimen), offer options: to open the most recent
-          // identical project (which will be presented as a pseudo
-          // "start afresh with this lesson" option); to open an
-          // existing non-identical project.
-
-          // The most recently-modified unchanged project will be first,
-          // since the DB sorts descending by mtime.
-          const projectId = existingIdentical[0].projectSummary.id;
-
-          actions.setState({
-            state: "awaiting-user-choice",
-            projectName: lesson.project.name,
-            startAfreshOption: { kind: "open-existing-identical", projectId },
-            existingProjectOptions: changedProjectSummaries,
-          });
-          break;
-        }
+        return;
       }
     } catch (e) {
       console.error("projectFromSpecimenFlow.boot():", e);
