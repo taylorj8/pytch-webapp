@@ -229,6 +229,17 @@ context("Create project from specimen", () => {
             cy.title().should("eq", "Pytch: Hello World Specimen");
             cy.get("[data-project-id]").then(shouldEqualIds([secondId]));
 
+            // From the lesson URL, choose the "carry on" option and
+            // edit its contents back to the original.
+            cy.visit(lessonUrl);
+            cy.get("li.open-existing").click();
+            cy.title().should("eq", "Pytch: Hello World Specimen");
+            cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
+            cy.pytchSetCodeRaw('import pytch\n\nprint("Hello world!")');
+            // Make sure the app knows we've made a change:
+            cy.get("#pytch-ace-editor").type("X{backspace}");
+            saveProject();
+
             // After all that, "My projects" should contain three
             // specimen-linked projects, plus the test seed one:
             cy.pytchHomeFromIDE();
@@ -239,6 +250,12 @@ context("Create project from specimen", () => {
               "Hello World Specimen",
               "Test seed project",
             ]);
+
+            // Now we should get the most-recently-edited identical project when
+            // we visit the lesson URL.
+            cy.visit(lessonUrl);
+            cy.title().should("eq", "Pytch: Hello World Specimen");
+            cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
           });
       });
   });
