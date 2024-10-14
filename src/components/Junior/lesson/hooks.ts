@@ -40,6 +40,9 @@ export function useMappedLinkedJrTutorial<Result>(
   }, eqResult);
 }
 
+export const useLinkedSpecimen = (): LinkedSpecimen =>
+  useMappedLinkedSpecimen((specimen) => specimen);
+
 export function useMappedLinkedSpecimen<Result>(
   mapContent: (specimen: LinkedSpecimen) => Result,
   eqResult?: (prev: Result, next: Result) => boolean
