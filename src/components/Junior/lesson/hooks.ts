@@ -12,17 +12,8 @@ const useHasLinkedContentOfKind = (tgtKind: LinkedContentKind): boolean =>
     );
   });
 
-export const useHasLinkedLesson = (): boolean =>
-  useStoreState((state) => {
-    const loadState = state.activeProject.linkedContentLoadingState;
-
-    return (
-      (loadState.kind === "succeeded" &&
-        loadState.content.kind === "jr-tutorial") ||
-      (loadState.kind === "pending" &&
-        loadState.contentRef.kind === "jr-tutorial")
-    );
-  });
+export const useHasLinkedLesson = () =>
+  useHasLinkedContentOfKind("jr-tutorial");
 
 export const useLinkedJrTutorial = (): LinkedJrTutorial =>
   useMappedLinkedJrTutorial((tutorial) => tutorial);
