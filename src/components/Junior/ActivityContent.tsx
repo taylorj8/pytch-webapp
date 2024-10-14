@@ -70,6 +70,7 @@ export const ActivityContent: React.FC<EmptyProps> = () => {
           </>
         );
       case "lesson":
+      case "specimen":
         return <MaybeLessonContent />;
       default:
         return assertNever(s.tab);
