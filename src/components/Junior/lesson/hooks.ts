@@ -20,9 +20,6 @@ export const useHasLinkedLesson = () =>
 
 export const useHasLinkedSpecimen = () => useHasLinkedContentOfKind("specimen");
 
-export const useLinkedJrTutorial = (): LinkedJrTutorial =>
-  useMappedLinkedJrTutorial((tutorial) => tutorial);
-
 export function useMappedLinkedJrTutorial<Result>(
   mapContent: (tutorial: LinkedJrTutorial) => Result,
   eqResult?: (prev: Result, next: Result) => boolean
@@ -40,8 +37,8 @@ export function useMappedLinkedJrTutorial<Result>(
   }, eqResult);
 }
 
-export const useLinkedSpecimen = (): LinkedSpecimen =>
-  useMappedLinkedSpecimen((specimen) => specimen);
+export const useLinkedJrTutorial = (): LinkedJrTutorial =>
+  useMappedLinkedJrTutorial((tutorial) => tutorial);
 
 export function useMappedLinkedSpecimen<Result>(
   mapContent: (specimen: LinkedSpecimen) => Result,
@@ -59,3 +56,6 @@ export function useMappedLinkedSpecimen<Result>(
     return mapContent(contentState.content);
   }, eqResult);
 }
+
+export const useLinkedSpecimen = (): LinkedSpecimen =>
+  useMappedLinkedSpecimen((specimen) => specimen);
