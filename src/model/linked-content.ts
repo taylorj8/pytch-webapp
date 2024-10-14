@@ -25,7 +25,7 @@ type LinkedNoContent = { kind: "none" };
 
 const kLinkedNoContent: LinkedNoContent = { kind: "none" };
 
-type LinkedSpecimen = { kind: "specimen"; lesson: LessonDescriptor };
+export type LinkedSpecimen = { kind: "specimen"; lesson: LessonDescriptor };
 
 export type LinkedContent = LinkedNoContent | LinkedJrTutorial | LinkedSpecimen;
 
