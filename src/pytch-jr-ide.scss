@@ -58,6 +58,15 @@
     );
   }
 
+  &.activity-content-expanded-specimen {
+    @include grid-hstack-four(
+      $activity-bar-width,
+      $help-sidebar-content-width,
+      minmax($min-actor-properties-width, 1fr),
+      auto
+    );
+  }
+
   &.activity-content-expanded-helpsidebar {
     @include grid-hstack-four(
       $activity-bar-width,
