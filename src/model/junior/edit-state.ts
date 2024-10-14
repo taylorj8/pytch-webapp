@@ -202,10 +202,7 @@ export const editState: EditState = {
         actions.expandActivityContent("lesson");
         break;
       case "specimen":
-        // Should not happen.
-        console.log(
-          `unexpected linkedContentKind "specimen" in per-method program`
-        );
+        actions.expandActivityContent("specimen");
         break;
       default:
         assertNever(linkedContentKind);
