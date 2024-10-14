@@ -20,7 +20,7 @@ export type InfoPanelTabKey = "output" | "errors";
 
 export type InfoPanelState = "collapsed" | "expanded";
 
-export type ActivityBarTabKey = "helpsidebar" | "lesson";
+export type ActivityBarTabKey = "helpsidebar" | "lesson" | "specimen";
 export type ActivityContentState =
   | { kind: "collapsed" }
   | { kind: "expanded"; tab: ActivityBarTabKey };
