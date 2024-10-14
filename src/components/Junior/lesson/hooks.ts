@@ -15,6 +15,8 @@ const useHasLinkedContentOfKind = (tgtKind: LinkedContentKind): boolean =>
 export const useHasLinkedLesson = () =>
   useHasLinkedContentOfKind("jr-tutorial");
 
+export const useHasLinkedSpecimen = () => useHasLinkedContentOfKind("specimen");
+
 export const useLinkedJrTutorial = (): LinkedJrTutorial =>
   useMappedLinkedJrTutorial((tutorial) => tutorial);
 
