@@ -115,6 +115,20 @@ export class StructuredProgramOps {
     return await hexSHA256(hashInput);
   }
 
+  /** Return a map from each actor's `id` to the index of that actor in
+   * the given `program`. */
+  static actorIndexFromIdLut(program: StructuredProgram): Map<Uuid, number> {
+    let indexFromId = new Map<Uuid, number>();
+    let actorIndex = 0;
+    for (const actor of program.actors) {
+      if (indexFromId.has(actor.id))
+        throw new Error(`multiple actors with id ${actor.id}`);
+      indexFromId.set(actor.id, actorIndex);
+      ++actorIndex;
+    }
+    return indexFromId;
+  }
+
   /** Return the unique `Actor` with the given `actorId` in the given
    * `program`.  Throw an error if there is not exactly one such
    * `Actor`.  */
