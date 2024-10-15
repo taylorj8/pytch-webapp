@@ -19,6 +19,7 @@ import {
 } from "../../src/model/junior/structured-program";
 import {
   threeSpriteProgramNames,
+  threeSpriteProgram,
 } from "./fixtures";
 import { hexSHA256 } from "../../src/utils";
 
@@ -333,12 +334,6 @@ describe("Structured programs", () => {
 
   describe("programs", () => {
     const Ops = StructuredProgramOps;
-
-    const threeSpriteProgram = () => {
-      let program = Ops.newEmpty();
-      threeSpriteProgramNames.forEach((name) => Ops.addSprite(program, name));
-      return program;
-    };
 
     it("create an empty program", () => {
       const program = Ops.newEmpty();
