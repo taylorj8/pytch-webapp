@@ -44,7 +44,7 @@ export class AssetMetaDataOps {
 
   /** Split the given `fullPathname` into the "directory" part, which
    * holds the `actorId`, and the "filename" part, which holds the
-   * `basename` . */
+   * `basename`. */
   static pathComponents(fullPathname: string): AssetPathComponents {
     const maybeMatch = dirnameBasenameRegExp.exec(fullPathname);
     if (maybeMatch == null) {
@@ -82,8 +82,7 @@ export class AssetMetaDataOps {
   /** Return the common `actorId` (i.e., "directory") component of the
    * two given full pathnames `fullPathname_0` and `fullPathname_1`.  If
    * those two pathnames do not have equal `actorId` components, throw
-   * an error.
-   * */
+   * an error. */
   static commonActorIdComponent(
     fullPathname_0: string,
     fullPathname_1: string

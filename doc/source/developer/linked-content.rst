@@ -8,9 +8,18 @@ in some way, or answer some questions about how it works.
 A Pytch project, as stored in the user's project list, therefore has
 *linked content*, which can be of various kinds.  There is a
 ``"none"`` kind to represent the case where there is no linked
-content.  Currently the only other kind of linked content is
-``"specimen"``, although it's possible that tutorial content will be
-folded into this model in the future.
+content.  Other kinds of linked content are:
+
+``"specimen"``
+  The project is linked to a specimen project, usually as part of a
+  lesson which directs the student to make some changes to the project
+  or investigate it in some way.
+
+``"jr-tutorial"``
+  The project is following a script-by-script tutorial.
+
+It's possible that "flat" tutorial content will be folded into this
+model in the future.
 
 
 Linked specimen
@@ -49,10 +58,6 @@ the specimen project at, for this example, the URL
 
    https://pytch.org/lesson-specimens/course-1/week-1.zip
 
-This might, on the server side, be implemented with ``week-1.zip``
-being a symbolic link to a file whose name is based on the content
-hash of the project; see below.
-
 The lesson content is kept outside the main app deployment to allow
 independent development and updates.  For local development, yet
 another local HTTP server is required.
@@ -68,6 +73,12 @@ and has a drop-down for various actions relating to the specimen.  The
 linked content is loaded (asynchronously) as part of fetching the
 project from the IndexedDB store.
 
+.. note::
+   The script-by-script IDE shows a brief summary panel for
+   ``"specimen"`` linked content.  For linked ``"jr-tutorial"``
+   content, the IDE has a *lesson* tab in the activity bar at the
+   left.
+
 Specimen linked content
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -82,6 +93,17 @@ zip in response to a URL like
 as well as via whatever path such as
 ``lesson-specimens/course-1/week-1.zip`` the content was originally
 loaded from.
+
+On the server side, this is currently implemented by making the
+‘files’ under ``_by_content_hash_`` be symbolic links to the original
+files, e.g.,
+
+.. code-block:: text
+
+   _by_content_hash_
+   ├── 0f33⋯bb63.zip ⇒ ../course-1/week-5.zip
+   ├── 2065⋯4a9a.zip ⇒ ../course-1/week-2.zip
+   etc
 
 Currently the linked content is just the project, but in future we
 might combine this with metadata, such as suggested tasks or
