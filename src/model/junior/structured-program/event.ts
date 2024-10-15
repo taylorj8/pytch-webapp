@@ -1,4 +1,4 @@
-import { assertNever } from "../../../utils";
+import { assertNever, hexSHA256 } from "../../../utils";
 import { Uuid, UuidOps } from "./core-types";
 import { NoIdEventHandler } from "./skeleton";
 
@@ -72,6 +72,29 @@ export class EventDescriptorOps {
         return assertNever(event);
     }
   }
+
+  /** Return a fingerprint of the given `event` descriptor, consisting
+   * of the event kind and a kind-specific suffic separated by `:`.
+   * This suffix is `-` for nullary event-kinds, and the SHA256 of the
+   * event-kind argument (key-name or message) for unary event-kinds. */
+  static async fingerprint(event: EventDescriptor): Promise<string> {
+    const suffix = await (async () => {
+      switch (event.kind) {
+        case "green-flag":
+        case "clicked":
+        case "start-as-clone":
+          return "-";
+        case "key-pressed":
+          return await hexSHA256(event.keyName);
+        case "message-received":
+          return await hexSHA256(event.message);
+        default:
+          return assertNever(event);
+      }
+    })();
+
+    return `${event.kind}:${suffix}`;
+  }
 }
 
 export type EventHandler = {
@@ -92,5 +115,16 @@ export class EventHandlerOps {
   static fromSkeleton(noIdEventHandler: NoIdEventHandler): EventHandler {
     const id = UuidOps.newRandom();
     return { id, ...noIdEventHandler };
+  }
+
+  /** Return a fingerprint of the given `handler`, consisting of its
+   * event-descriptor fingerprint and a hash of the Python code,
+   * separated by `:`. */
+  static async fingerprint(handler: EventHandler): Promise<string> {
+    const eventFingerprint = await EventDescriptorOps.fingerprint(
+      handler.event
+    );
+    const codeHash = await hexSHA256(handler.pythonCode);
+    return `${eventFingerprint}:${codeHash}`;
   }
 }

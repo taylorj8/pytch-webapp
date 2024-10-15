@@ -103,10 +103,10 @@ export class PytchProgramOps {
         const contentHash = await hexSHA256(program.text);
         return `program=flat/${contentHash}`;
       }
-      case "per-method":
-        throw new Error(
-          'fingerprint() for "per-method" programs not yet implemented'
-        );
+      case "per-method": {
+        const suffix = await StructuredProgramOps.fingerprint(program.program);
+        return `program=per-method/${suffix}`;
+      }
       default:
         return assertNever(program);
     }

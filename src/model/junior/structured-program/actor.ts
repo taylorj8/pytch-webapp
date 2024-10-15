@@ -1,6 +1,6 @@
 import { Uuid, UuidOps } from "./core-types";
 import { EventHandler, EventHandlerOps } from "./event";
-import { assertNever } from "../../../utils";
+import { assertNever, hexSHA256 } from "../../../utils";
 import { IEmbodyContext, NoIdActor } from "./skeleton";
 
 export type ActorKind = "sprite" | "stage";
@@ -97,6 +97,19 @@ export class ActorOps {
       embodyContext.registerActorAsset(id, asset.fileBasename);
     });
     return { id, kind, name, handlers };
+  }
+
+  /** Return a fingerprint of the given `actor`, of the form
+   *
+   * _kind_`:`_name_`:[`_handler-1-fingerprint_`,`_handler-2-fingerprint_`,`_etc_`]`
+   */
+  static async fingerprint(actor: Actor): Promise<string> {
+    const kindAndName = `${actor.kind}:${actor.name}`;
+    const fingerprintPromises = actor.handlers.map(EventHandlerOps.fingerprint);
+    const handlerFingerprints = await Promise.all(fingerprintPromises);
+    const handlersTogether = handlerFingerprints.join(",");
+    const hashInput = `${kindAndName}[${handlersTogether}]`;
+    return await hexSHA256(hashInput);
   }
 
   /** Return the index into the `handlers` of the given `actor` of the

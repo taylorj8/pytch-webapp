@@ -17,6 +17,7 @@ import {
   Uuid,
   PendingCursorWarp,
 } from "../../src/model/junior/structured-program";
+import { hexSHA256 } from "../../src/utils";
 
 describe("Structured programs", () => {
   describe("uuids", () => {
@@ -167,6 +168,39 @@ describe("Structured programs", () => {
       assert.equal(handler.pythonCode, "");
       assert.equal(handler.event.kind, "green-flag");
     });
+
+    it("event-descriptor fingerprint", async () => {
+      assert.equal(await DescrOps.fingerprint(greenFlag), "green-flag:-");
+      assert.equal(await DescrOps.fingerprint(clicked), "clicked:-");
+
+      // echo -n b | sha256sum
+      const keyHash =
+        "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d";
+      assert.equal(
+        await DescrOps.fingerprint(keyPressed),
+        `key-pressed:${keyHash}`
+      );
+
+      // echo -n hello-world | sha256sum
+      const msgHash =
+        "afa27b44d43b02a9fea41d13cedc2e4016cfcf87c5dbf990e593669aa8ce286d";
+      assert.equal(
+        await DescrOps.fingerprint(msgReceived),
+        `message-received:${msgHash}`
+      );
+    });
+
+    it("event-handler fingerprint", async () => {
+      let handler = HandlerOps.newWithEmptyCode(greenFlag);
+      handler.pythonCode = "self.change_x(10)\n";
+
+      // echo 'self.change_x(10)' | sha256sum
+      const expPrint =
+        "green-flag:-" +
+        ":9316589606996b706bfc78937013a3b7a666e9834d2d2cc0808d3d7fb55d64c3";
+
+      assert.equal(await HandlerOps.fingerprint(handler), expPrint);
+    });
   });
 
   describe("actors", () => {
@@ -253,6 +287,33 @@ describe("Structured programs", () => {
           "found more than once"
         );
       });
+    });
+
+    it("fingerprint", async () => {
+      let sprite = Ops.newEmptySprite("Banana");
+
+      let handler = EventHandlerOps.newWithEmptyCode({ kind: "green-flag" });
+      handler.pythonCode = "self.change_x(10)\n";
+      sprite.handlers.push(handler);
+
+      const eventDescr: EventDescriptor = { kind: "key-pressed", keyName: "f" };
+      handler = EventHandlerOps.newWithEmptyCode(eventDescr);
+      handler.pythonCode = "self.change_y(4)\n";
+      sprite.handlers.push(handler);
+
+      const expPrintInput =
+        "sprite:Banana[" +
+        "green-flag:-" +
+        // echo 'self.change_x(10)' | sha256sum
+        ":9316589606996b706bfc78937013a3b7a666e9834d2d2cc0808d3d7fb55d64c3" +
+        ",key-pressed" +
+        // echo -n f | sha256sum
+        ":252f10c83610ebca1a059c0bae8255eba2f95be4d1d7bcfa89d7248a82d9f111" +
+        // echo 'self.change_y(4)' | sha256sum
+        ":19af915ddded349af3583511014954fbb4adea5f09788a9c82ce94afa3a876b8]";
+
+      const expPrint = await hexSHA256(expPrintInput);
+      assert.equal(await ActorOps.fingerprint(sprite), expPrint);
     });
   });
 
@@ -414,6 +475,30 @@ describe("Structured programs", () => {
       assert.throws(() => {
         Ops.uniqueHandlerByIdGlobally(program, handler.id);
       }, "multiple handlers with id");
+    });
+
+    it("fingerprint", async () => {
+      let program = threeSpriteProgram();
+
+      const handler0 = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
+      program.actors[2].handlers.push(handler0);
+      const h0 = await EventHandlerOps.fingerprint(handler0);
+
+      let handler1 = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
+      handler1.pythonCode = "self.switch_costume(3)";
+      program.actors[3].handlers.push(handler1);
+      const h1 = await EventHandlerOps.fingerprint(handler1);
+
+      const expPrintInput = [
+        await hexSHA256("stage:Stage[]"),
+        await hexSHA256("sprite:Sprite1[]"),
+        await hexSHA256(`sprite:Sprite2[${h0}]`),
+        await hexSHA256(`sprite:Sprite4[${h1}]`),
+      ].join(",");
+      const expPrint = await hexSHA256(expPrintInput);
+
+      let gotPrint = await StructuredProgramOps.fingerprint(program);
+      assert.equal(gotPrint, expPrint);
     });
   });
 
