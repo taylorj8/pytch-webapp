@@ -389,8 +389,14 @@ export const zipfileDataFromProject = async (
   // Ensure folder exists, even if there are no assets.
   const assetsFolder = failIfNull(zipFile.folder("assets"), "no assets folder");
   assetsFolder.folder("files");
+
+  const orderedAssets = PytchProgramOps.assetsCanonicallyOrdered(
+    project.program,
+    project.assets
+  );
+
   await Promise.all(
-    project.assets.map(async (asset) => {
+    orderedAssets.map(async (asset) => {
       // TODO: Once we're able to delete assets, the following might fail:
       const data = await assetData(asset.id);
       zipFile.file(`assets/files/${asset.name}`, data);
@@ -398,7 +404,7 @@ export const zipfileDataFromProject = async (
   );
 
   const assetMetadataJSON = JSON.stringify(
-    project.assets.map((a) => ({
+    orderedAssets.map((a) => ({
       name: a.name,
       transform: a.assetInProject.transform,
     }))
