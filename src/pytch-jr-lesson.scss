@@ -313,7 +313,8 @@ $task-checkbox-not-done-colour: #999;
 .Junior-LessonContent-HeaderBar {
   background-color: $pytch-colour-main-blue;
 
-  .chapter-title {
+  .chapter-title,
+  .specimen-name {
     color: $pytch-colour-main-yellow;
     font-size: 1.25rem;
     margin-left: 1rem;
@@ -325,6 +326,10 @@ $task-checkbox-not-done-colour: #999;
       text-align: left;
       font-weight: bold;
     }
+  }
+
+  .specimen-name {
+    margin-top: 0.5rem;
   }
 }
 

@@ -20,7 +20,7 @@ export type InfoPanelTabKey = "output" | "errors";
 
 export type InfoPanelState = "collapsed" | "expanded";
 
-export type ActivityBarTabKey = "helpsidebar" | "lesson";
+export type ActivityBarTabKey = "helpsidebar" | "lesson" | "specimen";
 export type ActivityContentState =
   | { kind: "collapsed" }
   | { kind: "expanded"; tab: ActivityBarTabKey };
@@ -202,10 +202,7 @@ export const editState: EditState = {
         actions.expandActivityContent("lesson");
         break;
       case "specimen":
-        // Should not happen.
-        console.log(
-          `unexpected linkedContentKind "specimen" in per-method program`
-        );
+        actions.expandActivityContent("specimen");
         break;
       default:
         assertNever(linkedContentKind);
