@@ -3,6 +3,8 @@ import { Uuid } from "./core-types";
 import { EventDescriptor, EventHandler, EventHandlerOps } from "./event";
 import { assertNever, hexSHA256 } from "../../../utils";
 import { IEmbodyContext, NoIdsStructuredProject } from "./skeleton";
+import { AssetMetaDataOps } from "./asset";
+import { AssetNameAndType } from "../../../database/indexed-db";
 
 export type StructuredProgram = {
   actors: Array<Actor>;
@@ -157,6 +159,51 @@ export class StructuredProgramOps {
   ): Array<AssetT> {
     const actorIds = new Set<Uuid>(program.actors.map((a) => a.id));
     return assets.filter((a) => actorIds.has(AssetMetaDataOps.actorId(a.name)));
+  }
+
+  /** Return an array of indexes into the given `assets` such that
+   * taking the elements in the order given by those indexes gives the
+   * assets in "canonical" order.  This means that all assets for the
+   * stage come first, then all assets for the first sprite, etc.
+   * Within each actor, costumes/backdrops come before sounds.  Within
+   * each mime-major-type, the order of the assets is preserved from the
+   * input array to the output array.
+   *
+   * In more detail, after
+   * ```
+   * idxs = canonicalAssetOrder(program, assets);
+   * ```
+   * we have that `assets[idxs[0]]` is the first asset in the canonical
+   * order (the Stage's first Backdrop), `assets[idxs[1]]` is the
+   * second asset in the canonical order, etc.
+   * */
+  static canonicalAssetOrder(
+    program: StructuredProgram,
+    assets: Array<AssetNameAndType>
+  ): Array<number> {
+    const actorIndexFromId = StructuredProgramOps.actorIndexFromIdLut(program);
+
+    let assetSortRecords: Array<AssetSortRecord> = assets.map(
+      (asset, assetIdx) => {
+        const actorId = AssetMetaDataOps.actorId(asset.name);
+        const actorIdx = actorIndexFromId.get(actorId);
+        if (actorIdx == null) {
+          throw new Error(`no actor for asset ${asset.name}`);
+        }
+
+        const mimeType = AssetMetaDataOps.mimeMajorType(asset.mimeType);
+        const mimeSortKey = AssetMetaDataOps.mimeMajorTypeSortKey(mimeType);
+
+        return { actorIdx, mimeSortKey, assetIdx };
+      }
+    );
+
+    // JS2019 onwards specifies that sort() be stable, so we can just
+    // compare the actor index and mime-type.
+    assetSortRecords.sort(assetSortRecordOrdering);
+
+    const indexes = assetSortRecords.map((record) => record.assetIdx);
+    return indexes;
   }
 
   /** Return the unique `Actor` with the given `actorId` in the given
