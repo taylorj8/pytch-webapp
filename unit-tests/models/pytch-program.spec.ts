@@ -2,6 +2,7 @@ import { assert } from "chai";
 import { PytchProgram, PytchProgramOps } from "../../src/model/pytch-program";
 import { hexSHA256 } from "../../src/utils";
 import { StructuredProgramOps } from "../../src/model/junior/structured-program";
+import { assetOrderingData, threeSpriteProgram } from "./fixtures";
 
 describe("PytchProgram operations", () => {
   function assertFlatPython(program: PytchProgram, expCodeText: string) {
@@ -145,5 +146,14 @@ describe("PytchProgram operations", () => {
     const expFingerprint = `program=flat/${expHash}`;
 
     assert.equal(gotFingerprint, expFingerprint);
+  });
+
+  it("canonical asset order", () => {
+    const structuredProgram = threeSpriteProgram();
+    const program = PytchProgramOps.fromStructuredProgram(structuredProgram);
+    const { assets, expIndexes } = assetOrderingData(structuredProgram);
+    const gotAssets = PytchProgramOps.assetsCanonicallyOrdered(program, assets);
+    const expAssets = expIndexes.map((i) => assets[i]);
+    assert.deepEqual(gotAssets, expAssets);
   });
 });

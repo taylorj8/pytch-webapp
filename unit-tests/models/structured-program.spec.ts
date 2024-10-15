@@ -17,6 +17,10 @@ import {
   Uuid,
   PendingCursorWarp,
 } from "../../src/model/junior/structured-program";
+import {
+  threeSpriteProgramNames,
+  threeSpriteProgram,
+} from "./fixtures";
 import { hexSHA256 } from "../../src/utils";
 
 describe("Structured programs", () => {
@@ -331,13 +335,6 @@ describe("Structured programs", () => {
   describe("programs", () => {
     const Ops = StructuredProgramOps;
 
-    const threeSpriteProgramNames = ["Sprite1", "Sprite2", "Sprite4"];
-    const threeSpriteProgram = () => {
-      let program = Ops.newEmpty();
-      threeSpriteProgramNames.forEach((name) => Ops.addSprite(program, name));
-      return program;
-    };
-
     it("create an empty program", () => {
       const program = Ops.newEmpty();
       assert.equal(program.actors.length, 1);
@@ -499,6 +496,16 @@ describe("Structured programs", () => {
 
       let gotPrint = await StructuredProgramOps.fingerprint(program);
       assert.equal(gotPrint, expPrint);
+    });
+
+    it("actor index/id lut", () => {
+      const program = threeSpriteProgram();
+      const actors = program.actors;
+      const lut = StructuredProgramOps.actorIndexFromIdLut(program);
+      assert.equal(lut.size, 4);
+      for (let idx = 0; idx !== actors.length; ++idx) {
+        assert.equal(lut.get(actors[idx].id), idx);
+      }
     });
   });
 

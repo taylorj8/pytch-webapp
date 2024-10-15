@@ -171,9 +171,15 @@ export class AddAssetDescriptorOps {
 export class StandaloneProjectDescriptorOps {
   static async fingerprint(desc: StandaloneProjectDescriptor) {
     const programFingerprint = await PytchProgramOps.fingerprint(desc.program);
-    const assetsFingerprint = await AddAssetDescriptorOps.fingerprintArray(
+
+    const orderedAssets = PytchProgramOps.assetsCanonicallyOrdered(
+      desc.program,
       desc.assets
     );
+    const assetsFingerprint = await AddAssetDescriptorOps.fingerprintArray(
+      orderedAssets
+    );
+
     return `${programFingerprint}\n${assetsFingerprint}\n`;
   }
 
@@ -389,16 +395,21 @@ export const zipfileDataFromProject = async (
   // Ensure folder exists, even if there are no assets.
   const assetsFolder = failIfNull(zipFile.folder("assets"), "no assets folder");
   assetsFolder.folder("files");
-  await Promise.all(
-    project.assets.map(async (asset) => {
-      // TODO: Once we're able to delete assets, the following might fail:
-      const data = await assetData(asset.id);
-      zipFile.file(`assets/files/${asset.name}`, data);
-    })
+
+  const orderedAssets = PytchProgramOps.assetsCanonicallyOrdered(
+    project.program,
+    project.assets
   );
 
+  // Use loop not Promise.all() to ensure assets are added in order.
+  for (const asset of orderedAssets) {
+    // TODO: Once we're able to delete assets, the following might fail:
+    const data = await assetData(asset.id);
+    zipFile.file(`assets/files/${asset.name}`, data);
+  }
+
   const assetMetadataJSON = JSON.stringify(
-    project.assets.map((a) => ({
+    orderedAssets.map((a) => ({
       name: a.name,
       transform: a.assetInProject.transform,
     }))

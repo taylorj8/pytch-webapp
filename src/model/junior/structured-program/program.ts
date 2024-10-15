@@ -3,6 +3,8 @@ import { Uuid } from "./core-types";
 import { EventDescriptor, EventHandler, EventHandlerOps } from "./event";
 import { assertNever, hexSHA256 } from "../../../utils";
 import { IEmbodyContext, NoIdsStructuredProject } from "./skeleton";
+import { AssetMetaDataOps } from "./asset";
+import { AssetNameAndType } from "../../../database/indexed-db";
 
 export type StructuredProgram = {
   actors: Array<Actor>;
@@ -66,6 +68,19 @@ export type PythonCodeUpdateDescriptor = {
   code: string;
 };
 
+type AssetSortRecord = {
+  actorIdx: number;
+  mimeSortKey: number;
+  assetIdx: number;
+};
+
+function assetSortRecordOrdering(a: AssetSortRecord, b: AssetSortRecord) {
+  if (a.actorIdx !== b.actorIdx) {
+    return a.actorIdx - b.actorIdx;
+  }
+  return a.mimeSortKey - b.mimeSortKey;
+}
+
 export class StructuredProgramOps {
   /** Create and return a new `StructuredProgram` containing just an
    * empty Stage. */
@@ -113,6 +128,82 @@ export class StructuredProgramOps {
     const actorFingerprints = await Promise.all(fingerprintPromises);
     const hashInput = actorFingerprints.join(",");
     return await hexSHA256(hashInput);
+  }
+
+  /** Return a map from each actor's `id` to the index of that actor in
+   * the given `program`. */
+  static actorIndexFromIdLut(program: StructuredProgram): Map<Uuid, number> {
+    let indexFromId = new Map<Uuid, number>();
+    let actorIndex = 0;
+    for (const actor of program.actors) {
+      if (indexFromId.has(actor.id))
+        throw new Error(`multiple actors with id ${actor.id}`);
+      indexFromId.set(actor.id, actorIndex);
+      ++actorIndex;
+    }
+    return indexFromId;
+  }
+
+  /** Return an array holding (in the same order) just those elements of
+   * the given `asset` array which are "active" in the given `program`.
+   * An asset is active if its _actorId_ correponds to one of the actors
+   * in the given `program`.
+   *
+   * Non-active assets can exist because we don't delete the
+   * asset-in-project records corresponding to a sprite from the
+   * database when deleting that sprite.  See also comment in
+   * `PytchProgramOps.assetsCanonicallyOrdered()`. */
+  static filterActiveAssets<AssetT extends AssetNameAndType>(
+    program: StructuredProgram,
+    assets: Array<AssetT>
+  ): Array<AssetT> {
+    const actorIds = new Set<Uuid>(program.actors.map((a) => a.id));
+    return assets.filter((a) => actorIds.has(AssetMetaDataOps.actorId(a.name)));
+  }
+
+  /** Return an array of indexes into the given `assets` such that
+   * taking the elements in the order given by those indexes gives the
+   * assets in "canonical" order.  This means that all assets for the
+   * stage come first, then all assets for the first sprite, etc.
+   * Within each actor, costumes/backdrops come before sounds.  Within
+   * each mime-major-type, the order of the assets is preserved from the
+   * input array to the output array.
+   *
+   * In more detail, after
+   * ```
+   * idxs = canonicalAssetOrder(program, assets);
+   * ```
+   * we have that `assets[idxs[0]]` is the first asset in the canonical
+   * order (the Stage's first Backdrop), `assets[idxs[1]]` is the
+   * second asset in the canonical order, etc.
+   * */
+  static canonicalAssetOrder(
+    program: StructuredProgram,
+    assets: Array<AssetNameAndType>
+  ): Array<number> {
+    const actorIndexFromId = StructuredProgramOps.actorIndexFromIdLut(program);
+
+    let assetSortRecords: Array<AssetSortRecord> = assets.map(
+      (asset, assetIdx) => {
+        const actorId = AssetMetaDataOps.actorId(asset.name);
+        const actorIdx = actorIndexFromId.get(actorId);
+        if (actorIdx == null) {
+          throw new Error(`no actor for asset ${asset.name}`);
+        }
+
+        const mimeType = AssetMetaDataOps.mimeMajorType(asset.mimeType);
+        const mimeSortKey = AssetMetaDataOps.mimeMajorTypeSortKey(mimeType);
+
+        return { actorIdx, mimeSortKey, assetIdx };
+      }
+    );
+
+    // JS2019 onwards specifies that sort() be stable, so we can just
+    // compare the actor index and mime-type.
+    assetSortRecords.sort(assetSortRecordOrdering);
+
+    const indexes = assetSortRecords.map((record) => record.assetIdx);
+    return indexes;
   }
 
   /** Return the unique `Actor` with the given `actorId` in the given
