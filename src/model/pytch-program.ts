@@ -1,3 +1,4 @@
+import { AssetNameAndType } from "../database/indexed-db";
 import { assertNever, hexSHA256 } from "../utils";
 import {
   AssetMetaData,
@@ -125,5 +126,45 @@ export class PytchProgramOps {
           ` but is of kind "${actualKind}"`
       );
     return program as PytchProgramOfKind<KindT>;
+  }
+
+  /** Return an array holding the "active" elements of the given
+   * `assets` array, in the "canonical" order with respect to the given
+   * `program`.
+   *
+   * For a "flat" program: All assets are active, and the canonical
+   * order is the input order.  I.e., for "flat" programs, this function
+   * just returns `assets`.
+   *
+   * For a "per-method" program: An asset is "active" if the _actorId_
+   * part of its name is the id of an actor in the given `program`.  The
+   * canonical order is first by actor, then by time (image/sound), then
+   * by the order in the input.
+   * */
+  static assetsCanonicallyOrdered<AssetT extends AssetNameAndType>(
+    program: PytchProgram,
+    assets: Array<AssetT>
+  ): Array<AssetT> {
+    switch (program.kind) {
+      case "flat":
+        return assets;
+      case "per-method": {
+        // This filtering is only necessary because we don't clean up
+        // old project-assets in the IndexedDB when the user deletes a
+        // sprite.  We should.  Think will be able to do as a DB version
+        // upgrade (even though it doesn't change the schema), and will
+        // then be able to rely on there being no "inactive" assets.
+        const activeAssets = StructuredProgramOps.filterActiveAssets(
+          program.program,
+          assets
+        );
+        const orderedAssetIndexes = StructuredProgramOps.canonicalAssetOrder(
+          program.program,
+          activeAssets
+        );
+        const orderedAssets = orderedAssetIndexes.map((i) => activeAssets[i]);
+        return orderedAssets;
+      }
+    }
   }
 }
