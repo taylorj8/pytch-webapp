@@ -17,6 +17,9 @@ import {
   Uuid,
   PendingCursorWarp,
 } from "../../src/model/junior/structured-program";
+import {
+  threeSpriteProgramNames,
+} from "./fixtures";
 import { hexSHA256 } from "../../src/utils";
 
 describe("Structured programs", () => {
@@ -331,7 +334,6 @@ describe("Structured programs", () => {
   describe("programs", () => {
     const Ops = StructuredProgramOps;
 
-    const threeSpriteProgramNames = ["Sprite1", "Sprite2", "Sprite4"];
     const threeSpriteProgram = () => {
       let program = Ops.newEmpty();
       threeSpriteProgramNames.forEach((name) => Ops.addSprite(program, name));
