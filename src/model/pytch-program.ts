@@ -167,4 +167,15 @@ export class PytchProgramOps {
       }
     }
   }
+
+  static assetFingerprintsNeedSorting(program: PytchProgram): boolean {
+    switch (program.kind) {
+      case "flat":
+        return true;
+      case "per-method":
+        return false;
+      default:
+        return assertNever(program);
+    }
+  }
 }

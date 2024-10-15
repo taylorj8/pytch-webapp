@@ -159,11 +159,16 @@ export class AddAssetDescriptorOps {
     return [nameHash, mimeTypeHash, contentHash, transformHash].join("/");
   }
 
-  static async fingerprintArray(assets: Array<AddAssetDescriptor>) {
+  static async fingerprintArray(
+    assets: Array<AddAssetDescriptor>,
+    doSort: boolean
+  ) {
     let fingerprints = await Promise.all(
       assets.map((a) => AddAssetDescriptorOps.fingerprint(a))
     );
-    fingerprints.sort();
+    if (doSort) {
+      fingerprints.sort();
+    }
     return `assets=${fingerprints.join(",")}`;
   }
 }
@@ -172,12 +177,18 @@ export class StandaloneProjectDescriptorOps {
   static async fingerprint(desc: StandaloneProjectDescriptor) {
     const programFingerprint = await PytchProgramOps.fingerprint(desc.program);
 
+    // There are two phases of sorting related to project assets.
+    // First, the project assets themselves have a canonical order.
+    // Then, once we have computed the fingerprints of those assets, we
+    // might need to sort those fingerprints.
+
     const orderedAssets = PytchProgramOps.assetsCanonicallyOrdered(
       desc.program,
       desc.assets
     );
     const assetsFingerprint = await AddAssetDescriptorOps.fingerprintArray(
-      orderedAssets
+      orderedAssets,
+      PytchProgramOps.assetFingerprintsNeedSorting(desc.program)
     );
 
     return `${programFingerprint}\n${assetsFingerprint}\n`;
