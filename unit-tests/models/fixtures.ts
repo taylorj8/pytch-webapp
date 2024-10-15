@@ -1,3 +1,4 @@
+import { AssetNameAndType } from "../../src/database/indexed-db";
 import {
   StructuredProgramOps,
 } from "../../src/model/junior/structured-program";
@@ -10,4 +11,9 @@ export const threeSpriteProgram = () => {
     StructuredProgramOps.addSprite(program, name)
   );
   return program;
+};
+
+type AssetOrderingData = {
+  assets: Array<AssetNameAndType>;
+  expIndexes: Array<number>;
 };
