@@ -1,20 +1,24 @@
 import { useStoreState } from "../../../store";
 import { LinkedJrTutorial } from "../../../model/junior/jr-tutorial";
+import {
+  LinkedContentKind,
+  LinkedSpecimen,
+} from "../../../model/linked-content";
 
-export const useHasLinkedLesson = (): boolean =>
+const useHasLinkedContentOfKind = (tgtKind: LinkedContentKind): boolean =>
   useStoreState((state) => {
     const loadState = state.activeProject.linkedContentLoadingState;
 
     return (
-      (loadState.kind === "succeeded" &&
-        loadState.content.kind === "jr-tutorial") ||
-      (loadState.kind === "pending" &&
-        loadState.contentRef.kind === "jr-tutorial")
+      (loadState.kind === "succeeded" && loadState.content.kind === tgtKind) ||
+      (loadState.kind === "pending" && loadState.contentRef.kind === tgtKind)
     );
   });
 
-export const useLinkedJrTutorial = (): LinkedJrTutorial =>
-  useMappedLinkedJrTutorial((tutorial) => tutorial);
+export const useHasLinkedLesson = () =>
+  useHasLinkedContentOfKind("jr-tutorial");
+
+export const useHasLinkedSpecimen = () => useHasLinkedContentOfKind("specimen");
 
 export function useMappedLinkedJrTutorial<Result>(
   mapContent: (tutorial: LinkedJrTutorial) => Result,
@@ -32,3 +36,26 @@ export function useMappedLinkedJrTutorial<Result>(
     return mapContent(contentState.content);
   }, eqResult);
 }
+
+export const useLinkedJrTutorial = (): LinkedJrTutorial =>
+  useMappedLinkedJrTutorial((tutorial) => tutorial);
+
+export function useMappedLinkedSpecimen<Result>(
+  mapContent: (specimen: LinkedSpecimen) => Result,
+  eqResult?: (prev: Result, next: Result) => boolean
+) {
+  return useStoreState((state) => {
+    const contentState = state.activeProject.linkedContentLoadingState;
+
+    if (contentState.kind !== "succeeded")
+      throw new Error("linked content has not been loaded");
+
+    if (contentState.content.kind !== "specimen")
+      throw new Error("linked content is wrong kind");
+
+    return mapContent(contentState.content);
+  }, eqResult);
+}
+
+export const useLinkedSpecimen = (): LinkedSpecimen =>
+  useMappedLinkedSpecimen((specimen) => specimen);
