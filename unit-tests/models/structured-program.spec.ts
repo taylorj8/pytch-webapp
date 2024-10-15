@@ -500,6 +500,16 @@ describe("Structured programs", () => {
       let gotPrint = await StructuredProgramOps.fingerprint(program);
       assert.equal(gotPrint, expPrint);
     });
+
+    it("actor index/id lut", () => {
+      const program = threeSpriteProgram();
+      const actors = program.actors;
+      const lut = StructuredProgramOps.actorIndexFromIdLut(program);
+      assert.equal(lut.size, 4);
+      for (let idx = 0; idx !== actors.length; ++idx) {
+        assert.equal(lut.get(actors[idx].id), idx);
+      }
+    });
   });
 
   describe("source map", () => {
