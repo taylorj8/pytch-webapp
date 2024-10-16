@@ -1,10 +1,12 @@
 /// <reference types="cypress" />
 
-import { initSpecimenIntercepts, setInstantDelays } from "./utils";
+import { initSpecimenIntercepts, saveButton, setInstantDelays } from "./utils";
 import {
   assertCostumeNames,
+  launchDeleteActorByIndex,
   selectActorAspect,
   selectSprite,
+  settleModalDialog,
 } from "./junior/utils";
 
 const lessonUrl = "/lesson/hello-world-lesson";
@@ -97,6 +99,24 @@ context("Create project from specimen", () => {
         visitLessonUrl();
         assertTitleInIDE();
         cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
+
+        // Delete the Alien and check this counts as a change.
+        saveButton.shouldReactToInteraction(() => {
+          launchDeleteActorByIndex(1);
+          settleModalDialog("DELETE");
+        });
+
+        // Now we should get the choice screen again:
+        visitLessonUrl();
+        cy.contains("You have already started work");
+        cy.get("li.open-existing")
+          .should("have.length", 1)
+          .within(() => cy.contains(perMethodProjectName))
+          .then(shouldEqualIds([firstId]));
+        cy.get("li.start-afresh")
+          .should("have.length", 1)
+          .invoke("attr", "data-start-afresh-kind")
+          .then((kind) => expect(kind).eq("create"));
       });
   });
 
@@ -229,6 +249,17 @@ context("Create project from specimen", () => {
             cy.title().should("eq", "Pytch: Hello World Specimen");
             cy.get("[data-project-id]").then(shouldEqualIds([secondId]));
 
+            // From the lesson URL, choose the "carry on" option and
+            // edit its contents back to the original.
+            cy.visit(lessonUrl);
+            cy.get("li.open-existing").click();
+            cy.title().should("eq", "Pytch: Hello World Specimen");
+            cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
+            cy.pytchSetCodeRaw('import pytch\n\nprint("Hello world!")');
+            // Make sure the app knows we've made a change:
+            cy.get("#pytch-ace-editor").type("X{backspace}");
+            saveProject();
+
             // After all that, "My projects" should contain three
             // specimen-linked projects, plus the test seed one:
             cy.pytchHomeFromIDE();
@@ -239,6 +270,12 @@ context("Create project from specimen", () => {
               "Hello World Specimen",
               "Test seed project",
             ]);
+
+            // Now we should get the most-recently-edited identical project when
+            // we visit the lesson URL.
+            cy.visit(lessonUrl);
+            cy.title().should("eq", "Pytch: Hello World Specimen");
+            cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
           });
       });
   });
