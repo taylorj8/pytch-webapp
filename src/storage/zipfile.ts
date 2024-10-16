@@ -171,9 +171,15 @@ export class AddAssetDescriptorOps {
 export class StandaloneProjectDescriptorOps {
   static async fingerprint(desc: StandaloneProjectDescriptor) {
     const programFingerprint = await PytchProgramOps.fingerprint(desc.program);
-    const assetsFingerprint = await AddAssetDescriptorOps.fingerprintArray(
+
+    const orderedAssets = PytchProgramOps.assetsCanonicallyOrdered(
+      desc.program,
       desc.assets
     );
+    const assetsFingerprint = await AddAssetDescriptorOps.fingerprintArray(
+      orderedAssets
+    );
+
     return `${programFingerprint}\n${assetsFingerprint}\n`;
   }
 
