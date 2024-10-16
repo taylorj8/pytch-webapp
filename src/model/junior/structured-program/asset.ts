@@ -54,6 +54,17 @@ export class AssetMetaDataOps {
     return { actorId: maybeMatch[1], basename: maybeMatch[2] };
   }
 
+  /** Return the "type" (as opposed to the "subtype") of the given
+   * `mimeType`, forced to all-lowercase.  The "type" is the part up to
+   * but not including the first `/` character. */
+  static mimeMajorType(mimeFullType: string): string {
+    const slashIdx = mimeFullType.indexOf("/");
+    if (slashIdx === -1) {
+      throw new Error(`could not parse mime-type "${mimeFullType}"`);
+    }
+    return mimeFullType.slice(0, slashIdx).toLowerCase();
+  }
+
   /** Return the common `actorId` (i.e., "directory") component of the
    * two given full pathnames `fullPathname_0` and `fullPathname_1`.  If
    * those two pathnames do not have equal `actorId` components, throw
