@@ -1,6 +1,11 @@
 /// <reference types="cypress" />
 
 import { initSpecimenIntercepts, setInstantDelays } from "./utils";
+import {
+  assertCostumeNames,
+  selectActorAspect,
+  selectSprite,
+} from "./junior/utils";
 
 const lessonUrl = "/lesson/hello-world-lesson";
 
@@ -39,6 +44,60 @@ context("Create project from specimen", () => {
       cy.title().should("eq", `Pytch: ${perMethodProjectName}`);
 
     cy.pytchResetDatabase();
+
+    // First visit should create and open project:
+    visitLessonUrl();
+    assertTitleInIDE();
+
+    cy.get("[data-project-id]")
+      .invoke("attr", "data-project-id")
+      .then((idStr: string | undefined) => {
+        if (idStr == null) throw new Error('no "data-project-id" attr');
+        const firstId = parseInt(idStr);
+
+        // Visiting the lesson URL should open the self-same project:
+        visitLessonUrl();
+        assertTitleInIDE();
+        cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
+
+        // Change and save it.
+        selectSprite("Alien");
+        selectActorAspect("Costumes");
+        dragCostume("enemy-alien", "special-alien");
+        assertCostumeNames([
+          "friendly-alien.png",
+          "special-alien.png",
+          "enemy-alien.png",
+        ]);
+
+        // Visiting the lesson URL should give choice:
+        visitLessonUrl();
+        cy.contains("You have already started work");
+        cy.get("li.open-existing")
+          .should("have.length", 1)
+          .within(() => cy.contains(perMethodProjectName))
+          .then(shouldEqualIds([firstId]));
+        cy.get("li.start-afresh")
+          .should("have.length", 1)
+          .invoke("attr", "data-start-afresh-kind")
+          .then((kind) => expect(kind).eq("create"));
+
+        // Open existing and put costumes back in order:
+        cy.get("li.open-existing:first-child").click();
+        selectSprite("Alien");
+        selectActorAspect("Costumes");
+        dragCostume("enemy-alien", "friendly-alien");
+        assertCostumeNames([
+          "enemy-alien.png",
+          "friendly-alien.png",
+          "special-alien.png",
+        ]);
+
+        // Visiting the lesson URL should open the self-same project:
+        visitLessonUrl();
+        assertTitleInIDE();
+        cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
+      });
   });
 
   it("behaves correctly (flat)", () => {
