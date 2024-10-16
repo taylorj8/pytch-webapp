@@ -9,6 +9,15 @@ globalThis.crypto = globalThis.crypto ?? crypto;
 describe("Asset operations", () => {
   describe("mime-type operations", () => {
     const Ops = AssetMetaDataOps;
+
+    it("mime-major-type", () => {
+      assert.equal(Ops.mimeMajorType("TEXT/plain;"), "text");
+      assert.equal(
+        Ops.mimeMajorType("multipart/form-data;boundary=a"),
+        "multipart"
+      );
+      assert.throws(() => Ops.mimeMajorType("blah;blah"), "could not parse");
+    });
   });
 
   describe("content hashing", () => {
