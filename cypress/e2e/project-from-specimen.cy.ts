@@ -1,10 +1,12 @@
 /// <reference types="cypress" />
 
-import { initSpecimenIntercepts, setInstantDelays } from "./utils";
+import { initSpecimenIntercepts, saveButton, setInstantDelays } from "./utils";
 import {
   assertCostumeNames,
+  launchDeleteActorByIndex,
   selectActorAspect,
   selectSprite,
+  settleModalDialog,
 } from "./junior/utils";
 
 const lessonUrl = "/lesson/hello-world-lesson";
@@ -97,6 +99,24 @@ context("Create project from specimen", () => {
         visitLessonUrl();
         assertTitleInIDE();
         cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
+
+        // Delete the Alien and check this counts as a change.
+        saveButton.shouldReactToInteraction(() => {
+          launchDeleteActorByIndex(1);
+          settleModalDialog("DELETE");
+        });
+
+        // Now we should get the choice screen again:
+        visitLessonUrl();
+        cy.contains("You have already started work");
+        cy.get("li.open-existing")
+          .should("have.length", 1)
+          .within(() => cy.contains(perMethodProjectName))
+          .then(shouldEqualIds([firstId]));
+        cy.get("li.start-afresh")
+          .should("have.length", 1)
+          .invoke("attr", "data-start-afresh-kind")
+          .then((kind) => expect(kind).eq("create"));
       });
   });
 
