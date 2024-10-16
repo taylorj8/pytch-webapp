@@ -37,7 +37,7 @@ const ActivityBarTab: React.FC<ActivityBarTabProps> = ({ tab, isActive }) => {
 
   const onClick = isActive ? () => collapseAction() : () => expandAction(tab);
   const uiDetails = uiDetailsFromTabKey(tab);
-  const classes = classNames("ActivityBarTab", { isActive });
+  const classes = classNames("ActivityBarTab", { isActive }, `tab-key-${tab}`);
 
   return (
     <div className={classes} onClick={onClick}>
