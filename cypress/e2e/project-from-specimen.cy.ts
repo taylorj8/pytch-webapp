@@ -257,6 +257,24 @@ context("Create project from specimen", () => {
     cy.get(".LinkedContentBar.no-linked-content");
   });
 
+  it("shows linked-content activity pane (per-method)", () => {
+    // Create and open new project from specimen.
+    cy.visit(perMethodLessonUrl);
+    cy.get(".Junior-LessonContent-HeaderBar").contains(perMethodProjectName);
+
+    // Click around a bit.
+
+    cy.get(".ActivityBarTab.tab-key-specimen").click();
+    cy.get(".Junior-LessonContent-HeaderBar").should("not.exist");
+
+    cy.get(".HelpSidebar").should("not.exist");
+    cy.get(".ActivityBarTab.tab-key-helpsidebar").click();
+    cy.get(".HelpSidebar");
+
+    cy.get(".ActivityBarTab.tab-key-specimen").click();
+    cy.get(".Junior-LessonContent-HeaderBar").contains(perMethodProjectName);
+  });
+
   it("includes project name in zipfile name", () => {
     cy.pytchResetDatabase();
     cy.visit(lessonUrl);
