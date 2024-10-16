@@ -24,7 +24,7 @@ context("Create project from specimen", () => {
 
   beforeEach(initSpecimenIntercepts);
 
-  it("behaves correctly", () => {
+  it("behaves correctly (flat)", () => {
     const saveProject = () => {
       cy.get("button.unsaved-changes-exist").click();
       cy.get("button.no-changes-since-last-save");
@@ -167,7 +167,7 @@ context("Create project from specimen", () => {
       });
   });
 
-  it("shows linked-content top bar", () => {
+  it("shows linked-content top bar (flat)", () => {
     cy.pytchResetDatabase();
 
     // Create and open new project from specimen.
