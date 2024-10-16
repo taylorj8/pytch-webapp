@@ -4,6 +4,9 @@ import { initSpecimenIntercepts } from "./utils";
 
 const lessonUrl = "/lesson/hello-world-lesson";
 
+const perMethodLessonUrl = "/lesson/per-method-blue-invaders";
+const perMethodProjectName = "Script-by-script Blue Invaders";
+
 context("Create project from specimen", () => {
   function projectIdOfElt(elt: HTMLElement): number {
     const mProjectIdStr = elt.getAttribute("data-project-id");
