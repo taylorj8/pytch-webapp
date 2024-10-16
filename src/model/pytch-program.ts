@@ -104,9 +104,8 @@ export class PytchProgramOps {
         return `program=flat/${contentHash}`;
       }
       case "per-method": {
-        throw new Error(
-          'fingerprint() for "per-method" programs not yet implemented'
-        );
+        const suffix = await StructuredProgramOps.fingerprint(program.program);
+        return `program=per-method/${suffix}`;
       }
       default:
         return assertNever(program);
