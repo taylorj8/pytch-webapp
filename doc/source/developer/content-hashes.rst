@@ -15,7 +15,7 @@ Content hash
 Example
 -------
 
-The fingerprint of a project is a string of the form
+The fingerprint of a ``"flat"`` project is a string of the form
 
 .. code-block:: text
 

@@ -25,7 +25,7 @@ number stored there.
 Pytch zipfile version 3
 -----------------------
 
-A version-2 Pytch zipfile is laid out along the lines of the following
+A version-3 Pytch zipfile is laid out along the lines of the following
 example:
 
 .. code-block:: text
@@ -37,8 +37,17 @@ example:
    assets/files/banana.jpg
    assets/files/whoosh.mp3
 
-With the exception of having a file ``code/code.json`` instead of a
-file ``code/code.py``, the format is the same as in version 2.
+The format is the same as in version 2, with the following exceptions:
+
+* The program is stored in the file ``code/code.json`` instead of the
+  file ``code/code.py``.  The object represented in this file mirrors
+  the type ``PytchProgram`` in the TypeScript code; :ref:`more detail
+  below <zipfile-code-representation>`.
+
+* The asset metadata and files should be in "canonical" order;
+  :ref:`more detail below <zipfile-asset-ordering>`.
+
+.. _zipfile-code-representation:
 
 Code representation
 ~~~~~~~~~~~~~~~~~~~
@@ -48,13 +57,64 @@ object stored in this file should have exactly the following
 properties:
 
 ``kind``
-  The fixed string ``"flat"``.
+  One of the fixed strings ``"flat"`` or ``"per-method"``, indicating
+  what kind of program this is.
+
+The object should also have further properties depending on its
+``kind``:
+
+``"flat"`` programs
+^^^^^^^^^^^^^^^^^^^
 
 ``text``
   A string containing the user's Python program code.
 
-(The intent is that future versions of the zipfile format will allow
-other representations of the user's code.)
+``"per-method"`` programs
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``program``
+  An object of type ``StructuredProgram``.  This contains information
+  on the actors (stage and sprites) of the program.  For each one, the
+  object stores that actor's event-handlers (scripts); see the code
+  for details.  The order of actors is important, with the stage
+  always first.
+
+.. _zipfile-asset-ordering:
+
+Asset ordering
+~~~~~~~~~~~~~~
+
+The order of the records in the ``assets/metadata.json`` file should
+match the order of the asset files under ``assets/files`` in the
+zipfile.  (Note that unzipping the file into your filesystem may or
+may not preserve this order.)
+
+The order should be as follows.
+
+``"flat"`` programs
+^^^^^^^^^^^^^^^^^^^
+
+The order dictates the order in which the assets appear in the "Images
+and Sounds" pane.  The "flat" IDE has no capability to re-order
+assets, and the order of assets in the "Images and Sounds" pane is not
+relevant to the project's behaviour, because the ``Costumes`` (etc.)
+lists are explicit in the code.
+
+``"per-method"`` programs
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The assets should be ordered as follows.
+
+* First by actor, so all stage assets occur first, followed by all
+  assets belonging to the first sprite, then all those belonging to
+  the second sprite, etc.
+
+* Within each actor, all images should appear before all sounds.
+
+* Within each asset-kind, the order should be the order those costumes
+  (say) appear in the (implicit) list of costumes for that actor,
+  which is the same as the order the costumes have in the "Costumes"
+  tab for that actor.
 
 
 Pytch zipfile version 2
