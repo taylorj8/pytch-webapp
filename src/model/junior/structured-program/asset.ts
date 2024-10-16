@@ -65,6 +65,20 @@ export class AssetMetaDataOps {
     return mimeFullType.slice(0, slashIdx).toLowerCase();
   }
 
+  /** Return an integer corresponding to the given `mimeMajorType`
+   * suitable for sorting, such that costumes/backdrops come before
+   * sounds.  Only `image` and `audio` major-types are supported. */
+  static mimeMajorTypeSortKey(mimeMajorType: string): number {
+    switch (mimeMajorType) {
+      case "image":
+        return 0;
+      case "audio":
+        return 1;
+      default:
+        throw new Error(`unknown major mime-type "${mimeMajorType}"`);
+    }
+  }
+
   /** Return the common `actorId` (i.e., "directory") component of the
    * two given full pathnames `fullPathname_0` and `fullPathname_1`.  If
    * those two pathnames do not have equal `actorId` components, throw
