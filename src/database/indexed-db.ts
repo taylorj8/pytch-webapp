@@ -274,8 +274,13 @@ export class DexieStorage extends Dexie {
     const programFingerprint = await PytchProgramOps.fingerprint(p.program);
 
     const projectAssets = await this.assetsInProject(id);
+    const orderedAssets = PytchProgramOps.assetsCanonicallyOrdered(
+      p.program,
+      projectAssets
+    );
+
     const addAssetDescriptors = await Promise.all(
-      projectAssets.map(async (a) => ({
+      orderedAssets.map(async (a) => ({
         name: a.name,
         mimeType: a.mimeType,
         data: await this.assetData(a.id),
