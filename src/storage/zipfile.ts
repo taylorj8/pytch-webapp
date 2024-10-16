@@ -395,13 +395,12 @@ export const zipfileDataFromProject = async (
     project.assets
   );
 
-  await Promise.all(
-    orderedAssets.map(async (asset) => {
-      // TODO: Once we're able to delete assets, the following might fail:
-      const data = await assetData(asset.id);
-      zipFile.file(`assets/files/${asset.name}`, data);
-    })
-  );
+  // Use loop not Promise.all() to ensure assets are added in order.
+  for (const asset of orderedAssets) {
+    // TODO: Once we're able to delete assets, the following might fail:
+    const data = await assetData(asset.id);
+    zipFile.file(`assets/files/${asset.name}`, data);
+  }
 
   const assetMetadataJSON = JSON.stringify(
     orderedAssets.map((a) => ({
