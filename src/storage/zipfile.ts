@@ -177,6 +177,11 @@ export class StandaloneProjectDescriptorOps {
   static async fingerprint(desc: StandaloneProjectDescriptor) {
     const programFingerprint = await PytchProgramOps.fingerprint(desc.program);
 
+    // There are two phases of sorting related to project assets.
+    // First, the project assets themselves have a canonical order.
+    // Then, once we have computed the fingerprints of those assets, we
+    // might need to sort those fingerprints.
+
     const orderedAssets = PytchProgramOps.assetsCanonicallyOrdered(
       desc.program,
       desc.assets
