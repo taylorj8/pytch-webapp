@@ -72,6 +72,13 @@ type AssetSortRecord = {
   assetIdx: number;
 };
 
+function assetSortRecordOrdering(a: AssetSortRecord, b: AssetSortRecord) {
+  if (a.actorIdx !== b.actorIdx) {
+    return a.actorIdx - b.actorIdx;
+  }
+  return a.mimeSortKey - b.mimeSortKey;
+}
+
 export class StructuredProgramOps {
   /** Create and return a new `StructuredProgram` containing just an
    * empty Stage. */
