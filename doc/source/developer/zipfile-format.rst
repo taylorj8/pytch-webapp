@@ -37,8 +37,14 @@ example:
    assets/files/banana.jpg
    assets/files/whoosh.mp3
 
-With the exception of having a file ``code/code.json`` instead of a
-file ``code/code.py``, the format is the same as in version 2.
+The format is the same as in version 2, with the following exception:
+
+* The program is stored in the file ``code/code.json`` instead of the
+  file ``code/code.py``.  The object represented in this file mirrors
+  the type ``PytchProgram`` in the TypeScript code; :ref:`more detail
+  below <zipfile-code-representation>`.
+
+.. _zipfile-code-representation:
 
 Code representation
 ~~~~~~~~~~~~~~~~~~~
@@ -48,13 +54,29 @@ object stored in this file should have exactly the following
 properties:
 
 ``kind``
-  The fixed string ``"flat"``.
+  One of the fixed strings ``"flat"`` or ``"per-method"``, indicating
+  what kind of program this is.
+
+The object should also have further properties depending on its
+``kind``:
+
+``"flat"`` programs
+^^^^^^^^^^^^^^^^^^^
 
 ``text``
   A string containing the user's Python program code.
 
-(The intent is that future versions of the zipfile format will allow
-other representations of the user's code.)
+``"per-method"`` programs
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``program``
+  An object of type ``StructuredProgram``.  This contains information
+  on the actors (stage and sprites) of the program.  For each one, the
+  object stores that actor's event-handlers (scripts); see the code
+  for details.  The order of actors is important, with the stage
+  always first.
+
+.. _zipfile-asset-ordering:
 
 
 Pytch zipfile version 2
