@@ -55,6 +55,7 @@ export const IDEContents: React.FC<EmptyProps> = () => {
         <DivSettingWindowTitle
           className={classes}
           windowTitle={`Pytch: ${projectName}`}
+          data-project-id={projectId}
         >
           <ActivityBar />
           <ActivityContent />

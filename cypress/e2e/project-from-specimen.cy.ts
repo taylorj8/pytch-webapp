@@ -1,33 +1,109 @@
 /// <reference types="cypress" />
 
-import { initSpecimenIntercepts } from "./utils";
+import { initSpecimenIntercepts, setInstantDelays } from "./utils";
+import {
+  assertCostumeNames,
+  selectActorAspect,
+  selectSprite,
+} from "./junior/utils";
 
 const lessonUrl = "/lesson/hello-world-lesson";
 
+const perMethodLessonUrl = "/lesson/per-method-blue-invaders";
+const perMethodProjectName = "Script-by-script Blue Invaders";
+
 context("Create project from specimen", () => {
+  function projectIdOfElt(elt: HTMLElement): number {
+    const mProjectIdStr = elt.getAttribute("data-project-id");
+    if (mProjectIdStr == null)
+      throw new Error('no "data-project-id" attribute');
+    return parseInt(mProjectIdStr);
+  }
+
+  const shouldEqualIds = (expIds: Array<number>) => ($li: JQuery) => {
+    let gotIds = $li.toArray().map(projectIdOfElt);
+    gotIds.sort((a, b) => a - b);
+
+    expect(gotIds.length).eq(expIds.length);
+    for (let i = 0; i != gotIds.length; ++i) {
+      expect(gotIds[i]).eq(expIds[i]);
+    }
+  };
+
   beforeEach(initSpecimenIntercepts);
 
-  it("behaves correctly", () => {
+  it("behaves correctly (per-method)", () => {
+    const visitLessonUrl = () =>
+      cy.visit(perMethodLessonUrl, { onLoad: setInstantDelays });
+
+    const getCostume = (stem: string) => cy.get(".AssetCard").contains(stem);
+    const dragCostume = (movingStem: string, targetStem: string) =>
+      getCostume(movingStem).drag(getCostume(targetStem));
+
+    const assertTitleInIDE = () =>
+      cy.title().should("eq", `Pytch: ${perMethodProjectName}`);
+
+    cy.pytchResetDatabase();
+
+    // First visit should create and open project:
+    visitLessonUrl();
+    assertTitleInIDE();
+
+    cy.get("[data-project-id]")
+      .invoke("attr", "data-project-id")
+      .then((idStr: string | undefined) => {
+        if (idStr == null) throw new Error('no "data-project-id" attr');
+        const firstId = parseInt(idStr);
+
+        // Visiting the lesson URL should open the self-same project:
+        visitLessonUrl();
+        assertTitleInIDE();
+        cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
+
+        // Change and save it.
+        selectSprite("Alien");
+        selectActorAspect("Costumes");
+        dragCostume("enemy-alien", "special-alien");
+        assertCostumeNames([
+          "friendly-alien.png",
+          "special-alien.png",
+          "enemy-alien.png",
+        ]);
+
+        // Visiting the lesson URL should give choice:
+        visitLessonUrl();
+        cy.contains("You have already started work");
+        cy.get("li.open-existing")
+          .should("have.length", 1)
+          .within(() => cy.contains(perMethodProjectName))
+          .then(shouldEqualIds([firstId]));
+        cy.get("li.start-afresh")
+          .should("have.length", 1)
+          .invoke("attr", "data-start-afresh-kind")
+          .then((kind) => expect(kind).eq("create"));
+
+        // Open existing and put costumes back in order:
+        cy.get("li.open-existing:first-child").click();
+        selectSprite("Alien");
+        selectActorAspect("Costumes");
+        dragCostume("enemy-alien", "friendly-alien");
+        assertCostumeNames([
+          "enemy-alien.png",
+          "friendly-alien.png",
+          "special-alien.png",
+        ]);
+
+        // Visiting the lesson URL should open the self-same project:
+        visitLessonUrl();
+        assertTitleInIDE();
+        cy.get("[data-project-id]").then(shouldEqualIds([firstId]));
+      });
+  });
+
+  it("behaves correctly (flat)", () => {
     const saveProject = () => {
       cy.get("button.unsaved-changes-exist").click();
       cy.get("button.no-changes-since-last-save");
-    };
-
-    function projectIdOfElt(elt: HTMLElement): number {
-      const mProjectIdStr = elt.getAttribute("data-project-id");
-      if (mProjectIdStr == null)
-        throw new Error('no "data-project-id" attribute');
-      return parseInt(mProjectIdStr);
-    }
-
-    const shouldEqualIds = (expIds: Array<number>) => ($li: JQuery) => {
-      let gotIds = $li.toArray().map(projectIdOfElt);
-      gotIds.sort((a, b) => a - b);
-
-      expect(gotIds.length).eq(expIds.length);
-      for (let i = 0; i != gotIds.length; ++i) {
-        expect(gotIds[i]).eq(expIds[i]);
-      }
     };
 
     cy.pytchResetDatabase();
@@ -167,7 +243,7 @@ context("Create project from specimen", () => {
       });
   });
 
-  it("shows linked-content top bar", () => {
+  it("shows linked-content top bar (flat)", () => {
     cy.pytchResetDatabase();
 
     // Create and open new project from specimen.
@@ -179,6 +255,24 @@ context("Create project from specimen", () => {
     cy.contains("My projects").click();
     cy.pytchOpenProject("Test seed project");
     cy.get(".LinkedContentBar.no-linked-content");
+  });
+
+  it("shows linked-content activity pane (per-method)", () => {
+    // Create and open new project from specimen.
+    cy.visit(perMethodLessonUrl);
+    cy.get(".Junior-LessonContent-HeaderBar").contains(perMethodProjectName);
+
+    // Click around a bit.
+
+    cy.get(".ActivityBarTab.tab-key-specimen").click();
+    cy.get(".Junior-LessonContent-HeaderBar").should("not.exist");
+
+    cy.get(".HelpSidebar").should("not.exist");
+    cy.get(".ActivityBarTab.tab-key-helpsidebar").click();
+    cy.get(".HelpSidebar");
+
+    cy.get(".ActivityBarTab.tab-key-specimen").click();
+    cy.get(".Junior-LessonContent-HeaderBar").contains(perMethodProjectName);
   });
 
   it("includes project name in zipfile name", () => {
