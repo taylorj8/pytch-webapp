@@ -25,7 +25,7 @@ number stored there.
 Pytch zipfile version 3
 -----------------------
 
-A version-2 Pytch zipfile is laid out along the lines of the following
+A version-3 Pytch zipfile is laid out along the lines of the following
 example:
 
 .. code-block:: text
