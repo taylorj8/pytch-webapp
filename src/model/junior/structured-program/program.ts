@@ -142,6 +142,23 @@ export class StructuredProgramOps {
     return indexFromId;
   }
 
+  /** Return an array holding (in the same order) just those elements of
+   * the given `asset` array which are "active" in the given `program`.
+   * An asset is active if its _actorId_ correponds to one of the actors
+   * in the given `program`.
+   *
+   * Non-active assets can exist because we don't delete the
+   * asset-in-project records corresponding to a sprite from the
+   * database when deleting that sprite.  See also comment in
+   * `PytchProgramOps.assetsCanonicallyOrdered()`. */
+  static filterActiveAssets<AssetT extends AssetNameAndType>(
+    program: StructuredProgram,
+    assets: Array<AssetT>
+  ): Array<AssetT> {
+    const actorIds = new Set<Uuid>(program.actors.map((a) => a.id));
+    return assets.filter((a) => actorIds.has(AssetMetaDataOps.actorId(a.name)));
+  }
+
   /** Return the unique `Actor` with the given `actorId` in the given
    * `program`.  Throw an error if there is not exactly one such
    * `Actor`.  */
