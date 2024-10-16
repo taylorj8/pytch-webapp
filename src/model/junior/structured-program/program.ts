@@ -66,6 +66,12 @@ export type PythonCodeUpdateDescriptor = {
   code: string;
 };
 
+type AssetSortRecord = {
+  actorIdx: number;
+  mimeSortKey: number;
+  assetIdx: number;
+};
+
 export class StructuredProgramOps {
   /** Create and return a new `StructuredProgram` containing just an
    * empty Stage. */
