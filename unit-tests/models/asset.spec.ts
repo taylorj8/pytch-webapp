@@ -2,10 +2,15 @@ import { assert } from "chai";
 import * as crypto from "node:crypto";
 import { AssetTransform, AssetTransformOps } from "../../src/model/asset/core";
 import { hexSHA256 } from "../../src/utils";
+import { AssetMetaDataOps } from "../../src/model/junior/structured-program";
 
 globalThis.crypto = globalThis.crypto ?? crypto;
 
 describe("Asset operations", () => {
+  describe("mime-type operations", () => {
+    const Ops = AssetMetaDataOps;
+  });
+
   describe("content hashing", () => {
     it("hashes non-trivial image transform", async () => {
       const tfm: AssetTransform = {
