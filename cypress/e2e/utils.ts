@@ -6,6 +6,12 @@ export function initSpecimenIntercepts() {
   cy.intercept("GET", "**/_by_content_hash_/*f4db652fe09e1663.zip", {
     fixture: "lesson-specimens/hello-world-lesson.zip",
   });
+  cy.intercept("GET", "**/per-method-blue-invaders.zip", {
+    fixture: "lesson-specimens/per-method-blue-invaders.zip",
+  });
+  cy.intercept("GET", "**/_by_content_hash_/*051713cf816591ae.zip", {
+    fixture: "lesson-specimens/per-method-blue-invaders.zip",
+  });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
