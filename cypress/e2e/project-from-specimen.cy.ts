@@ -5,29 +5,29 @@ import { initSpecimenIntercepts } from "./utils";
 const lessonUrl = "/lesson/hello-world-lesson";
 
 context("Create project from specimen", () => {
+  function projectIdOfElt(elt: HTMLElement): number {
+    const mProjectIdStr = elt.getAttribute("data-project-id");
+    if (mProjectIdStr == null)
+      throw new Error('no "data-project-id" attribute');
+    return parseInt(mProjectIdStr);
+  }
+
+  const shouldEqualIds = (expIds: Array<number>) => ($li: JQuery) => {
+    let gotIds = $li.toArray().map(projectIdOfElt);
+    gotIds.sort((a, b) => a - b);
+
+    expect(gotIds.length).eq(expIds.length);
+    for (let i = 0; i != gotIds.length; ++i) {
+      expect(gotIds[i]).eq(expIds[i]);
+    }
+  };
+
   beforeEach(initSpecimenIntercepts);
 
   it("behaves correctly", () => {
     const saveProject = () => {
       cy.get("button.unsaved-changes-exist").click();
       cy.get("button.no-changes-since-last-save");
-    };
-
-    function projectIdOfElt(elt: HTMLElement): number {
-      const mProjectIdStr = elt.getAttribute("data-project-id");
-      if (mProjectIdStr == null)
-        throw new Error('no "data-project-id" attribute');
-      return parseInt(mProjectIdStr);
-    }
-
-    const shouldEqualIds = (expIds: Array<number>) => ($li: JQuery) => {
-      let gotIds = $li.toArray().map(projectIdOfElt);
-      gotIds.sort((a, b) => a - b);
-
-      expect(gotIds.length).eq(expIds.length);
-      for (let i = 0; i != gotIds.length; ++i) {
-        expect(gotIds[i]).eq(expIds[i]);
-      }
     };
 
     cy.pytchResetDatabase();
