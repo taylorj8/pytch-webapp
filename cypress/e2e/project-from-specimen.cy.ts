@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import { initSpecimenIntercepts } from "./utils";
+import { initSpecimenIntercepts, setInstantDelays } from "./utils";
 
 const lessonUrl = "/lesson/hello-world-lesson";
 
@@ -26,6 +26,20 @@ context("Create project from specimen", () => {
   };
 
   beforeEach(initSpecimenIntercepts);
+
+  it("behaves correctly (per-method)", () => {
+    const visitLessonUrl = () =>
+      cy.visit(perMethodLessonUrl, { onLoad: setInstantDelays });
+
+    const getCostume = (stem: string) => cy.get(".AssetCard").contains(stem);
+    const dragCostume = (movingStem: string, targetStem: string) =>
+      getCostume(movingStem).drag(getCostume(targetStem));
+
+    const assertTitleInIDE = () =>
+      cy.title().should("eq", `Pytch: ${perMethodProjectName}`);
+
+    cy.pytchResetDatabase();
+  });
 
   it("behaves correctly (flat)", () => {
     const saveProject = () => {
