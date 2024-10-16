@@ -2,10 +2,30 @@ import { assert } from "chai";
 import * as crypto from "node:crypto";
 import { AssetTransform, AssetTransformOps } from "../../src/model/asset/core";
 import { hexSHA256 } from "../../src/utils";
+import { AssetMetaDataOps } from "../../src/model/junior/structured-program";
 
 globalThis.crypto = globalThis.crypto ?? crypto;
 
 describe("Asset operations", () => {
+  describe("mime-type operations", () => {
+    const Ops = AssetMetaDataOps;
+
+    it("mime-major-type", () => {
+      assert.equal(Ops.mimeMajorType("TEXT/plain;"), "text");
+      assert.equal(
+        Ops.mimeMajorType("multipart/form-data;boundary=a"),
+        "multipart"
+      );
+      assert.throws(() => Ops.mimeMajorType("blah;blah"), "could not parse");
+    });
+
+    it("mime-major-type sort key", () => {
+      assert.equal(Ops.mimeMajorTypeSortKey("image"), 0);
+      assert.equal(Ops.mimeMajorTypeSortKey("audio"), 1);
+      assert.throws(() => Ops.mimeMajorTypeSortKey("text"), "unknown");
+    });
+  });
+
   describe("content hashing", () => {
     it("hashes non-trivial image transform", async () => {
       const tfm: AssetTransform = {

@@ -135,9 +135,12 @@ interface AssetRecord {
   data: ArrayBuffer;
 }
 
-export interface AddAssetDescriptor {
+export interface AssetNameAndType {
   name: string;
   mimeType: string;
+}
+
+export interface AddAssetDescriptor extends AssetNameAndType {
   data: ArrayBuffer;
   transform?: AssetTransform;
 }
