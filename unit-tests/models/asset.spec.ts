@@ -18,6 +18,12 @@ describe("Asset operations", () => {
       );
       assert.throws(() => Ops.mimeMajorType("blah;blah"), "could not parse");
     });
+
+    it("mime-major-type sort key", () => {
+      assert.equal(Ops.mimeMajorTypeSortKey("image"), 0);
+      assert.equal(Ops.mimeMajorTypeSortKey("audio"), 1);
+      assert.throws(() => Ops.mimeMajorTypeSortKey("text"), "unknown");
+    });
   });
 
   describe("content hashing", () => {
