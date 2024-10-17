@@ -21,6 +21,11 @@ context("Drag/drop of junior assets", () => {
     settleModalDialog(expButtonMatch);
   };
 
+  const getCostume = (stem: string) => cy.get(".AssetCard").contains(stem);
+
+  const dragCostume = (movingStem: string, targetStem: string) =>
+    getCostume(movingStem).drag(getCostume(targetStem));
+
   it("allows drag/drop reordering of costumes", () => {
     const originalOrder = [
       /* 0 */ "python-logo.png",
@@ -38,10 +43,6 @@ context("Drag/drop of junior assets", () => {
       assertCostumeNames(indexes.map((i) => originalOrder[i]));
       assertCostumeIndexLabels(nCostumes);
     };
-
-    const getCostume = (stem: string) => cy.get(".AssetCard").contains(stem);
-    const dragCostume = (movingStem: string, targetStem: string) =>
-      getCostume(movingStem).drag(getCostume(targetStem));
 
     selectSprite("Snake");
     selectActorAspect("Costumes");
