@@ -198,7 +198,6 @@ class AssetServer {
   clear() {
     const revokeURLIfImage = (asset: Asset) => {
       if (asset.kind === AssetKind.Image) {
-        console.log("revoking", asset.image.src);
         URL.revokeObjectURL(asset.image.src);
       }
     };
