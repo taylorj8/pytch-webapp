@@ -1,4 +1,5 @@
 import { range } from "../../../src/utils";
+import { saveButton } from "../utils";
 import {
   addFromMediaLib,
   assertCostumeIndexLabels,
@@ -21,6 +22,11 @@ context("Drag/drop of junior assets", () => {
     settleModalDialog(expButtonMatch);
   };
 
+  const getCostume = (stem: string) => cy.get(".AssetCard").contains(stem);
+
+  const dragCostume = (movingStem: string, targetStem: string) =>
+    getCostume(movingStem).drag(getCostume(targetStem));
+
   it("allows drag/drop reordering of costumes", () => {
     const originalOrder = [
       /* 0 */ "python-logo.png",
@@ -38,10 +44,6 @@ context("Drag/drop of junior assets", () => {
       assertCostumeNames(indexes.map((i) => originalOrder[i]));
       assertCostumeIndexLabels(nCostumes);
     };
-
-    const getCostume = (stem: string) => cy.get(".AssetCard").contains(stem);
-    const dragCostume = (movingStem: string, targetStem: string) =>
-      getCostume(movingStem).drag(getCostume(targetStem));
 
     selectSprite("Snake");
     selectActorAspect("Costumes");
@@ -177,5 +179,33 @@ context("Drag/drop of junior assets", () => {
     addAllFromMediaLibEntry("quiz buttons", 5);
     assertCostumeNames(expCostumeNames);
     assertCostumeIndexLabels(expCostumeNames.length);
+  });
+
+  it("updates mtime when reordering costumes", () => {
+    const sbsName = "Per-method test project";
+    const flatName = "Test seed project";
+
+    selectSprite("Snake");
+    selectActorAspect("Costumes");
+    addFromMediaLib(["apple"]);
+
+    cy.pytchHomeFromIDE();
+    cy.contains("My projects").click();
+    cy.pytchProjectNamesShouldDeepEqual([sbsName, flatName]);
+
+    cy.pytchOpenProject(flatName);
+    saveButton.click();
+
+    cy.go("back");
+    cy.pytchProjectNamesShouldDeepEqual([flatName, sbsName]);
+
+    cy.pytchOpenProject(sbsName);
+    selectSprite("Snake");
+    selectActorAspect("Costumes");
+    dragCostume("apple", "python-logo");
+    assertCostumeNames(["apple.png", "python-logo.png"]);
+
+    cy.go("back");
+    cy.pytchProjectNamesShouldDeepEqual([sbsName, flatName]);
   });
 });

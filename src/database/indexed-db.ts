@@ -701,43 +701,48 @@ export class DexieStorage extends Dexie {
     if (!isInNameGroup(targetName))
       throw new Error(`${targetName} is not within name-group`);
 
-    this.transaction("rw", this.projectAssets, async () => {
-      const allAssets = await this._assetsOfProject(projectId);
-      const assetsInGroup = allAssets.filter((a) => isInNameGroup(a.name));
+    this.transaction(
+      "rw",
+      [this.projectAssets, this.projectSummaries],
+      async () => {
+        const allAssets = await this._assetsOfProject(projectId);
+        const assetsInGroup = allAssets.filter((a) => isInNameGroup(a.name));
 
-      const movingIdx = assetsInGroup.findIndex((a) => a.name === movingName);
-      if (movingIdx === -1)
-        throw new Error(`project ${projectId} has no asset "${movingName}"`);
+        const movingIdx = assetsInGroup.findIndex((a) => a.name === movingName);
+        if (movingIdx === -1)
+          throw new Error(`project ${projectId} has no asset "${movingName}"`);
 
-      const targetIdx = assetsInGroup.findIndex((a) => a.name === targetName);
-      if (targetIdx === -1)
-        throw new Error(`project ${projectId} has no asset "${targetName}"`);
+        const targetIdx = assetsInGroup.findIndex((a) => a.name === targetName);
+        if (targetIdx === -1)
+          throw new Error(`project ${projectId} has no asset "${targetName}"`);
 
-      if (movingIdx === targetIdx)
-        // Perhaps an application-level error, but treat as no-op.
-        return;
+        if (movingIdx === targetIdx)
+          // Perhaps an application-level error, but treat as no-op.
+          return;
 
-      const reorderedAssets: Array<ProjectAssetRecord> = (() => {
-        const movingElt = assetsInGroup[movingIdx];
-        if (movingIdx < targetIdx) {
-          const head0 = assetsInGroup.slice(0, movingIdx);
-          const head1 = assetsInGroup.slice(movingIdx + 1, targetIdx + 1);
-          const tail = assetsInGroup.slice(targetIdx + 1);
-          return [...head0, ...head1, movingElt, ...tail];
-        } else {
-          const head = assetsInGroup.slice(0, targetIdx);
-          const tail0 = assetsInGroup.slice(targetIdx, movingIdx);
-          const tail1 = assetsInGroup.slice(movingIdx + 1);
-          return [...head, movingElt, ...tail0, ...tail1];
-        }
-      })();
+        const reorderedAssets: Array<ProjectAssetRecord> = (() => {
+          const movingElt = assetsInGroup[movingIdx];
+          if (movingIdx < targetIdx) {
+            const head0 = assetsInGroup.slice(0, movingIdx);
+            const head1 = assetsInGroup.slice(movingIdx + 1, targetIdx + 1);
+            const tail = assetsInGroup.slice(targetIdx + 1);
+            return [...head0, ...head1, movingElt, ...tail];
+          } else {
+            const head = assetsInGroup.slice(0, targetIdx);
+            const tail0 = assetsInGroup.slice(targetIdx, movingIdx);
+            const tail1 = assetsInGroup.slice(movingIdx + 1);
+            return [...head, movingElt, ...tail0, ...tail1];
+          }
+        })();
 
-      reorderedAssets.forEach((a, idx) => {
-        a.sortKey = idx;
-      });
+        reorderedAssets.forEach((a, idx) => {
+          a.sortKey = idx;
+        });
 
-      await this.projectAssets.bulkPut(reorderedAssets);
-    });
+        await this.projectAssets.bulkPut(reorderedAssets);
+        await this._updateProjectMtime(projectId);
+      }
+    );
   }
 
   async updateProject(
