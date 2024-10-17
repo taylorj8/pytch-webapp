@@ -111,9 +111,12 @@ const createProjectFromTutorial = async (
   // to the new project the front-end will fetch that information
   // afresh.  TODO: Some kind of cache layer so we don't push then
   // fetch the exact same information.
-  await Promise.all(
-    assetURLs.map((url) => addRemoteAssetToProject(project.id, url))
-  );
+  //
+  // Use loop not Promise.all() to ensure assets are added in correct
+  // order:
+  for (const url of assetURLs) {
+    await addRemoteAssetToProject(project.id, url);
+  }
 
   actions.clearSlugCreating();
   methods.completionAction();
