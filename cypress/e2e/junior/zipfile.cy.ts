@@ -1,6 +1,11 @@
 import JSZip from "jszip";
 import { saveButton } from "../utils";
-import { launchDeleteActorByIndex, settleModalDialog } from "./utils";
+import {
+  assertBackdropNames,
+  launchDeleteActorByIndex,
+  selectActorAspect,
+  settleModalDialog,
+} from "./utils";
 
 context("Zipfiles", () => {
   beforeEach(() => {
@@ -62,5 +67,20 @@ context("Zipfiles", () => {
           });
         });
       });
+  });
+
+  it("preserves backdrops order", () => {
+    cy.contains("My projects").click();
+    cy.pytchTryUploadZipfiles(["lots-of-backdrops.zip"]);
+    selectActorAspect("Backdrops");
+
+    let expNames = ["big-painting.jpg"];
+    for (let i = 0; i !== 256; ++i) {
+      const digits = i.toString().padStart(3, "0");
+      const smallImageName = `solid-${digits}.png`;
+      expNames.push(smallImageName);
+    }
+
+    assertBackdropNames(expNames);
   });
 });
