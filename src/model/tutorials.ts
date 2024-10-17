@@ -107,13 +107,16 @@ const createProjectFromTutorial = async (
   const assetURLs = isPerMethod ? [] : await tutorialAssetURLs(tutorialSlug);
 
   // It's enough to make the back-end database know about the assets
-  // belonging to the newly-created project, because when we navigate
-  // to the new project the front-end will fetch that information
-  // afresh.  TODO: Some kind of cache layer so we don't push then
-  // fetch the exact same information.
-  await Promise.all(
-    assetURLs.map((url) => addRemoteAssetToProject(project.id, url))
-  );
+  // belonging to the newly-created project, because when we navigate to
+  // the new project the front-end will fetch that information afresh.
+  // TODO: Some kind of cache layer so we don't push then fetch the
+  // exact same information.
+  //
+  // Use loop not Promise.all() to ensure assets are added in correct
+  // order:
+  for (const url of assetURLs) {
+    await addRemoteAssetToProject(project.id, url);
+  }
 
   actions.clearSlugCreating();
   methods.completionAction();

@@ -331,17 +331,17 @@ export class DexieStorage extends Dexie {
       programKind: program.kind,
     };
 
-    await Promise.all(
-      completeOptions.assets.map((asset) =>
-        this.addAssetToProject(
-          project.id,
-          asset.name,
-          asset.mimeType,
-          asset.data,
-          asset.transform
-        )
-      )
-    );
+    // Use loop not Promise.all() to ensure assets are added in correct
+    // order:
+    for (const asset of completeOptions.assets) {
+      await this.addAssetToProject(
+        project.id,
+        asset.name,
+        asset.mimeType,
+        asset.data,
+        asset.transform
+      );
+    }
 
     return project;
   }
