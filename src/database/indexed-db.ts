@@ -701,7 +701,10 @@ export class DexieStorage extends Dexie {
     if (!isInNameGroup(targetName))
       throw new Error(`${targetName} is not within name-group`);
 
-    this.transaction("rw", this.projectAssets, async () => {
+    this.transaction(
+      "rw",
+      [this.projectAssets, this.projectSummaries],
+      async () => {
       const allAssets = await this._assetsOfProject(projectId);
       const assetsInGroup = allAssets.filter((a) => isInNameGroup(a.name));
 
@@ -737,6 +740,7 @@ export class DexieStorage extends Dexie {
       });
 
       await this.projectAssets.bulkPut(reorderedAssets);
+      await this._updateProjectMtime(projectId);
     });
   }
 
