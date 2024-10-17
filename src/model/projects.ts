@@ -218,15 +218,16 @@ export const projectCollection: IProjectCollection = {
     const newProject = await createNewProject(descriptor.name, { program });
 
     const remoteAssets = templateContent.assets;
-    await Promise.all(
-      remoteAssets.map(({ urlBasename, customLocalName }) =>
-        addRemoteAssetToProject(
-          newProject.id,
-          urlWithinApp(`/assets/${urlBasename}`),
-          customLocalName
-        )
-      )
-    );
+
+    // Use loop not Promise.all() to ensure assets are added in correct
+    // order:
+    for (const { urlBasename, customLocalName } of remoteAssets) {
+      await addRemoteAssetToProject(
+        newProject.id,
+        urlWithinApp(`/assets/${urlBasename}`),
+        customLocalName
+      );
+    }
 
     actions.noteDatabaseChange();
 
