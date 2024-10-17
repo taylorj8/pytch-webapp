@@ -636,6 +636,10 @@ export const activeProject: IActiveProject = {
         targetAssetName,
         AssetMetaDataOps.nameBelongsToActor(owningActorId)
       );
+
+      // Mtime has been updated:
+      helpers.getStoreActions().projectCollection.noteDatabaseChange();
+
       await actions.syncAssetsFromStorage();
     } catch (err) {
       console.log("reorderAssetsAndSync(): error", err);
