@@ -260,6 +260,14 @@ describe("Structured programs", () => {
         assert.equal(handler1.pythonCode, pythonCode);
       });
 
+      it("duplicate failure no handler", () => {
+        const sprite = bananaWithScript();
+        assert.throws(
+          () => Ops.duplicateHandlerById(sprite, UuidOps.newRandom()),
+          "not found in actor"
+        );
+      });
+
       it("handles delete of non-existent", () => {
         let sprite = Ops.newEmptySprite("Banana");
         assert.throws(
