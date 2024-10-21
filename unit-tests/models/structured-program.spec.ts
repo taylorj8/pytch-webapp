@@ -234,20 +234,17 @@ describe("Structured programs", () => {
       };
 
       it("append, rejecting dup", () => {
-        let sprite = Ops.newEmptySprite("Banana");
-        const handler = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
-        Ops.appendHandler(sprite, handler);
+        const sprite = bananaWithScript();
         assert.equal(sprite.handlers.length, 1);
         assert.throws(
-          () => Ops.appendHandler(sprite, handler),
+          () => Ops.appendHandler(sprite, sprite.handlers[0]),
           "already has a handler"
         );
       });
 
       it("delete existing", () => {
-        let sprite = Ops.newEmptySprite("Banana");
-        const handler = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
-        Ops.appendHandler(sprite, handler);
+        const sprite = bananaWithScript();
+        const handler = sprite.handlers[0];
         const deletedHandler = Ops.deleteHandlerById(sprite, handler.id);
         assert.equal(deletedHandler, handler);
         assert.equal(sprite.handlers.length, 0);
