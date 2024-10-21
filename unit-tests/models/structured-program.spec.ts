@@ -20,6 +20,7 @@ import {
 } from "../../src/model/junior/structured-program";
 import { threeSpriteProgramNames, threeSpriteProgram } from "./fixtures";
 import { hexSHA256 } from "../../src/utils";
+import { HandlerDuplicationDescriptor } from "../../src/model/junior/structured-program/program";
 
 describe("Structured programs", () => {
   describe("uuids", () => {
@@ -485,6 +486,30 @@ describe("Structured programs", () => {
         clickedHandlerId
       );
       assert.equal(foundHandler.event.kind, "clicked");
+    });
+
+    it("duplicate handler", () => {
+      let program = threeSpriteProgram();
+      const sprite = program.actors[1];
+      ActorOps.appendHandler(
+        sprite,
+        EventHandlerOps.newWithEmptyCode({ kind: "clicked" })
+      );
+
+      const descr: HandlerDuplicationDescriptor = {
+        actorId: sprite.id,
+        handlerId: sprite.handlers[0].id,
+      };
+      Ops.duplicateHandler(program, descr);
+
+      assert.equal(sprite.handlers.length, 2);
+
+      assert.notEqual(sprite.handlers[1].id, sprite.handlers[0].id);
+      assert.deepEqual(sprite.handlers[1].event, sprite.handlers[0].event);
+      assert.equal(
+        sprite.handlers[1].pythonCode,
+        sprite.handlers[0].pythonCode
+      );
     });
 
     it("detect dupd handler-id", () => {
