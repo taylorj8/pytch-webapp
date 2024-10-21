@@ -16,6 +16,7 @@ import {
   LocationWithinHandler,
   Uuid,
   PendingCursorWarp,
+  Actor,
 } from "../../src/model/junior/structured-program";
 import {
   threeSpriteProgramNames,
@@ -225,6 +226,13 @@ describe("Structured programs", () => {
     });
 
     describe("handlers", () => {
+      const bananaWithScript = (): Actor => {
+        let sprite = Ops.newEmptySprite("Banana");
+        const handler = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
+        Ops.appendHandler(sprite, handler);
+        return sprite;
+      };
+
       it("append, rejecting dup", () => {
         let sprite = Ops.newEmptySprite("Banana");
         const handler = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
