@@ -18,10 +18,7 @@ import {
   PendingCursorWarp,
   Actor,
 } from "../../src/model/junior/structured-program";
-import {
-  threeSpriteProgramNames,
-  threeSpriteProgram,
-} from "./fixtures";
+import { threeSpriteProgramNames, threeSpriteProgram } from "./fixtures";
 import { hexSHA256 } from "../../src/utils";
 
 describe("Structured programs", () => {
