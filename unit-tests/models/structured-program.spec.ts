@@ -247,6 +247,19 @@ describe("Structured programs", () => {
         assert.equal(sprite.handlers.length, 0);
       });
 
+      it("duplicate", () => {
+        let sprite = bananaWithScript();
+        const handler = sprite.handlers[0];
+        const pythonCode = "# Hello world";
+        handler.pythonCode = pythonCode;
+        const id0 = handler.id;
+        Ops.duplicateHandlerById(sprite, id0);
+        assert.equal(sprite.handlers.length, 2);
+        const handler1 = sprite.handlers[1];
+        assert.notEqual(handler1.id, id0);
+        assert.equal(handler1.pythonCode, pythonCode);
+      });
+
       it("handles delete of non-existent", () => {
         let sprite = Ops.newEmptySprite("Banana");
         assert.throws(
