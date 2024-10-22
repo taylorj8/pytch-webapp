@@ -186,6 +186,7 @@ context("Create/modify/delete event handlers", () => {
         .find(".scratch-block-wrapper")
         .drag(".Junior-CodeEditor");
     };
+
     let expHatBlockLabels: Array<string> = [];
     assertHatBlockLabels(expHatBlockLabels.slice());
 
