@@ -1,9 +1,6 @@
 /// <reference types="cypress" />
 
-import {
-  createProjectFollowingTutorial,
-  launchShareTutorialModal,
-} from "./utils";
+import { launchShareTutorialModal } from "./utils";
 
 context("Work with tutorials list", () => {
   it("shows list of tutorials", () => {
@@ -53,10 +50,7 @@ context("Interact with a tutorial", () => {
 
 context("Scratchblocks rendering", () => {
   it("renders scratchblocks", () => {
-    cy.pytchProjectFollowingTutorial(
-      "vending machine",
-      "ticket-vending-machine"
-    );
+    cy.pytchProjectFollowingTutorial("ticket-vending-machine");
     cy.get(".ToC").contains("Show all ticket types").click();
     cy.get(".scratchblocks svg").contains("costume");
     cy.get(".ToC").contains("Remember cost of chosen ticket").click();
@@ -95,8 +89,8 @@ context("Demo of a tutorial", () => {
   it("dismisses button tour when creating tutorial", () => {
     cy.contains("Click the green flag");
     cy.pytchHomeFromIDE();
-    cy.get(".NavBar").contains("Tutorials").click();
-    createProjectFollowingTutorial("Boing");
+    const createOptions = { resetDatabaseFirst: false };
+    cy.pytchProjectFollowingTutorial("boing", createOptions);
     cy.get(".pytch-static-tooltip.hidden").should("have.length", 1);
     cy.get(".pytch-static-tooltip.shown").should("not.exist");
   });

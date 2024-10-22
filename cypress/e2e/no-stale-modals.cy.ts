@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 import {
-  createProjectFollowingTutorial,
   initSpecimenIntercepts,
   setInstantDelays,
   launchCreateProjectModal,
@@ -36,8 +35,8 @@ context("Modals are cancelled when navigating away", () => {
     cy.visit("/lesson/hello-world-lesson", { onLoad: setInstantDelays });
     cy.pytchHomeFromIDE();
 
-    cy.get(".NavBar").contains("Tutorials").click();
-    createProjectFollowingTutorial("Catch the apple");
+    const createOptions = { resetDatabaseFirst: false };
+    cy.pytchProjectFollowingTutorial("catch-apple", createOptions);
     cy.pytchHomeFromIDE();
 
     cy.pytchTryUploadZipfiles([

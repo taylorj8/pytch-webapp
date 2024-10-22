@@ -178,19 +178,32 @@ Cypress.Commands.add("pytchSwitchProject", (name: string) => {
   cy.pytchOpenProject(name);
 });
 
+export type CreateProjectTutorialOptions = {
+  resetDatabaseFirst: boolean;
+};
+const defaultCreateProjectTutorialOptions: CreateProjectTutorialOptions = {
+  resetDatabaseFirst: true,
+};
 const createTutorialProject = (
-  tutorialMatch: string,
   tutorialSlug: string,
-  buttonContent: string
+  buttonContent: string,
+  options?: Partial<CreateProjectTutorialOptions>
 ) => {
-  cy.pytchResetDatabase();
+  const fullOptions: CreateProjectTutorialOptions = Object.assign(
+    {},
+    defaultCreateProjectTutorialOptions,
+    options
+  );
+
+  if (fullOptions.resetDatabaseFirst) {
+    cy.pytchResetDatabase();
+  }
+
   cy.contains("My projects").click();
   cy.contains("Tutorials").click();
-  cy.contains(tutorialMatch)
-    .parent()
-    .within(() => {
-      cy.contains(buttonContent).click();
-    });
+  cy.get(`.TutorialCard[data-slug="${tutorialSlug}"]`).within(() => {
+    cy.contains(buttonContent).click();
+  });
 
   // More/less as per pytchOpenProject() above, except don't let it get
   // fooled by the buttons on the tutorials page:
@@ -204,14 +217,13 @@ const createTutorialProject = (
 
 Cypress.Commands.add(
   "pytchProjectFollowingTutorial",
-  (tutorialMatch = "Boing", tutorialSlug = "boing") =>
-    createTutorialProject(tutorialMatch, tutorialSlug, "Tutorial")
+  (tutorialSlug = "boing", options?: Partial<CreateProjectTutorialOptions>) =>
+    createTutorialProject(tutorialSlug, "Tutorial", options)
 );
 
 Cypress.Commands.add(
   "pytchProjectDemonstratingTutorial",
-  (tutorialMatch = "Boing", tutorialSlug = "boing") =>
-    createTutorialProject(tutorialMatch, tutorialSlug, "Demo")
+  (tutorialSlug = "boing") => createTutorialProject(tutorialSlug, "Demo")
 );
 
 Cypress.Commands.add(
