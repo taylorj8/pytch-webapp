@@ -16,11 +16,9 @@ import {
   LocationWithinHandler,
   Uuid,
   PendingCursorWarp,
+  Actor,
 } from "../../src/model/junior/structured-program";
-import {
-  threeSpriteProgramNames,
-  threeSpriteProgram,
-} from "./fixtures";
+import { threeSpriteProgramNames, threeSpriteProgram } from "./fixtures";
 import { hexSHA256 } from "../../src/utils";
 
 describe("Structured programs", () => {
@@ -225,21 +223,25 @@ describe("Structured programs", () => {
     });
 
     describe("handlers", () => {
-      it("append, rejecting dup", () => {
+      const bananaWithScript = (): Actor => {
         let sprite = Ops.newEmptySprite("Banana");
         const handler = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
         Ops.appendHandler(sprite, handler);
+        return sprite;
+      };
+
+      it("append, rejecting dup", () => {
+        const sprite = bananaWithScript();
         assert.equal(sprite.handlers.length, 1);
         assert.throws(
-          () => Ops.appendHandler(sprite, handler),
+          () => Ops.appendHandler(sprite, sprite.handlers[0]),
           "already has a handler"
         );
       });
 
       it("delete existing", () => {
-        let sprite = Ops.newEmptySprite("Banana");
-        const handler = EventHandlerOps.newWithEmptyCode({ kind: "clicked" });
-        Ops.appendHandler(sprite, handler);
+        const sprite = bananaWithScript();
+        const handler = sprite.handlers[0];
         const deletedHandler = Ops.deleteHandlerById(sprite, handler.id);
         assert.equal(deletedHandler, handler);
         assert.equal(sprite.handlers.length, 0);
