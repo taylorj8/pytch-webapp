@@ -92,6 +92,7 @@ const CheckboxHelp: React.FC<CheckboxHelpProps> = ({ interactivityKind }) => {
 };
 
 type ShowHelpStageButtonProps = {
+  nStagesTotal: number;
   nStagesStillHidden: number;
   interactivityKind: TaskInteractivityKind;
   showNextHelpStage: () => void;
@@ -99,25 +100,40 @@ type ShowHelpStageButtonProps = {
   onCheckboxClick: () => void;
 };
 const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
+  nStagesTotal,
   nStagesStillHidden,
   interactivityKind,
   showNextHelpStage,
   hideAllHelpStages,
   onCheckboxClick,
 }) => {
-  const label = (() => {
-    switch (nStagesStillHidden) {
-      case 0:
-        return "Hide help";
-      case 1:
-        return "Show me";
-      default:
-        return "Hint";
-    }
-  })();
+  const maybeButton =
+    nStagesTotal > 0 &&
+    (() => {
+      const label = (() => {
+        switch (nStagesStillHidden) {
+          case 0:
+            return "Hide help";
+          case 1:
+            return "Show me";
+          default:
+            return "Hint";
+        }
+      })();
 
-  const onClick =
-    nStagesStillHidden === 0 ? hideAllHelpStages : showNextHelpStage;
+      const onClick =
+        nStagesStillHidden === 0 ? hideAllHelpStages : showNextHelpStage;
+
+      return (
+        <Button
+          key={nStagesStillHidden}
+          variant="outline-success"
+          onClick={onClick}
+        >
+          {label}
+        </Button>
+      );
+    })();
 
   return (
     <div className="ShowNextHelpStageButton-container">
@@ -129,13 +145,7 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
         />
         <CheckboxHelp interactivityKind={interactivityKind} />
       </div>
-      <Button
-        key={nStagesStillHidden}
-        variant="outline-success"
-        onClick={onClick}
-      >
-        {label}
-      </Button>
+      {maybeButton}
     </div>
   );
 };
@@ -202,6 +212,7 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
       {taskHelpStages}
       <div className="help-stage-divider" />
       <ShowNextHelpStageButton
+        nStagesTotal={task.helpStages.length}
         nStagesStillHidden={nStagesStillHidden}
         interactivityKind={kind}
         showNextHelpStage={() => showNextHelpStage(task.index)}
