@@ -79,7 +79,10 @@ export type LearnerTaskCommit =
   | LearnerTaskCommitEditScript
   | LearnerTaskCommitChangeHatBlock;
 
+// Should only encounter the "error" kind when developing tutorials,
+// e.g., when the author mis-types a commit slug.
 export type LearnerTaskHelpStageFragment =
+  | { kind: "error"; element: HTMLElement; message: string }
   | { kind: "element"; element: HTMLElement }
   | { kind: "commit"; commit: LearnerTaskCommit };
 
