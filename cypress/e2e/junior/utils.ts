@@ -498,3 +498,10 @@ export const launchDeleteHandlerByIndex = (idx: number) => {
   ScriptOps.chooseHandlerDropdownItem(idx, "DELETE");
   cy.get(".modal-header").should("have.length", 1).contains("Delete script?");
 };
+
+/** Assuming that we are in the per-method IDE, with the Code tab
+ * active, perform the "Duplicate handler" action for the script at the
+ * given `idx`. */
+export const duplicateHandlerByIndex = (idx: number) => {
+  ScriptOps.chooseHandlerDropdownItem(idx, "Duplicate");
+};

@@ -73,6 +73,7 @@ import {
   SpriteUpsertionArgs,
   StructuredProgram,
   StructuredProgramOps,
+  HandlerDuplicationDescriptor,
 } from "./junior/structured-program/program";
 import { AssetOperationContext } from "./asset";
 import { AssetMetaDataOps } from "./junior/structured-program";
@@ -225,6 +226,11 @@ type HandlerUpsertionAugArgs = {
   handleHandlerId(uuid: Uuid): void;
 };
 
+type HandlerDuplicationAugArgs = {
+  descriptor: HandlerDuplicationDescriptor;
+  handleHandlerId(uuid: Uuid): void;
+};
+
 function assertLinkedContentSucceededOfKind<KindT extends LinkedContentKind>(
   loadingState: LinkedContentLoadingState,
   requiredContentKind: KindT
@@ -348,6 +354,8 @@ export interface IActiveProject {
   // a code change has occurred via the noteCodeChange() action.
   _upsertHandler: Action<IActiveProject, HandlerUpsertionAugArgs>;
   upsertHandler: Thunk<IActiveProject, HandlerUpsertionDescriptor>;
+  _duplicateHandler: Action<IActiveProject, HandlerDuplicationAugArgs>;
+  duplicateHandler: Thunk<IActiveProject, HandlerDuplicationDescriptor>;
   _setHandlerPythonCode: Action<IActiveProject, PythonCodeUpdateDescriptor>;
   setHandlerPythonCode: Thunk<IActiveProject, PythonCodeUpdateDescriptor>;
   _deleteHandler: Action<IActiveProject, HandlerDeletionDescriptor>;
@@ -596,6 +604,31 @@ export const activeProject: IActiveProject = {
 
     // It's a slight fudge to use this pending-warp machinery, but the
     // "scroll into view" behaviour this generates does no harm.
+    pendingCursorWarp.set({ handlerId, lineNo: 1, colNo: 0 });
+  }),
+
+  _duplicateHandler: action((state, duplicationAugArgs) => {
+    let program = ensureStructured(state.project, "duplicateHandler");
+    const descriptor = duplicationAugArgs.descriptor;
+    const handlerId = StructuredProgramOps.duplicateHandler(
+      program,
+      descriptor
+    );
+    duplicationAugArgs.handleHandlerId(handlerId);
+  }),
+
+  duplicateHandler: thunk((actions, descriptor) => {
+    let idCell = valueCell<Uuid>("");
+    actions._duplicateHandler({ descriptor, handleHandlerId: idCell.set });
+    const handlerId = idCell.get();
+
+    actions.noteCodeChange();
+    actions.pulseNotableChange({
+      kind: "script-upserted",
+      upsertKind: "insert",
+      handlerId: handlerId,
+    });
+
     pendingCursorWarp.set({ handlerId, lineNo: 1, colNo: 0 });
   }),
 

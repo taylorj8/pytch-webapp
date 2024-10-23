@@ -9,6 +9,8 @@ import {
   typeIntoScriptEditor,
   ScriptOps,
   launchDeleteHandlerByIndex,
+  duplicateHandlerByIndex,
+  aceControllerMapFromWindow,
 } from "./utils";
 import { saveButton } from "../utils";
 
@@ -179,6 +181,37 @@ context("Create/modify/delete event handlers", () => {
     assertHatBlockLabels([]);
   });
 
+  it("can duplicate handler", () => {
+    selectSprite("Snake");
+    ScriptOps.addSomeHandlers();
+    let expLabels = ScriptOps.allExtendedHandlerLabels.slice();
+
+    duplicateHandlerByIndex(2);
+    expLabels.splice(2, 0, "when I start as a clone");
+    assertHatBlockLabels(expLabels.slice());
+
+    duplicateHandlerByIndex(0);
+    expLabels.splice(0, 0, "when green flag clicked");
+    assertHatBlockLabels(expLabels.slice());
+
+    cy.window().then((window) => {
+      const controllerMap = aceControllerMapFromWindow(window);
+      const editorIds = controllerMap.nonSpecialEditorIds();
+      cy.wrap(editorIds.length).should("equal", 6);
+
+      let pythonBodies = editorIds.map((id) => controllerMap.get(id)?.value());
+      pythonBodies.sort();
+      cy.wrap(pythonBodies).should("deep.equal", [
+        "",
+        "",
+        "",
+        "",
+        'self.say_for_seconds("Hi there!", 2.0)',
+        'self.say_for_seconds("Hi there!", 2.0)',
+      ]);
+    });
+  });
+
   it("can drag/drop handler from help", () => {
     const dragHatBlockByIdx = (iHatBlock: number) => {
       cy.get(".pytch-method")
@@ -186,6 +219,7 @@ context("Create/modify/delete event handlers", () => {
         .find(".scratch-block-wrapper")
         .drag(".Junior-CodeEditor");
     };
+
     let expHatBlockLabels: Array<string> = [];
     assertHatBlockLabels(expHatBlockLabels.slice());
 
