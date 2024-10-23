@@ -141,6 +141,20 @@ export class ActorOps {
     return actor.handlers[handlerIdx];
   }
 
+  /** Duplicate the handler having the given `handlerId` within the
+   * given `actor`.  The new handler is inserted after the "source"
+   * handler.  Return the `id` of the newly-created handler.  Throw an
+   * error if there is no (source) handler with the given `handlerId`.
+   * */
+  static duplicateHandlerById(actor: Actor, handlerId: Uuid): Uuid {
+    const sourceHandlerIdx = ActorOps.handlerIndexById(actor, handlerId);
+    const originalHandler = actor.handlers[sourceHandlerIdx];
+    const clonedHandler = EventHandlerOps.clone(originalHandler);
+    const newHandlerIdx = sourceHandlerIdx + 1;
+    actor.handlers.splice(newHandlerIdx, 0, clonedHandler);
+    return clonedHandler.id;
+  }
+
   /** Return whether the given `actor` has a handler with the given
    * `handlerId`. */
   static hasHandlerById(actor: Actor, handlerId: Uuid): boolean {

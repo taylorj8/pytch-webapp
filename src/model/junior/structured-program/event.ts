@@ -95,6 +95,11 @@ export class EventDescriptorOps {
 
     return `${event.kind}:${suffix}`;
   }
+
+  /** Return a deep clone of the given `event`. */
+  static clone(event: EventDescriptor): EventDescriptor {
+    return Object.assign({}, event);
+  }
 }
 
 export type EventHandler = {
@@ -126,5 +131,14 @@ export class EventHandlerOps {
     );
     const codeHash = await hexSHA256(handler.pythonCode);
     return `${eventFingerprint}:${codeHash}`;
+  }
+
+  /** Return a deep clone of the given `handler`, except that the clone
+   * has a fresh `id`. */
+  static clone(handler: EventHandler): EventHandler {
+    const id = UuidOps.newRandom();
+    const event = EventDescriptorOps.clone(handler.event);
+    const pythonCode = handler.pythonCode;
+    return { id, event, pythonCode };
   }
 }

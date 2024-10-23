@@ -20,6 +20,7 @@ import {
 } from "../../src/model/junior/structured-program";
 import { threeSpriteProgramNames, threeSpriteProgram } from "./fixtures";
 import { hexSHA256 } from "../../src/utils";
+import { HandlerDuplicationDescriptor } from "../../src/model/junior/structured-program/program";
 
 describe("Structured programs", () => {
   describe("uuids", () => {
@@ -247,6 +248,27 @@ describe("Structured programs", () => {
         assert.equal(sprite.handlers.length, 0);
       });
 
+      it("duplicate", () => {
+        let sprite = bananaWithScript();
+        const handler = sprite.handlers[0];
+        const pythonCode = "# Hello world";
+        handler.pythonCode = pythonCode;
+        const id0 = handler.id;
+        Ops.duplicateHandlerById(sprite, id0);
+        assert.equal(sprite.handlers.length, 2);
+        const handler1 = sprite.handlers[1];
+        assert.notEqual(handler1.id, id0);
+        assert.equal(handler1.pythonCode, pythonCode);
+      });
+
+      it("duplicate failure no handler", () => {
+        const sprite = bananaWithScript();
+        assert.throws(
+          () => Ops.duplicateHandlerById(sprite, UuidOps.newRandom()),
+          "not found in actor"
+        );
+      });
+
       it("handles delete of non-existent", () => {
         let sprite = Ops.newEmptySprite("Banana");
         assert.throws(
@@ -464,6 +486,30 @@ describe("Structured programs", () => {
         clickedHandlerId
       );
       assert.equal(foundHandler.event.kind, "clicked");
+    });
+
+    it("duplicate handler", () => {
+      let program = threeSpriteProgram();
+      const sprite = program.actors[1];
+      ActorOps.appendHandler(
+        sprite,
+        EventHandlerOps.newWithEmptyCode({ kind: "clicked" })
+      );
+
+      const descr: HandlerDuplicationDescriptor = {
+        actorId: sprite.id,
+        handlerId: sprite.handlers[0].id,
+      };
+      Ops.duplicateHandler(program, descr);
+
+      assert.equal(sprite.handlers.length, 2);
+
+      assert.notEqual(sprite.handlers[1].id, sprite.handlers[0].id);
+      assert.deepEqual(sprite.handlers[1].event, sprite.handlers[0].event);
+      assert.equal(
+        sprite.handlers[1].pythonCode,
+        sprite.handlers[0].pythonCode
+      );
     });
 
     it("detect dupd handler-id", () => {
