@@ -213,7 +213,7 @@ export function allTasksDoneInCurrentChapter(
   return nTasksDone >= nTasksInclChapter;
 }
 
-function learnerTaskCommitFromDiv(
+function learnerTaskFragmentFromDiv(
   div: HTMLDivElement
 ): LearnerTaskHelpStageFragment {
   const jrCommitJson = div.dataset.jrCommit;
@@ -236,7 +236,7 @@ function learnerTaskHelpStageFromElt(elt: HTMLElement): LearnerTaskHelpStage {
   let fragments: Array<LearnerTaskHelpStageFragment> = [];
   div.childNodes.forEach((node) => {
     if (isDivOfClass(node, "jr-commit")) {
-      fragments.push(learnerTaskCommitFromDiv(node));
+      fragments.push(learnerTaskFragmentFromDiv(node));
     } else {
       fragments.push({ kind: "element", element: node as HTMLElement });
     }
