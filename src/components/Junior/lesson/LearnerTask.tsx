@@ -20,6 +20,20 @@ type HelpStageFragmentProps = { fragment: LearnerTaskHelpStageFragment };
 const HelpStageFragment: React.FC<HelpStageFragmentProps> = ({ fragment }) => {
   const content = (() => {
     switch (fragment.kind) {
+      case "error":
+        return (
+          <div className="error-summary">
+            <p>
+              Tutorial error. Please contact the Pytch team if you see this!
+              (Unless you are the author of a tutorial and you understand the
+              message below.)
+            </p>
+            <pre className="error-message">{fragment.message}</pre>
+            <div className="original-node">
+              <RawElement element={fragment.element} />
+            </div>
+          </div>
+        );
       case "element": {
         const element = fragment.element;
         return element instanceof Text ? null : (

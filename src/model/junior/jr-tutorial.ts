@@ -79,7 +79,10 @@ export type LearnerTaskCommit =
   | LearnerTaskCommitEditScript
   | LearnerTaskCommitChangeHatBlock;
 
+// Should only encounter the "error" kind when developing tutorials,
+// e.g., when the author mis-types a commit slug.
 export type LearnerTaskHelpStageFragment =
+  | { kind: "error"; element: HTMLElement; message: string }
   | { kind: "element"; element: HTMLElement }
   | { kind: "commit"; commit: LearnerTaskCommit };
 
@@ -210,13 +213,22 @@ export function allTasksDoneInCurrentChapter(
   return nTasksDone >= nTasksInclChapter;
 }
 
-function learnerTaskCommitFromDiv(div: HTMLDivElement): LearnerTaskCommit {
-  const jrCommitJson = failIfNull(
-    div.dataset.jrCommit,
-    "missing data-jr-commit attribute in DIV.jr-commit"
-  );
-
-  return JSON.parse(jrCommitJson) as LearnerTaskCommit;
+function learnerTaskFragmentFromDiv(
+  div: HTMLDivElement
+): LearnerTaskHelpStageFragment {
+  const jrCommitJson = div.dataset.jrCommit;
+  if (jrCommitJson != null) {
+    return {
+      kind: "commit",
+      commit: JSON.parse(jrCommitJson) as LearnerTaskCommit,
+    };
+  } else {
+    return {
+      kind: "error",
+      element: div,
+      message: "No data-jr-commit in DIV",
+    };
+  }
 }
 
 function learnerTaskHelpStageFromElt(elt: HTMLElement): LearnerTaskHelpStage {
@@ -224,8 +236,7 @@ function learnerTaskHelpStageFromElt(elt: HTMLElement): LearnerTaskHelpStage {
   let fragments: Array<LearnerTaskHelpStageFragment> = [];
   div.childNodes.forEach((node) => {
     if (isDivOfClass(node, "jr-commit")) {
-      const commit = learnerTaskCommitFromDiv(node);
-      fragments.push({ kind: "commit", commit });
+      fragments.push(learnerTaskFragmentFromDiv(node));
     } else {
       fragments.push({ kind: "element", element: node as HTMLElement });
     }
