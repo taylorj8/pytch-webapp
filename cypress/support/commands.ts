@@ -184,8 +184,21 @@ export type CreateProjectTutorialOptions = {
 const defaultCreateProjectTutorialOptions: CreateProjectTutorialOptions = {
   resetDatabaseFirst: true,
 };
-const createTutorialProject = (tutorialSlug: string, buttonContent: string) => {
-  cy.pytchResetDatabase();
+const createTutorialProject = (
+  tutorialSlug: string,
+  buttonContent: string,
+  options?: Partial<CreateProjectTutorialOptions>
+) => {
+  const fullOptions: CreateProjectTutorialOptions = Object.assign(
+    {},
+    defaultCreateProjectTutorialOptions,
+    options
+  );
+
+  if (fullOptions.resetDatabaseFirst) {
+    cy.pytchResetDatabase();
+  }
+
   cy.contains("My projects").click();
   cy.contains("Tutorials").click();
   cy.get(`.TutorialCard[data-slug="${tutorialSlug}"]`).within(() => {
