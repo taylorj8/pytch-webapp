@@ -178,6 +178,12 @@ Cypress.Commands.add("pytchSwitchProject", (name: string) => {
   cy.pytchOpenProject(name);
 });
 
+export type CreateProjectTutorialOptions = {
+  resetDatabaseFirst: boolean;
+};
+const defaultCreateProjectTutorialOptions: CreateProjectTutorialOptions = {
+  resetDatabaseFirst: true,
+};
 const createTutorialProject = (tutorialSlug: string, buttonContent: string) => {
   cy.pytchResetDatabase();
   cy.contains("My projects").click();
