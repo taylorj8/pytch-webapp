@@ -217,7 +217,8 @@ const createTutorialProject = (
 
 Cypress.Commands.add(
   "pytchProjectFollowingTutorial",
-  (tutorialSlug = "boing") => createTutorialProject(tutorialSlug, "Tutorial")
+  (tutorialSlug = "boing", options?: Partial<CreateProjectTutorialOptions>) =>
+    createTutorialProject(tutorialSlug, "Tutorial", options)
 );
 
 Cypress.Commands.add(

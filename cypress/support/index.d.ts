@@ -1,3 +1,4 @@
+import { CreateProjectTutorialOptions } from "./commands";
 import {
   ArrayRGBA,
   ContentMatch,
@@ -49,7 +50,10 @@ declare global {
 
       /** Reset the "pytch" storage database, then create and navigate to
        * a project following a sample tutorial. */
-      pytchProjectFollowingTutorial(tutorialSlug?: string): Chainable<Element>;
+      pytchProjectFollowingTutorial(
+        tutorialSlug?: string,
+        options?: Partial<CreateProjectTutorialOptions>
+      ): Chainable<Element>;
 
       /** Reset the "pytch" storage database, then create and navigate to
        * a project created as a demo of a sample tutorial. */
