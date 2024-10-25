@@ -20,3 +20,22 @@ interface VerticalRange {
   top: number;
   bottom: number;
 }
+
+function impliedRowRange(
+  parentDiv: HTMLElement,
+  targetRow1b: number,
+  fontSizeStr: string
+): VerticalRange | null {
+  const fontSize = parseFloat(fontSizeStr);
+  if (isNaN(fontSize)) return null;
+
+  const maybeFirstRow = parentDiv.querySelector(aceRowSelector(1));
+  if (maybeFirstRow == null) return null;
+
+  const firstRowRect = maybeFirstRow.getBoundingClientRect();
+  const nRowsOffset = targetRow1b - 1;
+  return {
+    top: firstRowRect.top + nRowsOffset * fontSize,
+    bottom: firstRowRect.bottom + nRowsOffset * fontSize,
+  };
+}
