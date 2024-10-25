@@ -42,6 +42,10 @@ class AceController {
     this.editor.focus();
   }
 
+  getCursorPosition() {
+    return this.editor.getCursorPosition();
+  }
+
   static kScrollIntoViewLinesBelow = 2.5;
 
   scrollIntoView(targetLineNo: number) {
