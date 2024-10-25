@@ -178,6 +178,8 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   // first time you drag a particular script.  It works correctly in a
   // static preview or release build.
 
+  const aceParentDivId = `aceParent-${handler.id}`;
+
   return (
     <>
       <DragPreviewImage connect={preview} src={PytchScriptPreview} />
@@ -195,7 +197,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
           </div>
         </div>
         <div className="drag-masked-editor">
-          <div ref={aceParentRef}>
+          <div ref={aceParentRef} id={aceParentDivId}>
             <div className="hat-code-spacer" />
             <AceEditor
               mode="python"
