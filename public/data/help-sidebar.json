@@ -587,6 +587,15 @@
     },
     {
         "kind": "block",
+        "python": "random.uniform(lowest, highest)",
+        "scratch": "(pick random (20.5) to (31.75))",
+        "help": {
+            "flat": "To use this function, you must have the line `import random` at the top of your program, just after the `import pytch` line.\n\nPick a random number (which might not be a whole number, i.e., it can have a fractional part) from `lowest` to `highest`.\n\n```\n# Pick a random warm temperature:\ntemperature = random.uniform(20.5, 31.75)\n```",
+            "per-method": "Pick a random number (which might not be a whole number, i.e., it can have a fractional part) from `lowest` to `highest`.\n\n```\n# Pick a random warm temperature:\ntemperature = random.uniform(20.5, 31.75)\n```"
+        }
+    },
+    {
+        "kind": "block",
         "python": "value_1 > value_2",
         "scratch": "<(score) > [50]>",
         "help": "Report whether the first value is larger than the second value.  You often use this as part of an `if` or `while` statement.\n\n```\n# If player got a good score,\n# congratulate them:\nif score > 50:\n    print(\"Well done!\")\n```\n\nPython also has the `>=` operator, which means 'larger than or equal to':\n```\n# If player is at least 1.5m tall,\n# tell them they can play:\nif height >= 1.5:\n    print(\"Let's play!\")\n```"
