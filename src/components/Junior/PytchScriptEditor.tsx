@@ -29,6 +29,7 @@ import PytchScriptPreview from "../../images/drag-preview-event-handler.png";
 import { DragPreviewImage } from "react-dnd";
 import { useNotableChanges } from "../hooks/notable-changes";
 import { ConjoinedResizeObserver } from "../../model/junior/conjoined-resize-observer";
+import { scrollCursorRowIntoView } from "./PytchScriptEditor-scroller";
 
 // Adapted from https://stackoverflow.com/a/71952718
 const insertElectricFullStop = (editor: AceEditorT) => {
@@ -75,6 +76,20 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   const updateCodeText = (code: string) => {
     setHandlerPythonCode({ actorId, handlerId, code });
   };
+
+  useEffect(() => {
+    const scroll = () => scrollCursorRowIntoView(handlerId);
+    scroll();
+
+    const aceParentDiv = aceParentRef.current;
+    if (aceParentDiv == null) return;
+
+    const inputDiv = aceParentDiv.querySelector(".ace_text-input");
+    if (inputDiv == null) return;
+
+    inputDiv.addEventListener("keydown", scroll);
+    return () => inputDiv.removeEventListener("keydown", scroll);
+  }, [aceParentRef]);
 
   useEffect(() => {
     const aceParentDiv = aceParentRef.current;
