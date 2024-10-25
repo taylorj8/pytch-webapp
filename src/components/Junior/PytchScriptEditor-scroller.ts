@@ -15,3 +15,8 @@ function hasLiveCursor(parentDiv: HTMLElement): boolean {
   // This is expected so don't log() if null:
   return maybeLiveCursors != null;
 }
+
+interface VerticalRange {
+  top: number;
+  bottom: number;
+}
