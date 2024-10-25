@@ -1,3 +1,5 @@
+import { aceControllerMap } from "../../skulpt-connection/code-editor";
+
 const kIdealCursorClearance = 65;
 
 function isNull<T>(x: T | null, xName: string): x is null {
@@ -40,4 +42,47 @@ function impliedRowRange(
     top: firstRowRect.top + nRowsOffset * fontSize,
     bottom: firstRowRect.bottom + nRowsOffset * fontSize,
   };
+}
+
+export function scrollCursorRowIntoView(handlerId: string) {
+  const editor = aceControllerMap.get(handlerId);
+  if (isNull(editor, `editor[${handlerId}]`)) return;
+
+  const parentDivId = `aceParent-${handlerId}`;
+  const parentDiv = document.getElementById(parentDivId);
+  if (isNull(parentDiv, "parentDiv")) return;
+
+  // Only scroll the editor if it has focus.
+  if (!hasLiveCursor(parentDiv)) return;
+
+  const codeEditorDiv = document.querySelector(".Junior-CodeEditor");
+  if (isNull(codeEditorDiv, "codeEditorDiv")) return;
+
+  const cursorRow1b = editor.getCursorPosition().row + 1;
+  const cursorLine = parentDiv.querySelector(aceRowSelector(cursorRow1b));
+
+  const cursorLineRect =
+    cursorLine != null
+      ? cursorLine.getBoundingClientRect()
+      : impliedRowRange(parentDiv, cursorRow1b, editor.getFontSize());
+  if (isNull(cursorLineRect, "cursorLineRect")) return;
+
+  const codeEditorRect = codeEditorDiv.getBoundingClientRect();
+
+  const requiredClearance = Math.min(
+    Math.floor(codeEditorRect.height / 3),
+    kIdealCursorClearance
+  );
+
+  const clearanceAbove = cursorLineRect.top - codeEditorRect.top;
+  if (clearanceAbove < requiredClearance) {
+    const top = codeEditorDiv.scrollTop - requiredClearance + clearanceAbove;
+    codeEditorDiv.scrollTo({ top });
+  }
+
+  const clearanceBelow = codeEditorRect.bottom - cursorLineRect.bottom;
+  if (clearanceBelow < requiredClearance) {
+    const top = codeEditorDiv.scrollTop + requiredClearance - clearanceBelow;
+    codeEditorDiv.scrollTo({ top });
+  }
 }
