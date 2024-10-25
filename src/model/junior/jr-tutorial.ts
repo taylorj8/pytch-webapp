@@ -1,7 +1,6 @@
 import {
   assertNever,
   ensureDivOfClass,
-  failIfNull,
   isDivOfClass,
   parsedHtmlBody,
 } from "../../utils";
