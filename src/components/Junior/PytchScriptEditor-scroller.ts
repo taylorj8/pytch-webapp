@@ -61,6 +61,10 @@ export function scrollCursorRowIntoView(handlerId: string) {
   const cursorRow1b = editor.getCursorPosition().row + 1;
   const cursorLine = parentDiv.querySelector(aceRowSelector(cursorRow1b));
 
+  // Sometimes the cursor row element does not exist, for example when
+  // pressing Enter while on the currently-last line of a script, or
+  // when pasting.  In that case, fall back to a calculation for where
+  // we think the row containing the cursor will be.
   const cursorLineRect =
     cursorLine != null
       ? cursorLine.getBoundingClientRect()
