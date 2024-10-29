@@ -285,23 +285,6 @@ type WithPytchJrProgramTestFun = (
   actions: Actions<IActiveProject>
 ) => void | Promise<void>;
 
-/** Under the given `title`, run the given `fn`, passing it the current
- * structured Pytch program and the bundle Easy-Peasy actions for the
- * `IActiveProject` model slice. */
-export const withPytchJrProgramIt = (
-  title: string,
-  fn: WithPytchJrProgramTestFun
-) =>
-  it(title, () =>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    cy.window().then((window: any) => {
-      const pytchCy = window.PYTCH_CYPRESS;
-      const program: StructuredProgram = pytchCy.currentProgram.program;
-      const actions: Actions<IActiveProject> = pytchCy.currentProgramActions;
-      fn(program, actions);
-    })
-  );
-
 /** Run the given function, providing it with the script-by-script
  * program as it is at that point in the test, and the actions for the
  * active project. */
