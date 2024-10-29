@@ -7,7 +7,7 @@ import {
   selectActorAspect,
   selectInfoPane,
   selectSprite,
-  withPytchJrProgramIt,
+  usingPytchJrProgram,
 } from "./utils";
 
 context("Scroll error-line into view", () => {
@@ -71,9 +71,8 @@ context("Scroll error-line into view", () => {
   ];
 
   goToErrorLocationSpecs.forEach((spec) =>
-    withPytchJrProgramIt(
-      `scrolls error at ${spec.scriptIdx}/${spec.lineNo} into view`,
-      (program, actions) => {
+    it(`scrolls error at ${spec.scriptIdx}/${spec.lineNo} into view`, () => {
+      usingPytchJrProgram((program, actions) => {
         insertNameErrorIntoStage(program, spec.scriptIdx, spec.lineNo, actions);
 
         selectSprite("Snake");
@@ -106,7 +105,7 @@ context("Scroll error-line into view", () => {
         assertScrollCorrect(spec.scriptIdx);
         cy.pytchSendKeysToApp("z");
         cy.get(".ace_line").contains("zyx = pront");
-      }
-    )
+      });
+    })
   );
 });
