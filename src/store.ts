@@ -7,5 +7,6 @@ const { useStoreActions, useStoreState, useStoreDispatch } =
 export { useStoreActions, useStoreDispatch, useStoreState };
 
 const store = createStore(pytchAppModel);
+export type PytchAppStore = typeof store;
 
 export default store;
