@@ -10,6 +10,7 @@ import { launchProjectInListDropdownAction } from "../utils";
 import { Actions } from "easy-peasy";
 import { IActiveProject } from "../../../src/model/project";
 import { range } from "../../../src/utils";
+import { PytchAppStore } from "../../../src/store";
 
 /** Click on the Sprite with the given `spriteName`, thereby selecting
  * it. */
@@ -300,6 +301,26 @@ export const withPytchJrProgramIt = (
       fn(program, actions);
     })
   );
+
+/** Run the given function, providing it with the script-by-script
+ * program as it is at that point in the test, and the actions for the
+ * active project. */
+export const usingPytchJrProgram = (fn: WithPytchJrProgramTestFun) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cy.window().then((window: any) => {
+    let pytchCypress = window.PYTCH_CYPRESS;
+    const store = pytchCypress.easyPeasyStore as PytchAppStore;
+
+    const pytchProgram = store.getState().activeProject.project.program;
+    if (pytchProgram.kind !== "per-method")
+      throw new Error("usingPytchJrProgram(): expecting per-method program");
+
+    const program = pytchProgram.program;
+    const actions = store.getActions().activeProject;
+
+    fn(program, actions);
+  });
+};
 
 /** Assuming there is only one event-handler visible, delete all its
  * code. */
