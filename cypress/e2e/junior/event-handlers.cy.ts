@@ -11,6 +11,7 @@ import {
   launchDeleteHandlerByIndex,
   duplicateHandlerByIndex,
   aceControllerMapFromWindow,
+  usingPytchJrProgram,
 } from "./utils";
 import { saveButton } from "../utils";
 
@@ -131,6 +132,7 @@ context("Create/modify/delete event handlers", () => {
 
     assertHatBlockLabels(["when green flag clicked", 'when "x" key pressed']);
 
+    usingPytchJrProgram((program, actions) => {
     typeIntoScriptEditor(0, '{home}print("started"){enter}');
     typeIntoScriptEditor(1, 'print("got x"){enter}');
 
@@ -141,6 +143,7 @@ context("Create/modify/delete event handlers", () => {
 
     cy.pytchSendKeysToApp("x");
     cy.pytchStdoutShouldEqual("started\ngot x\n");
+    });
   });
 
   it("can add and delete handlers", () => {
