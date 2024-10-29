@@ -132,28 +132,28 @@ context("Create/modify/delete event handlers", () => {
     assertHatBlockLabels(["when green flag clicked", 'when "x" key pressed']);
 
     usingPytchJrProgram((program, actions) => {
-    const snakeId = program.actors[1].id;
-    const flagHandlerId = program.actors[1].handlers[0].id;
-    const keyHandlerId = program.actors[1].handlers[1].id;
+      const snakeId = program.actors[1].id;
+      const flagHandlerId = program.actors[1].handlers[0].id;
+      const keyHandlerId = program.actors[1].handlers[1].id;
 
-    actions.setHandlerPythonCode({
-      actorId: snakeId,
-      handlerId: flagHandlerId,
-      code: 'print("started")',
-    });
-    actions.setHandlerPythonCode({
-      actorId: snakeId,
-      handlerId: keyHandlerId,
-      code: 'print("got x")',
-    });
+      actions.setHandlerPythonCode({
+        actorId: snakeId,
+        handlerId: flagHandlerId,
+        code: 'print("started")',
+      });
+      actions.setHandlerPythonCode({
+        actorId: snakeId,
+        handlerId: keyHandlerId,
+        code: 'print("got x")',
+      });
 
-    cy.pytchGreenFlag();
+      cy.pytchGreenFlag();
 
-    cy.pytchStdoutShouldEqual("started\n");
-    cy.get("#pytch-speech-bubbles").should("be.focused");
+      cy.pytchStdoutShouldEqual("started\n");
+      cy.get("#pytch-speech-bubbles").should("be.focused");
 
-    cy.pytchSendKeysToApp("x");
-    cy.pytchStdoutShouldEqual("started\ngot x\n");
+      cy.pytchSendKeysToApp("x");
+      cy.pytchStdoutShouldEqual("started\ngot x\n");
     });
   });
 
