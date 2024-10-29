@@ -3,8 +3,8 @@ import {
   selectActorAspect,
   selectInfoPane,
   selectSprite,
-  withPytchJrProgramIt,
   loadAndRunDemo,
+  usingPytchJrProgram,
 } from "./utils";
 
 context("Interact with errors", () => {
@@ -16,9 +16,8 @@ context("Interact with errors", () => {
   ];
 
   goToErrorLocationSpecs.forEach((spec) =>
-    withPytchJrProgramIt(
-      `switches to error tab on error (${spec.activeActor} active)`,
-      (program, actions) => {
+    it(`switches to error tab on error (${spec.activeActor} active)`, () => {
+      usingPytchJrProgram((program, actions) => {
         const snake = program.actors[1];
         actions.setHandlerPythonCode({
           actorId: snake.id,
@@ -42,7 +41,7 @@ context("Interact with errors", () => {
         cy.get(".go-to-line").should("have.length", 1).click();
         cy.get(".ActorCard").eq(1).should("have.class", "isFocused");
         cy.contains('3 + "a"').should("be.visible");
-      }
-    )
+      });
+    })
   );
 });
