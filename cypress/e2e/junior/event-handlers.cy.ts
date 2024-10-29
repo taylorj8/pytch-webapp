@@ -6,7 +6,6 @@ import {
   selectStage,
   settleModalDialog,
   soleEventHandlerCodeShouldEqual,
-  typeIntoScriptEditor,
   ScriptOps,
   launchDeleteHandlerByIndex,
   duplicateHandlerByIndex,
@@ -133,8 +132,20 @@ context("Create/modify/delete event handlers", () => {
     assertHatBlockLabels(["when green flag clicked", 'when "x" key pressed']);
 
     usingPytchJrProgram((program, actions) => {
-    typeIntoScriptEditor(0, '{home}print("started"){enter}');
-    typeIntoScriptEditor(1, 'print("got x"){enter}');
+    const snakeId = program.actors[1].id;
+    const flagHandlerId = program.actors[1].handlers[0].id;
+    const keyHandlerId = program.actors[1].handlers[1].id;
+
+    actions.setHandlerPythonCode({
+      actorId: snakeId,
+      handlerId: flagHandlerId,
+      code: 'print("started")',
+    });
+    actions.setHandlerPythonCode({
+      actorId: snakeId,
+      handlerId: keyHandlerId,
+      code: 'print("got x")',
+    });
 
     cy.pytchGreenFlag();
 
