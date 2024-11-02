@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { useLinkedJrTutorial } from "./hooks";
 import { EmptyProps, range } from "../../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useStoreActions } from "../../../store";
 
 type ProgressNodeKind = "completed" | "current" | "future";
 
@@ -26,6 +27,9 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
   const tutorialContent = linkedTutorial.content;
   const chapters = tutorialContent.chapters;
   const activeChapterIndex = linkedTutorial.interactionState.chapterIndex;
+  const setChapterIndex = useStoreActions(
+    (actions) => actions.activeProject.setLinkedLessonChapterIndex
+  );
 
   // Only some of the chapters count as "progress stages".  (We might
   // exclude the "Challenges" and "Asset credits" chapters, for
