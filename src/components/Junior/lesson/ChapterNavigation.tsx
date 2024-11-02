@@ -50,34 +50,15 @@ export const ChapterNavigation: React.FC<EmptyProps> = () => {
   const nextChapterTitle = state.mNextChapterTitle;
   if (nextChapterTitle == null) return null;
 
-  const nextIsEnabled = state.chapterIdx < state.nChapters - 1;
-  const prevIsEnabled = state.chapterIdx > 0;
-
-  const prevChapter = () => {
-    if (prevIsEnabled) setChapterIndex(state.chapterIdx - 1);
-  };
   const nextChapter = () => {
     setChapterIndex(state.chapterIdx + 1);
   };
 
-  const prevClasses = classNames("prev", { isEnabled: prevIsEnabled });
-  const nextClasses = classNames("next", { isEnabled: nextIsEnabled });
-
-  const mNextButton = state.allChapterTasksDone && (
-    <Button className={nextClasses} onClick={nextChapter}>
-      Next
-    </Button>
-  );
-
-  const classes = classNames("Junior-ChapterNavigation", {
-    someTasksRemain: !state.allChapterTasksDone,
-  });
   return (
-    <div className={classes}>
-      <Button className={prevClasses} onClick={prevChapter}>
-        Back
+    <div className="Junior-ChapterNavigation">
+      <Button className="next" onClick={nextChapter}>
+        Next: {nextChapterTitle}
       </Button>
-      {mNextButton}
     </div>
   );
 };
