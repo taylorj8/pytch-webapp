@@ -145,7 +145,7 @@ export const Chapter: React.FC<EmptyProps> = () => {
   if (!state.allChapterTasksDone) {
     const key = `${state.chapterIndex}/hint`;
     body.push(
-      <div key={key} className="my-3 hint-do-task-to-see-more">
+      <div key={key} className="hint-do-task-to-see-more">
         (You’ll see the next step once you’ve marked this task as done.)
       </div>
     );
