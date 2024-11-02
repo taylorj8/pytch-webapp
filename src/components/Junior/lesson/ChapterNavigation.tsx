@@ -3,7 +3,6 @@ import { EmptyProps } from "../../../utils";
 import { Button } from "react-bootstrap";
 import { useMappedLinkedJrTutorial } from "./hooks";
 import { useStoreActions } from "../../../store";
-import classNames from "classnames";
 import {
   LinkedJrTutorial,
   allTasksDoneInCurrentChapter,
