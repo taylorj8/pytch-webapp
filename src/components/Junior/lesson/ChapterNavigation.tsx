@@ -45,6 +45,11 @@ export const ChapterNavigation: React.FC<EmptyProps> = () => {
     (actions) => actions.activeProject.setLinkedLessonChapterIndex
   );
 
+  if (!state.allChapterTasksDone) return null;
+
+  const nextChapterTitle = state.mNextChapterTitle;
+  if (nextChapterTitle == null) return null;
+
   const nextIsEnabled = state.chapterIdx < state.nChapters - 1;
   const prevIsEnabled = state.chapterIdx > 0;
 
