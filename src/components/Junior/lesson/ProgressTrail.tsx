@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { useLinkedJrTutorial } from "./hooks";
 import { EmptyProps, range } from "../../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import RawElement from "../../RawElement";
 import { useStoreActions } from "../../../store";
 
 type ProgressNodeKind = "completed" | "current" | "future";
@@ -65,12 +66,35 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
     return <div key={idx} className={classes} />;
   });
 
+  const nodeHoverTargets = range(nProgressStages).map((idx) => {
+    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
+    const canJumpHere = nTasksDone >= nTasksBeforeChapter;
+
+    const contentElt = chapters[idx].titleElt.cloneNode(true) as HTMLElement;
+    const tooltip = (
+      <div className="progress-node-tooltip">
+        <RawElement element={contentElt} />
+      </div>
+    );
+
+    const onClick = canJumpHere ? () => setChapterIndex(idx) : () => void 0;
+    const classes = classNames("progress-node-hover-target", { canJumpHere });
+
+    return (
+      <div key={idx} className={classes} onClick={onClick}>
+        {tooltip}
+      </div>
+    );
+  });
+
   return (
     <>
       <div className="ProgressTrail">
         <div className="node-backgrounds">{nodeBackgrounds}</div>
         <div className="track" />
         <div className="nodes">{nodeDivs}</div>
+        <div className="node-hover-targets">{nodeHoverTargets}</div>
       </div>
       <div className="chapter-title">
         {maybeChapterNumberLabel}
