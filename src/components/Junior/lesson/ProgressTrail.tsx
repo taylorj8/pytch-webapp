@@ -20,7 +20,7 @@ const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = (props) => {
         <FontAwesomeIcon icon="check"></FontAwesomeIcon>
       </span>
     ) : kind === "future" ? (
-      <div></div>
+      <div className="future-node" />
     ) : null;
 
   return <div className={nodeClasses}>{objContent}</div>;

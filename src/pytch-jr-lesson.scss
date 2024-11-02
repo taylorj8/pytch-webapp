@@ -317,7 +317,7 @@ $task-checkbox-not-done-colour: #999;
       &.future {
         width: 1.2rem;
         padding: 0px 0.4rem;
-        div {
+        div.future-node {
           width: 0.4rem;
           height: 0.4rem;
           border-radius: 50%;
