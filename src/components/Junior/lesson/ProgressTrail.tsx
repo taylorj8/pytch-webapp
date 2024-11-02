@@ -55,9 +55,16 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
       <span className="chapter-number">{activeChapterIndex} —</span>
     ) : null;
 
+  const nodeBackgrounds = range(nProgressStages).map((idx) => {
+    const isActive = idx === activeChapterIndex;
+    const classes = classNames("progress-node-background", { isActive });
+    return <div key={idx} className={classes} />;
+  });
+
   return (
     <>
       <div className="ProgressTrail">
+        <div className="node-backgrounds">{nodeBackgrounds}</div>
         <div className="track" />
         <div className="nodes">{nodeDivs}</div>
       </div>
