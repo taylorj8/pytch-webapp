@@ -38,11 +38,7 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
   const progressStages = chapters.filter((chap) => chap.includeInProgressTrail);
   const nProgressStages = progressStages.length;
 
-  const chapterTitleElt =
-    linkedTutorial.content.chapters[activeChapterIndex].chunks[0];
-  if (chapterTitleElt.kind !== "element") {
-    throw new Error("first chunk is not element");
-  }
+  const chapterTitleElt = chapters[activeChapterIndex].titleElt;
 
   const nodeDivs = range(nProgressStages).map((idx) => (
     <ProgressTrailNode key={idx} idx={idx} currentIdx={activeChapterIndex} />
@@ -61,7 +57,7 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
       </div>
       <div className="chapter-title">
         {maybeChapterNumberLabel}
-        {chapterTitleElt.element.innerText}
+        {chapterTitleElt.innerText}
       </div>
     </>
   );
