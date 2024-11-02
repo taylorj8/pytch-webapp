@@ -16,6 +16,7 @@ import {
   stateHasProject,
 } from "../model/standalone-play-demo";
 
+import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import Stage from "./Stage";
 import QuestionInputPanel from "./QuestionInputPanel";
@@ -218,9 +219,12 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
   };
 
   const greenFlag = (
-    <div className="StageControlPseudoButton GreenFlag" onClick={onGreenFlag}>
+    <Button
+      className="StageControlPseudoButton GreenFlag"
+      onClick={onGreenFlag}
+    >
       <FontAwesomeIcon icon="play" />
-    </div>
+    </Button>
   );
 
   return (
