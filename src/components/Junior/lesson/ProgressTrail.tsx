@@ -6,15 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ProgressNodeKind = "completed" | "current" | "future";
 
-type ProgressTrailNodeProps = { idx: number; currentIdx: number };
-const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = (props) => {
-  const kind =
-    props.idx < props.currentIdx
-      ? "completed"
-      : props.idx === props.currentIdx
-      ? "current"
-      : "future";
-
+type ProgressTrailNodeProps = { kind: ProgressNodeKind };
+const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({ kind }) => {
   const nodeClasses = classNames("progress-node", kind);
   const objContent =
     kind === "completed" ? (
