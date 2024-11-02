@@ -176,9 +176,9 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
     }
 
     const handleResize = () => {
-      // This "28" is the height of the controls; ideally we would get
+      // This "36" is the height of the controls; ideally we would get
       // this from somewhere definitive, not hard-code it.
-      const layout = fullScreenStageDisplaySize(28);
+      const layout = fullScreenStageDisplaySize(36);
       setStageDisplayWidth(layout.width);
     };
 
