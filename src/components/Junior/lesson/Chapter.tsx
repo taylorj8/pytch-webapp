@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   JrTutorialChapter,
   LinkedJrTutorial,
@@ -8,6 +8,26 @@ import { LearnerTask } from "./LearnerTask";
 import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useMappedLinkedJrTutorial } from "./hooks";
 import RawElement from "../../RawElement";
+
+type ToCEntryProps = { key: React.Key; titleElt: HTMLElement };
+const ToCEntry: React.FC<ToCEntryProps> = (props) => {
+  const liRef = React.createRef<HTMLLIElement>();
+
+  useEffect(() => {
+    let liElt = liRef.current;
+    if (liElt == null) return;
+
+    props.titleElt.childNodes.forEach((node) => {
+      liElt.appendChild(node.cloneNode(true));
+    });
+
+    return () => {
+      liElt.innerHTML = "";
+    };
+  }, [liRef]);
+
+  return <li ref={liRef} />;
+};
 
 const LessonTableOfContents: React.FC<{ key: React.Key }> = () => {
   const chapters = useMappedLinkedJrTutorial(
