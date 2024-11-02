@@ -42,11 +42,7 @@ const LessonTableOfContents: React.FC<{ key: React.Key }> = () => {
       <h1 className="title">Summary of this project’s steps:</h1>
       <ul className="toc-contents">
         {realChapters.map((chapter, idx) => (
-          <li key={idx}>
-            <RawElement
-              element={chapter.titleElt.cloneNode(true) as HTMLHeadingElement}
-            />
-          </li>
+          <ToCEntry key={idx} titleElt={chapter.titleElt} />
         ))}
       </ul>
     </div>
