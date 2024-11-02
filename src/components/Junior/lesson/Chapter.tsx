@@ -10,17 +10,21 @@ import { useMappedLinkedJrTutorial } from "./hooks";
 import RawElement from "../../RawElement";
 
 const LessonTableOfContents: React.FC<{ key: React.Key }> = () => {
-  const chapterTitles = useMappedLinkedJrTutorial(
-    (tutorial) => tutorial.content.realChapterTitles
+  const chapters = useMappedLinkedJrTutorial(
+    (tutorial) => tutorial.content.chapters
   );
+
+  // Omit first "chapter", which is the overall summary.
+  const realChapters = chapters.slice(1);
+
   return (
     <div className="LessonTableOfContents">
       <h1 className="title">Summary of this project’s steps:</h1>
       <ul className="toc-contents">
-        {chapterTitles.map((chapterTitle, idx) => (
+        {realChapters.map((chapter, idx) => (
           <li key={idx}>
             <RawElement
-              element={chapterTitle.cloneNode(true) as HTMLHeadingElement}
+              element={chapter.titleElt.cloneNode(true) as HTMLHeadingElement}
             />
           </li>
         ))}
