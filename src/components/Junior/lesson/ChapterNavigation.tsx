@@ -8,6 +8,7 @@ import {
   LinkedJrTutorial,
   allTasksDoneInCurrentChapter,
 } from "../../../model/junior/jr-tutorial";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ChapterNavigationState = {
   allChapterTasksDone: boolean;
@@ -57,7 +58,8 @@ export const ChapterNavigation: React.FC<EmptyProps> = () => {
   return (
     <div className="Junior-ChapterNavigation">
       <Button className="next" onClick={nextChapter}>
-        Next: {nextChapterTitle}
+        Next: {nextChapterTitle}{" "}
+        <FontAwesomeIcon className="next-arrow" icon="arrow-right-long" />
       </Button>
     </div>
   );
