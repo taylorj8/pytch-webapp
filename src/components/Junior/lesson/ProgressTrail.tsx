@@ -40,9 +40,9 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
 
   const chapterTitleElt = chapters[activeChapterIndex].titleElt;
 
-  const nodeDivs = range(nProgressStages).map((idx) => (
-    <ProgressTrailNode key={idx} idx={idx} currentIdx={activeChapterIndex} />
-  ));
+  const nodeDivs = range(nProgressStages).map((idx) => {
+    return <ProgressTrailNode key={idx} idx={idx} currentIdx={activeChapterIndex} />;
+  });
 
   const maybeChapterNumberLabel =
     activeChapterIndex > 0 ? (
