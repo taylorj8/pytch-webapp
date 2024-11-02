@@ -391,6 +391,7 @@ $task-checkbox-not-done-colour: #999;
     }
 
     .hint-do-task-to-see-more {
+      height: $chapter-final-content-height;
       text-align: center;
       font-style: italic;
     }
