@@ -287,7 +287,8 @@ $progress-node-backgrounds-strip-x-margin: calc(
 );
 
 .ProgressTrail {
-  height: 2.25rem;
+  margin-top: 4px;
+  height: 2.5rem;
   display: grid;
   align-items: center;
 
