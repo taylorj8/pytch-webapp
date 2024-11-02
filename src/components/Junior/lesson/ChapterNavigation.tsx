@@ -57,7 +57,7 @@ export const ChapterNavigation: React.FC<EmptyProps> = () => {
     if (prevIsEnabled) setChapterIndex(state.chapterIdx - 1);
   };
   const nextChapter = () => {
-    if (nextIsEnabled) setChapterIndex(state.chapterIdx + 1);
+    setChapterIndex(state.chapterIdx + 1);
   };
 
   const prevClasses = classNames("prev", { isEnabled: prevIsEnabled });
