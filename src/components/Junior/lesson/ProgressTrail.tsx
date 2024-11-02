@@ -4,6 +4,8 @@ import { useLinkedJrTutorial } from "./hooks";
 import { EmptyProps, range } from "../../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+type ProgressNodeKind = "completed" | "current" | "future";
+
 type ProgressTrailNodeProps = { idx: number; currentIdx: number };
 const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = (props) => {
   const kind =
