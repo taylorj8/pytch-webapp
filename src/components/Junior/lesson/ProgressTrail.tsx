@@ -36,7 +36,18 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
   const chapterTitleElt = chapters[activeChapterIndex].titleElt;
 
   const nodeDivs = range(nProgressStages).map((idx) => {
-    return <ProgressTrailNode key={idx} idx={idx} currentIdx={activeChapterIndex} />;
+    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+    const nTasksInclChapter = tutorialContent.nTasksBeforeChapter[idx + 1];
+    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
+
+    const kind: ProgressNodeKind =
+      nTasksDone >= nTasksInclChapter
+        ? "completed"
+        : nTasksDone >= nTasksBeforeChapter
+        ? "current"
+        : "future";
+
+    return <ProgressTrailNode key={idx} kind={kind} />;
   });
 
   const maybeChapterNumberLabel =
