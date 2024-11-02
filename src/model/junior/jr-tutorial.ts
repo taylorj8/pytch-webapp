@@ -109,7 +109,6 @@ export type JrTutorialChapter = {
 export type JrTutorialContent = {
   name: string;
   chapters: Array<JrTutorialChapter>;
-  realChapterTitles: Array<HTMLHeadingElement>;
   nTasksTotal: number;
   nTasksByChapter: Array<number>;
   nTasksBeforeChapter: Array<number>;
@@ -269,7 +268,6 @@ export function jrTutorialContentFromHTML(
   let taskIdx = 0;
   let chapters: Array<JrTutorialChapter> = [];
   let nTasksByChapter: Array<number> = [];
-  let realChapterTitles: Array<HTMLHeadingElement> = [];
   tutorialDiv.childNodes.forEach((chapterNode, index) => {
     const chapterDiv = chapterNode as HTMLDivElement;
 
@@ -279,8 +277,6 @@ export function jrTutorialContentFromHTML(
       titleElt.innerText = "Summary and contents";
     } else {
       titleElt = chapterDiv.childNodes.item(0).cloneNode(true) as HTMLElement;
-      // Accumulate the non-intro titles:
-      realChapterTitles.push(titleElt as HTMLHeadingElement);
     }
 
     let nTasksThisChapter = 0;
@@ -317,7 +313,6 @@ export function jrTutorialContentFromHTML(
   return {
     name: slug,
     chapters,
-    realChapterTitles,
     nTasksTotal,
     nTasksByChapter,
     nTasksBeforeChapter,
