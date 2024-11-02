@@ -7,7 +7,6 @@ import { EmptyProps, assertNever } from "../../../utils";
 import { LearnerTask } from "./LearnerTask";
 import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useMappedLinkedJrTutorial } from "./hooks";
-import RawElement from "../../RawElement";
 
 // This is more fiddly, but just using a <RawElement> inside the <UL>
 // for the ToC leads to poor DOM structure (UL/LI/DIV/H2/text), which
