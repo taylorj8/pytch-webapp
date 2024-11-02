@@ -12,6 +12,7 @@ import {
 type ChapterNavigationState = {
   allChapterTasksDone: boolean;
   chapterIdx: number;
+  mNextChapterTitle: string | null;
   nChapters: number;
 };
 
@@ -19,7 +20,11 @@ function mapTutorial(tutorial: LinkedJrTutorial): ChapterNavigationState {
   const allChapterTasksDone = allTasksDoneInCurrentChapter(tutorial);
   const chapterIdx = tutorial.interactionState.chapterIndex;
   const nChapters = tutorial.content.chapters.length;
-  return { allChapterTasksDone, chapterIdx, nChapters };
+  const mNextChapterTitle =
+    chapterIdx === nChapters - 1
+      ? null
+      : tutorial.content.chapters[chapterIdx + 1].titleElt.innerText;
+  return { allChapterTasksDone, chapterIdx, mNextChapterTitle, nChapters };
 }
 
 function eqState(
@@ -29,6 +34,7 @@ function eqState(
   return (
     s1.allChapterTasksDone === s2.allChapterTasksDone &&
     s1.chapterIdx === s2.chapterIdx &&
+    s1.mNextChapterTitle === s2.mNextChapterTitle &&
     s1.nChapters === s2.nChapters
   );
 }
