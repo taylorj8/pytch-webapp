@@ -243,18 +243,7 @@ $task-checkbox-not-done-colour: #999;
   width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-
-  &.someTasksRemain {
-    margin-top: 2rem;
-  }
-
-  button {
-    visibility: hidden;
-    &.isEnabled {
-      visibility: visible;
-    }
-  }
+  justify-content: end;
 }
 
 .LessonTableOfContents {
