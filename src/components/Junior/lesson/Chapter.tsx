@@ -9,6 +9,9 @@ import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useMappedLinkedJrTutorial } from "./hooks";
 import RawElement from "../../RawElement";
 
+// This is more fiddly, but just using a <RawElement> inside the <UL>
+// for the ToC leads to poor DOM structure (UL/LI/DIV/H2/text), which
+// (reasonably enough) renders poorly on Safari.
 type ToCEntryProps = { key: React.Key; titleElt: HTMLElement };
 const ToCEntry: React.FC<ToCEntryProps> = (props) => {
   const liRef = React.createRef<HTMLLIElement>();
