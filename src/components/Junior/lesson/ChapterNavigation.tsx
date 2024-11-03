@@ -3,15 +3,16 @@ import { EmptyProps } from "../../../utils";
 import { Button } from "react-bootstrap";
 import { useMappedLinkedJrTutorial } from "./hooks";
 import { useStoreActions } from "../../../store";
-import classNames from "classnames";
 import {
   LinkedJrTutorial,
   allTasksDoneInCurrentChapter,
 } from "../../../model/junior/jr-tutorial";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ChapterNavigationState = {
   allChapterTasksDone: boolean;
   chapterIdx: number;
+  mNextChapterTitle: string | null;
   nChapters: number;
 };
 
@@ -19,7 +20,11 @@ function mapTutorial(tutorial: LinkedJrTutorial): ChapterNavigationState {
   const allChapterTasksDone = allTasksDoneInCurrentChapter(tutorial);
   const chapterIdx = tutorial.interactionState.chapterIndex;
   const nChapters = tutorial.content.chapters.length;
-  return { allChapterTasksDone, chapterIdx, nChapters };
+  const mNextChapterTitle =
+    chapterIdx === nChapters - 1
+      ? null
+      : tutorial.content.chapters[chapterIdx + 1].titleElt.innerText;
+  return { allChapterTasksDone, chapterIdx, mNextChapterTitle, nChapters };
 }
 
 function eqState(
@@ -29,6 +34,7 @@ function eqState(
   return (
     s1.allChapterTasksDone === s2.allChapterTasksDone &&
     s1.chapterIdx === s2.chapterIdx &&
+    s1.mNextChapterTitle === s2.mNextChapterTitle &&
     s1.nChapters === s2.nChapters
   );
 }
@@ -39,34 +45,21 @@ export const ChapterNavigation: React.FC<EmptyProps> = () => {
     (actions) => actions.activeProject.setLinkedLessonChapterIndex
   );
 
-  const nextIsEnabled = state.chapterIdx < state.nChapters - 1;
-  const prevIsEnabled = state.chapterIdx > 0;
+  if (!state.allChapterTasksDone) return null;
 
-  const prevChapter = () => {
-    if (prevIsEnabled) setChapterIndex(state.chapterIdx - 1);
-  };
+  const nextChapterTitle = state.mNextChapterTitle;
+  if (nextChapterTitle == null) return null;
+
   const nextChapter = () => {
-    if (nextIsEnabled) setChapterIndex(state.chapterIdx + 1);
+    setChapterIndex(state.chapterIdx + 1);
   };
 
-  const prevClasses = classNames("prev", { isEnabled: prevIsEnabled });
-  const nextClasses = classNames("next", { isEnabled: nextIsEnabled });
-
-  const mNextButton = state.allChapterTasksDone && (
-    <Button className={nextClasses} onClick={nextChapter}>
-      Next
-    </Button>
-  );
-
-  const classes = classNames("Junior-ChapterNavigation", {
-    someTasksRemain: !state.allChapterTasksDone,
-  });
   return (
-    <div className={classes}>
-      <Button className={prevClasses} onClick={prevChapter}>
-        Back
+    <div className="Junior-ChapterNavigation">
+      <Button className="next" onClick={nextChapter}>
+        Next: {nextChapterTitle}{" "}
+        <FontAwesomeIcon className="next-arrow" icon="arrow-right-long" />
       </Button>
-      {mNextButton}
     </div>
   );
 };
