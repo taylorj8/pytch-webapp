@@ -101,6 +101,7 @@ export type JrTutorialChapterChunk =
 
 export type JrTutorialChapter = {
   index: number;
+  titleElt: HTMLElement;
   includeInProgressTrail: boolean;
   chunks: Array<JrTutorialChapterChunk>;
 };
@@ -108,7 +109,6 @@ export type JrTutorialChapter = {
 export type JrTutorialContent = {
   name: string;
   chapters: Array<JrTutorialChapter>;
-  realChapterTitles: Array<HTMLHeadingElement>;
   nTasksTotal: number;
   nTasksByChapter: Array<number>;
   nTasksBeforeChapter: Array<number>;
@@ -268,15 +268,16 @@ export function jrTutorialContentFromHTML(
   let taskIdx = 0;
   let chapters: Array<JrTutorialChapter> = [];
   let nTasksByChapter: Array<number> = [];
-  let realChapterTitles: Array<HTMLHeadingElement> = [];
   tutorialDiv.childNodes.forEach((chapterNode, index) => {
     const chapterDiv = chapterNode as HTMLDivElement;
 
-    // Accumulate the non-intro titles:
-    if (index !== 0)
-      realChapterTitles.push(
-        chapterDiv.childNodes.item(0).cloneNode(true) as HTMLHeadingElement
-      );
+    let titleElt: HTMLElement;
+    if (index === 0) {
+      titleElt = document.createElement("H2");
+      titleElt.innerText = "Summary and contents";
+    } else {
+      titleElt = chapterDiv.childNodes.item(0).cloneNode(true) as HTMLElement;
+    }
 
     let nTasksThisChapter = 0;
     let chunks: Array<JrTutorialChapterChunk> = [];
@@ -299,7 +300,7 @@ export function jrTutorialContentFromHTML(
     const includeInProgressTrail =
       chapterDiv.dataset.excludeFromProgressTrail !== "true";
 
-    chapters.push({ index, includeInProgressTrail, chunks });
+    chapters.push({ index, titleElt, includeInProgressTrail, chunks });
   });
 
   let nTasksTotal = 0;
@@ -312,7 +313,6 @@ export function jrTutorialContentFromHTML(
   return {
     name: slug,
     chapters,
-    realChapterTitles,
     nTasksTotal,
     nTasksByChapter,
     nTasksBeforeChapter,

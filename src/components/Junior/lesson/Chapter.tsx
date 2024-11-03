@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   JrTutorialChapter,
   LinkedJrTutorial,
@@ -7,22 +7,44 @@ import { EmptyProps, assertNever } from "../../../utils";
 import { LearnerTask } from "./LearnerTask";
 import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useMappedLinkedJrTutorial } from "./hooks";
-import RawElement from "../../RawElement";
+
+// This is more fiddly, but just using a <RawElement> inside the <UL>
+// for the ToC leads to poor DOM structure (UL/LI/DIV/H2/text), which
+// (reasonably enough) renders poorly on Safari.
+type ToCEntryProps = { key: React.Key; titleElt: HTMLElement };
+const ToCEntry: React.FC<ToCEntryProps> = (props) => {
+  const liRef = React.createRef<HTMLLIElement>();
+
+  useEffect(() => {
+    let liElt = liRef.current;
+    if (liElt == null) return;
+
+    props.titleElt.childNodes.forEach((node) => {
+      liElt.appendChild(node.cloneNode(true));
+    });
+
+    return () => {
+      liElt.innerHTML = "";
+    };
+  }, [liRef]);
+
+  return <li ref={liRef} />;
+};
 
 const LessonTableOfContents: React.FC<{ key: React.Key }> = () => {
-  const chapterTitles = useMappedLinkedJrTutorial(
-    (tutorial) => tutorial.content.realChapterTitles
+  const chapters = useMappedLinkedJrTutorial(
+    (tutorial) => tutorial.content.chapters
   );
+
+  // Omit first "chapter", which is the overall summary.
+  const realChapters = chapters.slice(1);
+
   return (
     <div className="LessonTableOfContents">
       <h1 className="title">Summary of this project’s steps:</h1>
       <ul className="toc-contents">
-        {chapterTitles.map((chapterTitle, idx) => (
-          <li key={idx}>
-            <RawElement
-              element={chapterTitle.cloneNode(true) as HTMLHeadingElement}
-            />
-          </li>
+        {realChapters.map((chapter, idx) => (
+          <ToCEntry key={idx} titleElt={chapter.titleElt} />
         ))}
       </ul>
     </div>
