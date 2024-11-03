@@ -239,7 +239,12 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
   const alertVariant = kind === "current" ? "success" : "light";
   const classes = classNames("LearnerTask", `learner-task-${kind}`);
   return (
-    <Alert key={keyPath} variant={alertVariant} className={classes}>
+    <Alert
+      transition={false}
+      key={keyPath}
+      variant={alertVariant}
+      className={classes}
+    >
       <div className="task-outline">
         <div className="task-intro-content">
           <RawElement element={withCodeSnippetsRendered(task.intro)} />
