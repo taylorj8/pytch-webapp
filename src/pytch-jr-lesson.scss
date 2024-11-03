@@ -279,6 +279,13 @@ $progress-track-x-margin: calc(
 );
 $progress-track-thickness: 2px;
 
+$progress-node-background-box-size: 34px;
+
+$progress-node-backgrounds-strip-x-margin: calc(
+  $progress-node-strip-x-margin -
+    ($progress-node-background-box-size - $progress-node-box-size) / 2
+);
+
 .ProgressTrail {
   height: 2.25rem;
   display: grid;
