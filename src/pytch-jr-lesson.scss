@@ -3,6 +3,11 @@
 @import "./pytch-mixins.scss";
 @import "./pytch-variables.scss";
 
+// If the last thing in a chapter is a LearnerTask, then below that
+// content is either the "do the task to see more" message, or the "next
+// chapter" button.  Make them the same height to avoid layout jitter.
+$chapter-final-content-height: 4rem;
+
 .HatBlock.display-only {
   cursor: default;
   margin-top: -0.5rem; /* Allow for transform of bump */
@@ -241,9 +246,11 @@ $task-checkbox-not-done-colour: #999;
 
 .Junior-ChapterNavigation {
   width: 100%;
+  height: $chapter-final-content-height;
   display: flex;
   flex-direction: row;
   justify-content: end;
+  align-items: center;
 }
 
 .LessonTableOfContents {
@@ -346,7 +353,7 @@ $task-checkbox-not-done-colour: #999;
   background-color: $panel-background;
 
   > .content {
-    margin: 1rem;
+    margin: 1rem 1rem 5rem;
     h1 {
       font-size: 1.5rem;
     }
@@ -389,6 +396,7 @@ $task-checkbox-not-done-colour: #999;
     }
 
     .hint-do-task-to-see-more {
+      height: $chapter-final-content-height;
       text-align: center;
       font-style: italic;
     }
