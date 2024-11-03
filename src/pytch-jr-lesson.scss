@@ -243,9 +243,11 @@ $task-checkbox-not-done-colour: #999;
 
 .Junior-ChapterNavigation {
   width: 100%;
+  height: $chapter-final-content-height;
   display: flex;
   flex-direction: row;
   justify-content: end;
+  align-items: center;
 }
 
 .LessonTableOfContents {
