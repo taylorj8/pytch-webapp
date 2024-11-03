@@ -1,5 +1,6 @@
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
+  faLock,
   faBars,
   faXmark,
   faHome,
@@ -39,6 +40,7 @@ import {
 import { faTimesCircle, faEnvelope } from "@fortawesome/free-regular-svg-icons";
 
 library.add(
+  faLock,
   faBars,
   faXmark,
   faEnvelope,
