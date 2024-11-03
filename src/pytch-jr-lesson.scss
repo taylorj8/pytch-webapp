@@ -3,6 +3,9 @@
 @import "./pytch-mixins.scss";
 @import "./pytch-variables.scss";
 
+// If the last thing in a chapter is a LearnerTask, then below that
+// content is either the "do the task to see more" message, or the "next
+// chapter" button.  Make them the same height to avoid layout jitter.
 $chapter-final-content-height: 4rem;
 
 .HatBlock.display-only {
