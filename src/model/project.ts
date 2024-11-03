@@ -729,7 +729,6 @@ export const activeProject: IActiveProject = {
     content.interactionState.nTasksDone += dNTasks;
   }),
   markCurrentTaskDone: thunk((actions) => {
-    actions._hideAllCurrentTaskHelpStages();
     actions._increaseNTasksDone(1);
     actions._enqueueLinkedLessonDbSync();
   }),
