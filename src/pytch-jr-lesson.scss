@@ -266,6 +266,17 @@ $task-checkbox-not-done-colour: #999;
   }
 }
 
+$progress-node-strip-x-margin: 1rem;
+
+$progress-node-box-size: 1.2rem;
+$progress-node-future-size: 0.4rem;
+$progress-node-future-padding: calc(
+  ($progress-node-box-size - $progress-node-future-size) / 2
+);
+
+$progress-track-x-margin: 1.5rem;
+$progress-track-thickness: 1px;
+
 .ProgressTrail {
   height: 2.25rem;
   display: grid;
