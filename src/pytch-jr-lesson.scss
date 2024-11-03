@@ -173,6 +173,8 @@ $task-checkbox-not-done-colour: #999;
 
 .alert.LearnerTask {
   margin: 0rem -0.25rem 1rem;
+  transition-property: background-color;
+  transition-duration: 0.5s;
 
   .to-do-checkbox-container {
     display: flex;
