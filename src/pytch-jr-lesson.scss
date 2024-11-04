@@ -296,6 +296,14 @@ $progress-node-backgrounds-strip-x-margin: calc(
     grid-row: 1 / 2;
   }
 
+  .node-backgrounds {
+    margin: 0rem $progress-node-backgrounds-strip-x-margin;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .track {
     margin: 0rem $progress-track-x-margin;
     height: $progress-track-thickness;
