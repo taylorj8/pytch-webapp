@@ -296,6 +296,7 @@ $progress-node-backgrounds-strip-x-margin: calc(
     grid-row: 1 / 2;
   }
 
+  .node-hover-targets,
   .node-backgrounds {
     margin: 0rem $progress-node-backgrounds-strip-x-margin;
     display: flex;
