@@ -4,15 +4,10 @@ import { useLinkedJrTutorial } from "./hooks";
 import { EmptyProps, range } from "../../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-type ProgressTrailNodeProps = { idx: number; currentIdx: number };
-const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = (props) => {
-  const kind =
-    props.idx < props.currentIdx
-      ? "completed"
-      : props.idx === props.currentIdx
-      ? "current"
-      : "future";
+type ProgressNodeKind = "completed" | "current" | "future";
 
+type ProgressTrailNodeProps = { kind: ProgressNodeKind };
+const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({ kind }) => {
   const nodeClasses = classNames("progress-node", kind);
   const objContent =
     kind === "completed" ? (
@@ -41,7 +36,18 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
   const chapterTitleElt = chapters[activeChapterIndex].titleElt;
 
   const nodeDivs = range(nProgressStages).map((idx) => {
-    return <ProgressTrailNode key={idx} idx={idx} currentIdx={activeChapterIndex} />;
+    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+    const nTasksInclChapter = tutorialContent.nTasksBeforeChapter[idx + 1];
+    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
+
+    const kind: ProgressNodeKind =
+      nTasksDone >= nTasksInclChapter
+        ? "completed"
+        : nTasksDone >= nTasksBeforeChapter
+        ? "current"
+        : "future";
+
+    return <ProgressTrailNode key={idx} kind={kind} />;
   });
 
   const maybeChapterNumberLabel =
