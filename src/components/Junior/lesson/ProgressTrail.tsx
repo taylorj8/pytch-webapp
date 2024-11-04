@@ -74,6 +74,7 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
     const contentElt = chapters[idx].titleElt.cloneNode(true) as HTMLElement;
     const tooltip = (
       <div className="progress-node-tooltip">
+        {!canJumpHere && <FontAwesomeIcon className="locked" icon="lock" />}
         <RawElement element={contentElt} />
       </div>
     );

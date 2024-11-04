@@ -326,6 +326,9 @@ $progress-node-backgrounds-strip-x-margin: calc(
     }
 
     .progress-node-tooltip {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
       width: max-content;
       position: absolute;
       z-index: 1;
@@ -335,6 +338,12 @@ $progress-node-backgrounds-strip-x-margin: calc(
       background-color: white;
       color: $text-main-color;
       border: 1px solid $inactive-text-option-color;
+
+      .locked {
+        margin-left: 0.5rem;
+        font-size: 0.9rem;
+        color: $pytch-colour-main-blue;
+      }
 
       h2 {
         font-size: 0.9rem;
