@@ -274,7 +274,9 @@ $progress-node-future-padding: calc(
   ($progress-node-box-size - $progress-node-future-size) / 2
 );
 
-$progress-track-x-margin: 1.5rem;
+$progress-track-x-margin: calc(
+  $progress-node-strip-x-margin + $progress-node-box-size / 2
+);
 $progress-track-thickness: 1px;
 
 .ProgressTrail {
