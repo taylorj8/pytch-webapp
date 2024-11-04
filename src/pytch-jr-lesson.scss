@@ -304,6 +304,19 @@ $progress-node-backgrounds-strip-x-margin: calc(
     align-items: center;
   }
 
+  .progress-node-background {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    height: $progress-node-background-box-size;
+    width: $progress-node-background-box-size;
+  }
+
+  .progress-node-background.isActive {
+    border-color: white;
+    background-color: rgba($color: white, $alpha: 0.2);
+  }
+
   .track {
     margin: 0rem $progress-track-x-margin;
     height: $progress-track-thickness;
