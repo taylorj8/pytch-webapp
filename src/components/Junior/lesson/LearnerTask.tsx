@@ -238,6 +238,10 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
 
   const alertVariant = kind === "current" ? "success" : "light";
   const classes = classNames("LearnerTask", `learner-task-${kind}`);
+
+  // Suppress the usual Bootstrap Alert transition.  We manage this
+  // ourselves, to fade between the "done" and "not done" states of a
+  // LearnerTask as the user marks a task as done.
   return (
     <Alert
       transition={false}
