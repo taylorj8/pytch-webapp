@@ -3,6 +3,8 @@ import classNames from "classnames";
 import { useLinkedJrTutorial } from "./hooks";
 import { EmptyProps, range } from "../../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import RawElement from "../../RawElement";
+import { useStoreActions } from "../../../store";
 
 type ProgressNodeKind = "completed" | "current" | "future";
 
@@ -26,6 +28,9 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
   const tutorialContent = linkedTutorial.content;
   const chapters = tutorialContent.chapters;
   const activeChapterIndex = linkedTutorial.interactionState.chapterIndex;
+  const setChapterIndex = useStoreActions(
+    (actions) => actions.activeProject.setLinkedLessonChapterIndex
+  );
 
   // Only some of the chapters count as "progress stages".  (We might
   // exclude the "Challenges" and "Asset credits" chapters, for
@@ -55,11 +60,41 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
       <span className="chapter-number">{activeChapterIndex} —</span>
     ) : null;
 
+  const nodeBackgrounds = range(nProgressStages).map((idx) => {
+    const isActive = idx === activeChapterIndex;
+    const classes = classNames("progress-node-background", { isActive });
+    return <div key={idx} className={classes} />;
+  });
+
+  const nodeHoverTargets = range(nProgressStages).map((idx) => {
+    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
+    const canJumpHere = nTasksDone >= nTasksBeforeChapter;
+
+    const contentElt = chapters[idx].titleElt.cloneNode(true) as HTMLElement;
+    const tooltip = (
+      <div className="progress-node-tooltip">
+        <RawElement element={contentElt} />
+      </div>
+    );
+
+    const onClick = canJumpHere ? () => setChapterIndex(idx) : () => void 0;
+    const classes = classNames("progress-node-hover-target", { canJumpHere });
+
+    return (
+      <div key={idx} className={classes} onClick={onClick}>
+        {tooltip}
+      </div>
+    );
+  });
+
   return (
     <>
       <div className="ProgressTrail">
+        <div className="node-backgrounds">{nodeBackgrounds}</div>
         <div className="track" />
         <div className="nodes">{nodeDivs}</div>
+        <div className="node-hover-targets">{nodeHoverTargets}</div>
       </div>
       <div className="chapter-title">
         {maybeChapterNumberLabel}
