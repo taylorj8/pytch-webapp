@@ -266,10 +266,10 @@ $task-checkbox-not-done-colour: #999;
   }
 }
 
-$progress-node-strip-x-margin: 1rem;
+$progress-node-strip-x-margin: 16px;
 
-$progress-node-box-size: 1.2rem;
-$progress-node-future-size: 0.4rem;
+$progress-node-box-size: 18px;
+$progress-node-future-size: 10px;
 $progress-node-future-padding: calc(
   ($progress-node-box-size - $progress-node-future-size) / 2
 );
@@ -277,7 +277,7 @@ $progress-node-future-padding: calc(
 $progress-track-x-margin: calc(
   $progress-node-strip-x-margin + $progress-node-box-size / 2
 );
-$progress-track-thickness: 1px;
+$progress-track-thickness: 2px;
 
 .ProgressTrail {
   height: 2.25rem;
