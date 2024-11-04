@@ -20,7 +20,7 @@ const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = (props) => {
         <FontAwesomeIcon icon="check"></FontAwesomeIcon>
       </span>
     ) : kind === "future" ? (
-      <div></div>
+      <div className="future-node" />
     ) : null;
 
   return <div className={nodeClasses}>{objContent}</div>;
@@ -40,9 +40,9 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
 
   const chapterTitleElt = chapters[activeChapterIndex].titleElt;
 
-  const nodeDivs = range(nProgressStages).map((idx) => (
-    <ProgressTrailNode key={idx} idx={idx} currentIdx={activeChapterIndex} />
-  ));
+  const nodeDivs = range(nProgressStages).map((idx) => {
+    return <ProgressTrailNode key={idx} idx={idx} currentIdx={activeChapterIndex} />;
+  });
 
   const maybeChapterNumberLabel =
     activeChapterIndex > 0 ? (

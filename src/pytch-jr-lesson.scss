@@ -266,6 +266,19 @@ $task-checkbox-not-done-colour: #999;
   }
 }
 
+$progress-node-strip-x-margin: 16px;
+
+$progress-node-box-size: 18px;
+$progress-node-future-size: 10px;
+$progress-node-future-padding: calc(
+  ($progress-node-box-size - $progress-node-future-size) / 2
+);
+
+$progress-track-x-margin: calc(
+  $progress-node-strip-x-margin + $progress-node-box-size / 2
+);
+$progress-track-thickness: 2px;
+
 .ProgressTrail {
   height: 2.25rem;
   display: grid;
@@ -277,13 +290,13 @@ $task-checkbox-not-done-colour: #999;
   }
 
   .track {
-    margin: 0rem 1.5rem;
-    height: 1px;
+    margin: 0rem $progress-track-x-margin;
+    height: $progress-track-thickness;
     background-color: $pytch-colour-main-yellow;
   }
 
   .nodes {
-    margin: 0rem 1rem;
+    margin: 0rem $progress-node-strip-x-margin;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -293,12 +306,12 @@ $task-checkbox-not-done-colour: #999;
       width: 0px;
       flex-grow: 0;
       position: relative;
+      width: $progress-node-box-size;
+      height: $progress-node-box-size;
 
       @include align-center-middle();
 
       &.completed {
-        width: 1.2rem;
-        height: 1.2rem;
         border-radius: 50%;
         background-color: $pytch-colour-main-yellow;
         color: $pytch-colour-main-blue;
@@ -308,18 +321,15 @@ $task-checkbox-not-done-colour: #999;
         }
       }
       &.current {
-        width: 1.2rem;
-        height: 1.2rem;
         border-radius: 50%;
         background-color: $pytch-colour-main-blue;
         border: 2px solid $pytch-colour-main-yellow;
       }
       &.future {
-        width: 1.2rem;
-        padding: 0px 0.4rem;
-        div {
-          width: 0.4rem;
-          height: 0.4rem;
+        padding: $progress-node-future-padding;
+        div.future-node {
+          width: $progress-node-future-size;
+          height: $progress-node-future-size;
           border-radius: 50%;
           background-color: $pytch-colour-main-yellow;
         }
