@@ -1,11 +1,10 @@
 import React, { KeyboardEventHandler, useEffect } from "react";
 import { EmptyProps, assertNever } from "../../utils";
 import { useStoreActions } from "../../store";
-import { useJrEditState, useMappedProgram } from "./hooks";
+import { useJrEditState } from "./hooks";
 import { HelpSidebarInnerContent } from "../HelpSidebar";
 import { MaybeContent as MaybeLessonContent } from "./lesson/MaybeContent";
-import { StructuredProgramOps } from "../../model/junior/structured-program";
-import { HelpDisplayContext } from "../../model/help-sidebar";
+import { useHelpDisplayContext } from "../../model/help-sidebar";
 import { aceControllerMap } from "../../skulpt-connection/code-editor";
 import { WidthMonitor } from "./WidthMonitor";
 
@@ -13,21 +12,11 @@ const HelpSidebar = () => {
   const ensureHaveContent = useStoreActions(
     (actions) => actions.ideLayout.helpSidebar.ensureHaveContent
   );
-  const focusedActorId = useJrEditState((s) => s.focusedActor);
-  const focusedActorKind = useMappedProgram(
-    "<HelpSidebar>",
-    (program) =>
-      StructuredProgramOps.uniqueActorById(program, focusedActorId).kind
-  );
+  const displayContext = useHelpDisplayContext();
 
   useEffect(() => {
     ensureHaveContent();
   });
-
-  const displayContext: HelpDisplayContext = {
-    programKind: "per-method",
-    actorKind: focusedActorKind,
-  };
 
   return (
     <div className="HelpSidebar">
