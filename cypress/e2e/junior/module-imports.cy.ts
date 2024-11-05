@@ -2,6 +2,7 @@ import {
   deleteAllCodeOfSoleHandler,
   selectActorAspect,
   selectSprite,
+  usingPytchJrProgram,
 } from "./utils";
 
 context("Use Python stdlib modules", () => {
@@ -13,8 +14,13 @@ context("Use Python stdlib modules", () => {
     selectSprite("Snake");
     selectActorAspect("Code");
     cy.get(".ace_editor").contains("Hi there").should("be.visible");
-    deleteAllCodeOfSoleHandler();
-    cy.get(".PytchScriptEditor .ace_editor").type(codeText);
+    usingPytchJrProgram((program, actions) => {
+      actions.setHandlerPythonCode({
+        actorId: program.actors[1].id,
+        handlerId: program.actors[1].handlers[0].id,
+        code: codeText,
+      });
+    });
   };
 
   it("can use math module", () => {
