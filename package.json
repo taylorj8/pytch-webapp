@@ -51,7 +51,7 @@
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
-    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react": "^4.3.3",
     "ajv-cli": "^5.0.0",
     "chai": "^4.3.7",
     "cypress": "^13.8.0",
@@ -65,6 +65,6 @@
     "sass": "^1.63.6",
     "ts-mocha": "^10.0.0",
     "typescript": "^5.6.3",
-    "vite": "^4.3.9"
+    "vite": "^5.4.0"
   }
 }
