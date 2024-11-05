@@ -63,10 +63,6 @@ context("Navigation of per-method lesson", () => {
     clickUniqueSelected(".Junior-ChapterNavigation button.next");
   }
 
-  function clickToPrevChapter() {
-    clickUniqueSelected(".Junior-ChapterNavigation button.prev");
-  }
-
   function jumpToChapter(targetIndex: number) {
     cy.get(
       `.progress-node-hover-target[data-chapter-index="${targetIndex}"]`
@@ -144,13 +140,6 @@ context("Navigation of per-method lesson", () => {
       .eq(iLearnerTask)
       .find(".ShowNextHelpStageButton-container button")
       .should("have.text", expButtonText)
-      .click();
-  }
-
-  function clickTaskCheckbox(iLearnerTask: number) {
-    cy.get(".alert.LearnerTask")
-      .eq(iLearnerTask)
-      .find(".to-do-checkbox")
       .click();
   }
 
