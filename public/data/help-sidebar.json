@@ -596,6 +596,16 @@
     },
     {
         "kind": "block",
+        "python": "random.choice(options)",
+        "scratch": "(item (pick random (1) to (length of [cats v])) of [cats v])",
+        "scratchIsLong": true,
+        "help": {
+            "flat": "To use this function, you must have the line `import random` at the top of your program, just after the `import pytch` line.\n\nGive a random element from the list `options`.  For `options`, you can give a literal list, or use a variable which refers to a list.\n\nLiteral list, using []:\n\n```\n# Pick a random cat:\ncat = random.choice([\"Pepper\", \"Daisy\", \"Olive\"])\n```\nUsing a variable:\n\n```\n# Create list of cats:\nall_cats = [\"Pepper\", \"Daisy\", \"Olive\"]\n# Pick one at random:\ncat = random.choice(all_cats)\n```",
+            "per-method": "Give a random element from the list `options`.  For `options`, you can give a literal list, or use a variable which refers to a list.\n\nLiteral list, using []:\n\n```\n# Pick a random cat:\ncat = random.choice([\"Pepper\", \"Daisy\", \"Olive\"])\n```\nUsing a variable:\n\n```\n# Create list of cats:\nall_cats = [\"Pepper\", \"Daisy\", \"Olive\"]\n# Pick one at random:\ncat = random.choice(all_cats)\n```"
+        }
+    },
+    {
+        "kind": "block",
         "python": "value_1 > value_2",
         "scratch": "<(score) > [50]>",
         "help": "Report whether the first value is larger than the second value.  You often use this as part of an `if` or `while` statement.\n\n```\n# If player got a good score,\n# congratulate them:\nif score > 50:\n    print(\"Well done!\")\n```\n\nPython also has the `>=` operator, which means 'larger than or equal to':\n```\n# If player is at least 1.5m tall,\n# tell them they can play:\nif height >= 1.5:\n    print(\"Let's play!\")\n```"
