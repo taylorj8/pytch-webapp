@@ -107,6 +107,7 @@ context("Stage control actions", () => {
             // Unclear why TypeScript tells me this returns JSZipObject
             // when the type file says it return JSZipObject | null.
             const obj = zipFile.file(path);
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             expect(obj, `file "${path}" within zip`).not.null;
 
             // TypeScript doesn't understand Cypress control flow, so cast:

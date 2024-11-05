@@ -225,7 +225,7 @@ context("Modals are cancelled when navigating away", () => {
       descr.runModal();
       navBack();
       funcs.returnToPageUnderTest(page);
-      descr.afterwardsExpect && descr.afterwardsExpect();
+      if (descr.afterwardsExpect != null) descr.afterwardsExpect();
       funcs.returnToMyProjects();
     });
   }

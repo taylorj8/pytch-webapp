@@ -95,7 +95,7 @@ const _jsonOrFail = async (
   const text = await zipObj.async("text");
   try {
     return JSON.parse(text);
-  } catch (error) {
+  } catch {
     throw errorTransformation(
       new Error(`could not parse contents of "${path}"`)
     );
@@ -131,7 +131,7 @@ const _zipAsset = async (
 const _loadZipOrFail = async (zipData: ArrayBuffer): Promise<JSZip> => {
   try {
     return await JSZip.loadAsync(zipData);
-  } catch (err) {
+  } catch {
     throw wrappedError(new Error("File does not seem to be a zipfile"));
   }
 };
