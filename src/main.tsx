@@ -27,7 +27,6 @@ envVarMap.populate([
   ["VITE_VERSION_TAG", import.meta.env.VITE_VERSION_TAG],
 ]);
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const rootElt = document.getElementById("root")!;
 const root = createRoot(rootElt);
 root.render(
