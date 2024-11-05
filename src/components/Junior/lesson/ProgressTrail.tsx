@@ -83,7 +83,12 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
     const classes = classNames("progress-node-hover-target", { canJumpHere });
 
     return (
-      <div key={idx} className={classes} onClick={onClick}>
+      <div
+        key={idx}
+        data-chapter-index={`${idx}`}
+        className={classes}
+        onClick={onClick}
+      >
         {tooltip}
       </div>
     );
