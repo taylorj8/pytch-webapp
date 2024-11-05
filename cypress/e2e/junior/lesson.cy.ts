@@ -63,8 +63,10 @@ context("Navigation of per-method lesson", () => {
     clickUniqueSelected(".Junior-ChapterNavigation button.next");
   }
 
-  function clickToPrevChapter() {
-    clickUniqueSelected(".Junior-ChapterNavigation button.prev");
+  function jumpToChapter(targetIndex: number) {
+    cy.get(
+      `.progress-node-hover-target[data-chapter-index="${targetIndex}"]`
+    ).click();
   }
 
   function assertChapterNumber(expNumber: number) {
@@ -87,12 +89,10 @@ context("Navigation of per-method lesson", () => {
       assertChapterNumber(expChapter);
     }
 
-    // Step backwards only four times, so we get back to Chapter 1
-    // rather than the unnumbered introduction.
-    for (let i = 0; i !== 4; ++i) {
-      clickToPrevChapter();
-      const expChapter = 4 - i;
-      assertChapterNumber(expChapter);
+    // Jump directly back one at a time until chapter 1.
+    for (let i = 4; i !== 0; --i) {
+      jumpToChapter(i);
+      assertChapterNumber(i);
     }
   });
 
@@ -143,13 +143,6 @@ context("Navigation of per-method lesson", () => {
       .click();
   }
 
-  function clickTaskCheckbox(iLearnerTask: number) {
-    cy.get(".alert.LearnerTask")
-      .eq(iLearnerTask)
-      .find(".to-do-checkbox")
-      .click();
-  }
-
   it("can expand and contract help stages", () => {
     // Skip to chapter 3, which has a useful test case.
     for (let i = 0; i !== 3; ++i) advanceToNextChapter(i);
@@ -166,16 +159,6 @@ context("Navigation of per-method lesson", () => {
 
     requestMoreHelp(-1, "Hide help");
     cy.contains("Look at the existing code").should("not.exist");
-  });
-
-  it("can mark a task completed", () => {
-    advanceToNextChapter(0);
-    requestMoreHelp(0, "Show me");
-    clickTaskCheckbox(0);
-    cy.get(".alert.LearnerTask")
-      .eq(0)
-      .find(".LearnerTask-HelpStage")
-      .should("not.exist");
   });
 
   type CodeDiffViewKindCounts = {
