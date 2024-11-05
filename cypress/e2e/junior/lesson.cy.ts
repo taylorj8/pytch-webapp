@@ -67,6 +67,12 @@ context("Navigation of per-method lesson", () => {
     clickUniqueSelected(".Junior-ChapterNavigation button.prev");
   }
 
+  function jumpToChapter(targetIndex: number) {
+    cy.get(
+      `.progress-node-hover-target[data-chapter-index="${targetIndex}"]`
+    ).click();
+  }
+
   function assertChapterNumber(expNumber: number) {
     if (expNumber === 0) {
       cy.get(".chapter-title").should("be.visible");
