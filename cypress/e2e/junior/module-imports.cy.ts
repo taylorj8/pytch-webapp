@@ -1,9 +1,4 @@
-import {
-  deleteAllCodeOfSoleHandler,
-  selectActorAspect,
-  selectSprite,
-  usingPytchJrProgram,
-} from "./utils";
+import { selectActorAspect, selectSprite, usingPytchJrProgram } from "./utils";
 
 context("Use Python stdlib modules", () => {
   beforeEach(() => {
