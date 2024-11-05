@@ -93,12 +93,10 @@ context("Navigation of per-method lesson", () => {
       assertChapterNumber(expChapter);
     }
 
-    // Step backwards only four times, so we get back to Chapter 1
-    // rather than the unnumbered introduction.
-    for (let i = 0; i !== 4; ++i) {
-      clickToPrevChapter();
-      const expChapter = 4 - i;
-      assertChapterNumber(expChapter);
+    // Jump directly back one at a time until chapter 1.
+    for (let i = 4; i !== 0; --i) {
+      jumpToChapter(i);
+      assertChapterNumber(i);
     }
   });
 
