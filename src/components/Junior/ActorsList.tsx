@@ -18,7 +18,7 @@ import {
 } from "./hooks";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { ActorPropertiesTabKey } from "../../model/junior/edit-state";
-import { TabWithTypedKey, Tabs } from "../TabWithTypedKey";
+import { SingleTab } from "../SingleTab";
 
 type ActorThumbnailProps = { id: Uuid };
 const ActorThumbnail: React.FC<ActorThumbnailProps> = ({ id }) => {
@@ -174,11 +174,9 @@ export const ActorsList = () => {
     });
   };
 
-  const Tab = TabWithTypedKey<"actors">;
   return (
     <div className="Junior-ActorsList-container">
-      <Tabs>
-        <Tab eventKey="actors" title="Stage and sprites">
+      <SingleTab title="Stage and sprites">
           <div className="abs-0000">
             <div className="ActorsList">
               {program.actors.map((a) => {
@@ -200,8 +198,7 @@ export const ActorsList = () => {
               onClick={() => launchAddSpriteModal()}
             />
           </div>
-        </Tab>
-      </Tabs>
+      </SingleTab>
     </div>
   );
 };
