@@ -177,27 +177,27 @@ export const ActorsList = () => {
   return (
     <div className="Junior-ActorsList-container">
       <SingleTab title="Stage and sprites">
-          <div className="abs-0000">
-            <div className="ActorsList">
-              {program.actors.map((a) => {
-                const isFocused = a.id === focusedActor;
-                return (
-                  <ActorCard
-                    key={a.id}
-                    isFocused={isFocused}
-                    kind={a.kind}
-                    id={a.id}
-                    name={a.name}
-                  />
-                );
-              })}
-            </div>
-            <AddSomethingSingleButton
-              what="sprite"
-              label="Add sprite"
-              onClick={() => launchAddSpriteModal()}
-            />
+        <div className="abs-0000">
+          <div className="ActorsList">
+            {program.actors.map((a) => {
+              const isFocused = a.id === focusedActor;
+              return (
+                <ActorCard
+                  key={a.id}
+                  isFocused={isFocused}
+                  kind={a.kind}
+                  id={a.id}
+                  name={a.name}
+                />
+              );
+            })}
           </div>
+          <AddSomethingSingleButton
+            what="sprite"
+            label="Add sprite"
+            onClick={() => launchAddSpriteModal()}
+          />
+        </div>
       </SingleTab>
     </div>
   );
