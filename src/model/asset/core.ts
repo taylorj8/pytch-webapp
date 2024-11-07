@@ -1,5 +1,6 @@
 import { assertNever, hexSHA256 } from "../../utils";
 import { ActorKind } from "../junior/structured-program";
+import { AssetMimeType } from "../junior/structured-program/asset";
 
 // Assets are identified by a hash of their contents.
 export type AssetId = string;
@@ -124,7 +125,7 @@ export type AssetPresentationDataKind = AssetPresentationData["kind"];
 type AssetOperationScope = "flat" | ActorKind;
 
 export type AssetOperationContextKey =
-  | `${AssetOperationScope}/${AssetPresentationDataKind}`
+  | `${AssetOperationScope}/${AssetMimeType}`
   | "flat/any";
 
 export type AssetOperationContext = {
