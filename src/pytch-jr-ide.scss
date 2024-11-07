@@ -177,7 +177,16 @@
 ////////////////////////////////////////////////////////////////////////
 
 .compact-tablist-container {
+  @include min-dimens-zero();
+  @include grid-vstack-two(auto, 1fr);
+  position: relative;
+
   background-color: $panel-background;
+
+  .tab-content {
+    overflow: auto;
+    position: relative;
+  }
 
   ul.nav-tabs {
     > li > button,
@@ -211,27 +220,7 @@
   }
 }
 
-.Junior-ActorsList-container {
-  @include min-dimens-zero();
-  @include grid-vstack-two(auto, 1fr);
-  position: relative;
-
-  .tab-content {
-    overflow: auto;
-    position: relative;
-  }
-}
-
 .Junior-ActorProperties-container {
-  @include min-dimens-zero();
-  @include grid-vstack-two(auto, 1fr);
-  position: relative;
-
-  .tab-content {
-    overflow: auto;
-    position: relative;
-  }
-
   .AppearancesTabTitle {
     display: grid;
     .title-option {
@@ -267,9 +256,6 @@
 }
 
 .Junior-InfoPanel-container {
-  @include min-dimens-zero();
-  @include grid-vstack-two(auto, 1fr);
-  position: relative;
   border-top: $panel-divider-border-spec;
 
   button.collapse-or-expand-button {
@@ -290,10 +276,6 @@
     .tab-content {
       display: none;
     }
-  }
-
-  .tab-content {
-    overflow: auto;
   }
 }
 
