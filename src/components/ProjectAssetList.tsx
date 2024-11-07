@@ -131,7 +131,7 @@ export const ProjectAssetList = () => {
       throw new Error(`unknown loadState "${loadState}"`);
   }
 
-  const intro = assets.length === 0 && (
+  const maybeNoContentHelp = assets.length === 0 && (
     <NoContentHelp
       actorKind="project"
       contentKind="images or sounds"
@@ -141,7 +141,7 @@ export const ProjectAssetList = () => {
 
   return (
     <div className="AssetCardPane">
-      {intro}
+      {maybeNoContentHelp}
       <div className="AssetCardList">
         {assets.map((asset) => (
           <AssetCard key={asset.name} asset={asset} />
