@@ -418,9 +418,9 @@ const HelpSidebarSection: React.FC<HelpSidebarSectionProps> = ({
 type HelpSidebarInnerContentProps = {
   displayContext: HelpDisplayContext;
 };
-export const HelpSidebarInnerContent: React.FC<
-  HelpSidebarInnerContentProps
-> = ({ displayContext }) => {
+const HelpSidebarInnerContent: React.FC<HelpSidebarInnerContentProps> = ({
+  displayContext,
+}) => {
   const contentFetchState = useStoreState(
     (state) => state.ideLayout.helpSidebar.contentFetchState
   );
