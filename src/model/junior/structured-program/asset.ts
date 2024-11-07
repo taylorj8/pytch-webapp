@@ -8,6 +8,8 @@ export interface AssetMetaData {
 
 type AssetNames = { fullPathname: string; basename: string };
 
+export type AssetMimeType = "image" | "audio";
+
 type AssetNamesByKind = {
   appearances: Array<AssetNames>;
   sounds: Array<AssetNames>;
