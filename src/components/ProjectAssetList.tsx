@@ -8,6 +8,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AssetThumbnail } from "./AssetThumbnail";
 import { useRunFlow } from "../model";
+import { NoContentHelp } from "./Junior/NoContentHelp";
 
 type AssetCardProps = {
   asset: AssetPresentation;
@@ -132,10 +133,11 @@ export const ProjectAssetList = () => {
 
   const intro =
     assets.length === 0 ? (
-      <p className="info-pane-placeholder">
-        Your project does not yet have any images or sounds. Use the button
-        below to add some.
-      </p>
+      <NoContentHelp
+        actorKind="project"
+        contentKind="images or sounds"
+        buttonsPlural={true}
+      />
     ) : (
       <h1>Your project’s images and sounds</h1>
     );
