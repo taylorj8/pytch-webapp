@@ -1,9 +1,6 @@
 import React from "react";
 import classNames from "classnames";
-import {
-  AssetPresentationDataKind,
-  AssetPresentation,
-} from "../../model/asset";
+import { AssetPresentation } from "../../model/asset";
 import {
   ActorKind,
   AssetMetaDataOps,
@@ -19,10 +16,11 @@ import { DragPreviewImage } from "react-dnd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ProjectId } from "../../model/project-core";
 import { useRunFlow } from "../../model";
+import { AssetMimeType } from "../../model/junior/structured-program/asset";
 
 type RenameDropdownItemProps = {
   actorKind: ActorKind;
-  assetKind: AssetPresentationDataKind;
+  assetKind: AssetMimeType;
   fullPathname: string;
 };
 const RenameDropdownItem: React.FC<RenameDropdownItemProps> = ({
@@ -45,7 +43,7 @@ const RenameDropdownItem: React.FC<RenameDropdownItemProps> = ({
 };
 
 type DeleteDropdownItemProps = {
-  assetKind: AssetPresentationDataKind;
+  assetKind: AssetMimeType;
   fullPathname: string;
   displayName: string;
   isAllowed: boolean;
@@ -159,8 +157,8 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 };
 
 type AssetCardProps = {
-  assetKind: AssetPresentationDataKind;
-  expectedPresentationKind: "image" | "sound";
+  assetKind: AssetMimeType;
+  expectedPresentationKind: AssetMimeType;
   actorKind: ActorKind;
   displayIndex: number;
   assetPresentation: AssetPresentation;
