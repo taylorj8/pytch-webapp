@@ -131,16 +131,13 @@ export const ProjectAssetList = () => {
       throw new Error(`unknown loadState "${loadState}"`);
   }
 
-  const intro =
-    assets.length === 0 ? (
-      <NoContentHelp
-        actorKind="project"
-        contentKind="images or sounds"
-        buttonsPlural={true}
-      />
-    ) : (
-      <h1>Your project’s images and sounds</h1>
-    );
+  const intro = assets.length === 0 && (
+    <NoContentHelp
+      actorKind="project"
+      contentKind="images or sounds"
+      buttonsPlural={true}
+    />
+  );
 
   return (
     <div className="AssetCardPane">
