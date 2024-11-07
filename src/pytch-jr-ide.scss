@@ -203,6 +203,7 @@
     border-bottom-color: $panel-background;
     background-color: $secondary-bg-color;
   }
+
   button.nav-link {
     padding-top: 2px;
     padding-bottom: 2px;
@@ -211,6 +212,7 @@
     font-size: 0.875rem;
     text-transform: uppercase;
     color: $inactive-text-option-color;
+
     &.active {
       border-bottom-color: $panel-background;
       background-color: $panel-background;
