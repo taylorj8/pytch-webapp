@@ -14,6 +14,7 @@ import {
   PurePythonElementDescriptor,
   PythonCodeFromKind,
   showEntryInContext,
+  useHelpDisplayContext,
 } from "../model/help-sidebar";
 import { assertNever, copyTextToClipboard, failIfNull } from "../utils";
 import classNames from "classnames";
@@ -492,4 +493,25 @@ export const HelpSidebarInnerContent: React.FC<
         </>
       );
   }
+};
+
+export const HelpSidebar = () => {
+  const ensureHaveContent = useStoreActions(
+    (actions) => actions.ideLayout.helpSidebar.ensureHaveContent
+  );
+  const displayContext = useHelpDisplayContext();
+
+  useEffect(() => {
+    ensureHaveContent();
+  });
+
+  return (
+    <div className="HelpSidebar">
+      <div className="content">
+        <div className="inner-content">
+          <HelpSidebarInnerContent displayContext={displayContext} />
+        </div>
+      </div>
+    </div>
+  );
 };
