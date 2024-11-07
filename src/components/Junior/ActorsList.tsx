@@ -175,7 +175,7 @@ export const ActorsList = () => {
   };
 
   return (
-    <div className="Junior-ActorsList-container">
+    <div className="Junior-ActorsList-container compact-tablist-container">
       <SingleTab title="Stage and sprites">
         <div className="abs-0000">
           <div className="ActorsList">

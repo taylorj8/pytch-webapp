@@ -54,7 +54,11 @@ export const InfoPanel = () => {
   const toggleState = () => toggleStateAction();
   const collapseOrExpandIcon = isCollapsed ? "angle-up" : "angle-down";
 
-  const classes = classNames("Junior-InfoPanel-container", { isCollapsed });
+  const classes = classNames(
+    "Junior-InfoPanel-container",
+    "compact-tablist-container",
+    { isCollapsed }
+  );
   const Tab = TabWithTypedKey<TabKey>;
   return (
     <div className={classes}>
