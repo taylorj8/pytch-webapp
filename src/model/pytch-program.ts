@@ -35,6 +35,8 @@ export const PytchProgramAllKinds: Array<PytchProgramKind> = [
 export type PytchProgramOfKind<KindT extends PytchProgram["kind"]> =
   PytchProgram & { kind: KindT };
 
+export type AssetPathAffixes = { prefix: string; suffix: string };
+
 export class PytchProgramOps {
   /** Return a new `PytchProgram` instance of kind `"flat"` and with the
    * given `text`. */
