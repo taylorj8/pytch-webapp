@@ -5,7 +5,10 @@ import {
   PytchProgramOps,
 } from "../../src/model/pytch-program";
 import { hexSHA256 } from "../../src/utils";
-import { StructuredProgramOps } from "../../src/model/junior/structured-program";
+import {
+  StructuredProgramOps,
+  UuidOps,
+} from "../../src/model/junior/structured-program";
 import { assetOrderingData, threeSpriteProgram } from "./fixtures";
 
 describe("PytchProgram operations", () => {
@@ -165,6 +168,11 @@ describe("PytchProgram operations", () => {
       };
       assert.deepEqual(gotAffixes, expAffixes);
     }
+
+    it("per-method asset", () => {
+      const actorId = UuidOps.newRandom();
+      assertAffixes(`${actorId}/rabbit.jpg`, `${actorId}/`, "rabbit.jpg");
+    });
   });
 
   it("canonical asset order", () => {
