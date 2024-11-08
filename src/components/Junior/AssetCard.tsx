@@ -122,12 +122,12 @@ const CropScaleDropdownItem: React.FC<CropScaleDropdownItemProps> = ({
 };
 
 type AssetCardDropdownProps = {
-  actorKind: ActorKind;
+  operationScope: AssetOperationScope;
   presentation: AssetPresentation;
   deleteIsAllowed: boolean;
 };
 const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
-  actorKind,
+  operationScope,
   presentation,
   deleteIsAllowed,
 }) => {
@@ -143,7 +143,7 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
         presentation={presentation}
       />
       <RenameDropdownItem
-        actorKind={actorKind}
+        operationScope={operationScope}
         assetKind={assetKind}
         fullPathname={fullPathname}
       />
