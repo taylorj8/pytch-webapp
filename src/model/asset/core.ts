@@ -105,6 +105,10 @@ export interface IAssetInProject {
   transform: AssetTransform;
 }
 
+type DiscriminatedByAssetMimeType = {
+  kind: AssetMimeType;
+};
+
 export interface ImageAssetPresentationData {
   kind: "image";
   image: HTMLImageElement;
