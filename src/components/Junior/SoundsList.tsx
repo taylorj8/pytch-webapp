@@ -33,7 +33,6 @@ const SoundsContent = ({ actorKind, sounds }: SoundsContentProps) => {
         <AssetCard
           key={a.name}
           assetKind="audio"
-          expectedPresentationKind="audio"
           actorKind={actorKind}
           displayIndex={idx}
           assetPresentation={a}
