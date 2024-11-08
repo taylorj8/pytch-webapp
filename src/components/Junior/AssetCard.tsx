@@ -158,7 +158,6 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 
 type AssetCardProps = {
   assetKind: AssetMimeType;
-  expectedPresentationKind: AssetMimeType;
   actorKind: ActorKind;
   displayIndex: number;
   assetPresentation: AssetPresentation;
@@ -166,7 +165,6 @@ type AssetCardProps = {
 };
 export const AssetCard: React.FC<AssetCardProps> = ({
   assetKind,
-  expectedPresentationKind,
   actorKind,
   displayIndex,
   assetPresentation,
@@ -178,10 +176,10 @@ export const AssetCard: React.FC<AssetCardProps> = ({
   const [dropProps, dropRef] = useAssetCardDrop(fullPathname);
 
   const presentation = assetPresentation.presentation;
-  if (presentation.kind !== expectedPresentationKind) {
+  if (presentation.kind !== assetKind) {
     throw new Error(
       `expecting asset "${fullPathname}" to` +
-        ` have presentation of kind "${expectedPresentationKind}"` +
+        ` have presentation of kind "${assetKind}"` +
         ` but it is of kind "${presentation.kind}"`
     );
   }
