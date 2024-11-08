@@ -120,8 +120,6 @@ export type AssetPresentationData =
   | ImageAssetPresentationData
   | SoundAssetPresentationData;
 
-export type AssetPresentationDataKind = AssetPresentationData["kind"];
-
 type AssetOperationScope = "flat" | ActorKind;
 
 export type AssetOperationContextKey =

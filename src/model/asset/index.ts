@@ -17,7 +17,6 @@ export {
   type ImageAssetPresentationData,
   type SoundAssetPresentationData,
   type AssetPresentationData,
-  type AssetPresentationDataKind,
   type AssetOperationContextKey,
   type AssetOperationContext,
   unknownAssetOperationContext,
