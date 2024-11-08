@@ -49,7 +49,7 @@ const AppearancesContent: React.FC<AppearancesContentProps> = ({
         <AssetCard
           key={a.name}
           assetKind="image"
-          actorKind={actorKind}
+          operationScope={actorKind}
           displayIndex={idx}
           assetPresentation={a}
           canBeDeleted={canBeDeleted}
