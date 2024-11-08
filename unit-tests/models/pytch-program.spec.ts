@@ -1,5 +1,9 @@
 import { assert } from "chai";
-import { PytchProgram, PytchProgramOps } from "../../src/model/pytch-program";
+import {
+  AssetPathAffixes,
+  PytchProgram,
+  PytchProgramOps,
+} from "../../src/model/pytch-program";
 import { hexSHA256 } from "../../src/utils";
 import { StructuredProgramOps } from "../../src/model/junior/structured-program";
 import { assetOrderingData, threeSpriteProgram } from "./fixtures";
@@ -146,6 +150,21 @@ describe("PytchProgram operations", () => {
     const expFingerprint = `program=flat/${expHash}`;
 
     assert.equal(gotFingerprint, expFingerprint);
+  });
+
+  describe("asset affixes", () => {
+    function assertAffixes(
+      pathname: string,
+      expPrefix: string,
+      expSuffix: string
+    ) {
+      const gotAffixes = PytchProgramOps.assetPathAffixes(pathname);
+      const expAffixes: AssetPathAffixes = {
+        prefix: expPrefix,
+        suffix: expSuffix,
+      };
+      assert.deepEqual(gotAffixes, expAffixes);
+    }
   });
 
   it("canonical asset order", () => {
