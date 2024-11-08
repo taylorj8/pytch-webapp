@@ -2,6 +2,7 @@ import { AssetNameAndType } from "../database/indexed-db";
 import { assertNever, hexSHA256 } from "../utils";
 import {
   AssetMetaData,
+  AssetMetaDataOps,
   FlattenResults,
   flattenProgram,
 } from "./junior/structured-program";
@@ -178,6 +179,24 @@ export class PytchProgramOps {
         return false;
       default:
         return assertNever(program);
+    }
+  }
+
+  /** Return the "affixes" for the given `fullPathname`.  For an asset
+   * within a per-method program, the `prefix` is everything up to and
+   * including the `/` character (i.e., the actor-id followed by a `/`)
+   * and the `suffix` is the part after the `/`.  For an asset within a
+   * flat program, the `prefix` is empty and the `suffix` is the whole
+   * `fullPathname`.  Throw an error if `fullPathname` includes a `/`
+   * but the "directory" part is not a valid actor-id.
+   * */
+  static assetPathAffixes(fullPathname: string): AssetPathAffixes {
+    if (fullPathname.includes("/")) {
+      const { actorId, basename } =
+        AssetMetaDataOps.pathComponents(fullPathname);
+      return { prefix: `${actorId}/`, suffix: basename };
+    } else {
+      return { prefix: "", suffix: fullPathname };
     }
   }
 }
