@@ -132,7 +132,7 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 }) => {
   const projectId = useStoreState((state) => state.activeProject.project.id);
   const fullPathname = presentation.assetInProject.name;
-  const basename = PytchProgramOps.assetPathAffixes(fullPathname).suffix;
+  const displayName = PytchProgramOps.assetPathAffixes(fullPathname).suffix;
   const assetKind = presentation.presentation.kind;
 
   return (
@@ -149,7 +149,7 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
       <DeleteDropdownItem
         assetKind={assetKind}
         fullPathname={fullPathname}
-        displayName={basename}
+        displayName={displayName}
         isAllowed={deleteIsAllowed}
       />
     </DropdownButton>
@@ -190,7 +190,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
     dragProps,
     dropProps
   );
-  const basename = PytchProgramOps.assetPathAffixes(fullPathname).suffix;
+  const label = PytchProgramOps.assetPathAffixes(fullPathname).suffix;
 
   const dragPreview =
     assetKind === "image" ? ImageAssetPreview : SoundAssetPreview;
@@ -223,7 +223,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                     <AssetThumbnail presentationData={presentation} />
                   </div>
                   <div className="label">
-                    <pre>{basename}</pre>
+                    <pre>{label}</pre>
                   </div>
                 </div>
                 {indexLabel}
