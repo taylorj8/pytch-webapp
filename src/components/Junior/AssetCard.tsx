@@ -17,20 +17,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ProjectId } from "../../model/project-core";
 import { useRunFlow } from "../../model";
 import { AssetMimeType } from "../../model/junior/structured-program/asset";
+import { AssetOperationScope } from "../../model/asset/core";
 
 type RenameDropdownItemProps = {
-  actorKind: ActorKind;
+  operationScope: AssetOperationScope;
   assetKind: AssetMimeType;
   fullPathname: string;
 };
 const RenameDropdownItem: React.FC<RenameDropdownItemProps> = ({
-  actorKind,
+  operationScope,
   assetKind,
   fullPathname,
 }) => {
   const runRenameAsset = useRunFlow((f) => f.renameAssetFlow);
 
-  const operationContextKey = `${actorKind}/${assetKind}` as const;
+  const operationContextKey = `${operationScope}/${assetKind}` as const;
   const nameAffixes = PytchProgramOps.assetPathAffixes(fullPathname);
   const launchRename = () =>
     runRenameAsset({
