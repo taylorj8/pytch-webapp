@@ -173,6 +173,10 @@ describe("PytchProgram operations", () => {
       const actorId = UuidOps.newRandom();
       assertAffixes(`${actorId}/rabbit.jpg`, `${actorId}/`, "rabbit.jpg");
     });
+
+    it("flat asset", () => {
+      assertAffixes("kitten.jpg", "", "kitten.jpg");
+    });
   });
 
   it("canonical asset order", () => {
