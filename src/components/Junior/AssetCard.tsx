@@ -1,9 +1,6 @@
 import React from "react";
 import classNames from "classnames";
 import { AssetPresentation } from "../../model/asset";
-import {
-  ActorKind,
-} from "../../model/junior/structured-program";
 import { PytchProgramOps } from "../../model/pytch-program";
 import { useStoreState } from "../../store";
 import { Dropdown, DropdownButton } from "react-bootstrap";
@@ -159,14 +156,14 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 
 type AssetCardProps = {
   assetKind: AssetMimeType;
-  actorKind: ActorKind;
+  operationScope: AssetOperationScope;
   displayIndex: number;
   assetPresentation: AssetPresentation;
   canBeDeleted: boolean;
 };
 export const AssetCard: React.FC<AssetCardProps> = ({
   assetKind,
-  actorKind,
+  operationScope,
   displayIndex,
   assetPresentation,
   canBeDeleted,
@@ -187,7 +184,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
 
   const classes = classNames(
     "AssetCard",
-    `kind-${actorKind}`,
+    `kind-${operationScope}`,
     dragProps,
     dropProps
   );
@@ -204,7 +201,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
   // static preview or release build.
 
   const indexLabel = (
-    <div className={classNames("asset-card-display-index", actorKind)}>
+    <div className={classNames("asset-card-display-index", operationScope)}>
       <p>
         <code>{displayIndex}</code>
       </p>
@@ -229,7 +226,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                 </div>
                 {indexLabel}
                 <AssetCardDropdown
-                  actorKind={actorKind}
+                  operationScope={operationScope}
                   presentation={assetPresentation}
                   deleteIsAllowed={canBeDeleted}
                 />
