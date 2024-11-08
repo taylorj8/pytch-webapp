@@ -126,7 +126,7 @@ export type AssetPresentationData =
   | ImageAssetPresentationData
   | SoundAssetPresentationData;
 
-type AssetOperationScope = "flat" | ActorKind;
+export type AssetOperationScope = "flat" | ActorKind;
 
 export type AssetOperationContextKey =
   | `${AssetOperationScope}/${AssetMimeType}`
