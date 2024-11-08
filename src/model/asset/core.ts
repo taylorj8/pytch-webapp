@@ -109,13 +109,15 @@ type DiscriminatedByAssetMimeType = {
   kind: AssetMimeType;
 };
 
-export interface ImageAssetPresentationData {
+export interface ImageAssetPresentationData
+  extends DiscriminatedByAssetMimeType {
   kind: "image";
   image: HTMLImageElement;
   fullSourceImage: HTMLImageElement;
 }
 
-export interface SoundAssetPresentationData {
+export interface SoundAssetPresentationData
+  extends DiscriminatedByAssetMimeType {
   kind: "sound";
   audioBuffer: AudioBuffer | null;
 }
