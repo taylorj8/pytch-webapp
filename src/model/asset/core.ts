@@ -1,5 +1,6 @@
 import { assertNever, hexSHA256 } from "../../utils";
 import { ActorKind } from "../junior/structured-program";
+import { AssetMimeType } from "../junior/structured-program/asset";
 
 // Assets are identified by a hash of their contents.
 export type AssetId = string;
@@ -104,14 +105,20 @@ export interface IAssetInProject {
   transform: AssetTransform;
 }
 
-export interface ImageAssetPresentationData {
+type DiscriminatedByAssetMimeType = {
+  kind: AssetMimeType;
+};
+
+export interface ImageAssetPresentationData
+  extends DiscriminatedByAssetMimeType {
   kind: "image";
   image: HTMLImageElement;
   fullSourceImage: HTMLImageElement;
 }
 
-export interface SoundAssetPresentationData {
-  kind: "sound";
+export interface SoundAssetPresentationData
+  extends DiscriminatedByAssetMimeType {
+  kind: "audio";
   audioBuffer: AudioBuffer | null;
 }
 
@@ -119,12 +126,10 @@ export type AssetPresentationData =
   | ImageAssetPresentationData
   | SoundAssetPresentationData;
 
-export type AssetPresentationDataKind = AssetPresentationData["kind"];
-
 type AssetOperationScope = "flat" | ActorKind;
 
 export type AssetOperationContextKey =
-  | `${AssetOperationScope}/${AssetPresentationDataKind}`
+  | `${AssetOperationScope}/${AssetMimeType}`
   | "flat/any";
 
 export type AssetOperationContext = {
@@ -143,7 +148,7 @@ const contextLUT = new Map<AssetOperationContextKey, AssetOperationContext>([
     },
   ],
   [
-    "flat/sound",
+    "flat/audio",
     {
       scope: "your project",
       assetIndefinite: "a sound",
@@ -167,7 +172,7 @@ const contextLUT = new Map<AssetOperationContextKey, AssetOperationContext>([
     },
   ],
   [
-    "sprite/sound",
+    "sprite/audio",
     {
       scope: "this sprite",
       assetIndefinite: "a Sound",
@@ -183,7 +188,7 @@ const contextLUT = new Map<AssetOperationContextKey, AssetOperationContext>([
     },
   ],
   [
-    "stage/sound",
+    "stage/audio",
     {
       scope: "the stage",
       assetIndefinite: "a Sound",
