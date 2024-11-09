@@ -9,8 +9,10 @@ import {
   ActorKind,
   ActorKindOps,
   EventDescriptor,
+  StructuredProgramOps,
 } from "./junior/structured-program";
 import { highlightedPreEltsFromCode } from "./highlight-as-ace";
+import { useStoreState } from "../store";
 
 export type ElementArray = Array<Element>;
 
@@ -530,3 +532,25 @@ export const helpSidebar: IHelpSidebar = {
     }
   }),
 };
+
+export function useHelpDisplayContext(): HelpDisplayContext {
+  return useStoreState((state) => {
+    const program = state.activeProject.project.program;
+    const programKind = program.kind;
+    switch (programKind) {
+      case "flat":
+        return { programKind: "flat" };
+      case "per-method": {
+        const focusedActorId = state.jrEditState.focusedActor;
+        const focusedActor = StructuredProgramOps.uniqueActorById(
+          program.program,
+          focusedActorId
+        );
+        const actorKind = focusedActor.kind;
+        return { programKind: "per-method", actorKind };
+      }
+      default:
+        return assertNever(programKind);
+    }
+  });
+}
