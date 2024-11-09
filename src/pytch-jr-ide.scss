@@ -32,8 +32,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 .Junior-IDEContents {
-  margin: $ide-gap;
-
   // If the sprites list is allowed to get too short, the "+" button
   // ends up being positioned outside the panel.  If we impose a minimum
   // height on the sprites list, the height of the coding area doesn't
@@ -58,15 +56,7 @@
     );
   }
 
-  &.activity-content-expanded-specimen {
-    @include grid-hstack-four(
-      $activity-bar-width,
-      $help-sidebar-content-width,
-      minmax($min-actor-properties-width, 1fr),
-      auto
-    );
-  }
-
+  &.activity-content-expanded-specimen,
   &.activity-content-expanded-helpsidebar {
     @include grid-hstack-four(
       $activity-bar-width,
@@ -144,7 +134,6 @@
 
 .ActivityContent-container {
   position: relative;
-  margin-left: -$ide-gap;
   border-left: 1px solid $panel-divider-color;
 }
 
@@ -206,6 +195,7 @@
     border-bottom-color: $panel-background;
     background-color: $secondary-bg-color;
   }
+
   button.nav-link {
     padding-top: 2px;
     padding-bottom: 2px;
@@ -214,6 +204,7 @@
     font-size: 0.875rem;
     text-transform: uppercase;
     color: $inactive-text-option-color;
+
     &.active {
       border-bottom-color: $panel-background;
       background-color: $panel-background;
