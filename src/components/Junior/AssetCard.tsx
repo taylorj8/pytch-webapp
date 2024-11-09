@@ -1,9 +1,6 @@
 import React from "react";
 import classNames from "classnames";
 import { AssetPresentation } from "../../model/asset";
-import {
-  ActorKind,
-} from "../../model/junior/structured-program";
 import { PytchProgramOps } from "../../model/pytch-program";
 import { useStoreState } from "../../store";
 import { Dropdown, DropdownButton } from "react-bootstrap";
@@ -17,20 +14,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ProjectId } from "../../model/project-core";
 import { useRunFlow } from "../../model";
 import { AssetMimeType } from "../../model/junior/structured-program/asset";
+import { AssetOperationScope } from "../../model/asset/core";
 
 type RenameDropdownItemProps = {
-  actorKind: ActorKind;
+  operationScope: AssetOperationScope;
   assetKind: AssetMimeType;
   fullPathname: string;
 };
 const RenameDropdownItem: React.FC<RenameDropdownItemProps> = ({
-  actorKind,
+  operationScope,
   assetKind,
   fullPathname,
 }) => {
   const runRenameAsset = useRunFlow((f) => f.renameAssetFlow);
 
-  const operationContextKey = `${actorKind}/${assetKind}` as const;
+  const operationContextKey = `${operationScope}/${assetKind}` as const;
   const nameAffixes = PytchProgramOps.assetPathAffixes(fullPathname);
   const launchRename = () =>
     runRenameAsset({
@@ -121,12 +119,12 @@ const CropScaleDropdownItem: React.FC<CropScaleDropdownItemProps> = ({
 };
 
 type AssetCardDropdownProps = {
-  actorKind: ActorKind;
+  operationScope: AssetOperationScope;
   presentation: AssetPresentation;
   deleteIsAllowed: boolean;
 };
 const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
-  actorKind,
+  operationScope,
   presentation,
   deleteIsAllowed,
 }) => {
@@ -142,7 +140,7 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
         presentation={presentation}
       />
       <RenameDropdownItem
-        actorKind={actorKind}
+        operationScope={operationScope}
         assetKind={assetKind}
         fullPathname={fullPathname}
       />
@@ -158,14 +156,14 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 
 type AssetCardProps = {
   assetKind: AssetMimeType;
-  actorKind: ActorKind;
+  operationScope: AssetOperationScope;
   displayIndex: number;
   assetPresentation: AssetPresentation;
   canBeDeleted: boolean;
 };
 export const AssetCard: React.FC<AssetCardProps> = ({
   assetKind,
-  actorKind,
+  operationScope,
   displayIndex,
   assetPresentation,
   canBeDeleted,
@@ -186,7 +184,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
 
   const classes = classNames(
     "AssetCard",
-    `kind-${actorKind}`,
+    `kind-${operationScope}`,
     dragProps,
     dropProps
   );
@@ -203,7 +201,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
   // static preview or release build.
 
   const indexLabel = (
-    <div className={classNames("asset-card-display-index", actorKind)}>
+    <div className={classNames("asset-card-display-index", operationScope)}>
       <p>
         <code>{displayIndex}</code>
       </p>
@@ -228,7 +226,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                 </div>
                 {indexLabel}
                 <AssetCardDropdown
-                  actorKind={actorKind}
+                  operationScope={operationScope}
                   presentation={assetPresentation}
                   deleteIsAllowed={canBeDeleted}
                 />
