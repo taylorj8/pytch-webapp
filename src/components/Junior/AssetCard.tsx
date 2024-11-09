@@ -3,8 +3,8 @@ import classNames from "classnames";
 import { AssetPresentation } from "../../model/asset";
 import {
   ActorKind,
-  AssetMetaDataOps,
 } from "../../model/junior/structured-program";
+import { PytchProgramOps } from "../../model/pytch-program";
 import { useStoreState } from "../../store";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { AssetThumbnail } from "../AssetThumbnail";
@@ -31,12 +31,12 @@ const RenameDropdownItem: React.FC<RenameDropdownItemProps> = ({
   const runRenameAsset = useRunFlow((f) => f.renameAssetFlow);
 
   const operationContextKey = `${actorKind}/${assetKind}` as const;
-  const { actorId, basename } = AssetMetaDataOps.pathComponents(fullPathname);
+  const nameAffixes = PytchProgramOps.assetPathAffixes(fullPathname);
   const launchRename = () =>
     runRenameAsset({
       operationContextKey,
-      fixedPrefix: `${actorId}/`,
-      oldNameSuffix: basename,
+      fixedPrefix: nameAffixes.prefix,
+      oldNameSuffix: nameAffixes.suffix,
     });
 
   return <Dropdown.Item onClick={launchRename}>Rename</Dropdown.Item>;
@@ -132,7 +132,7 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 }) => {
   const projectId = useStoreState((state) => state.activeProject.project.id);
   const fullPathname = presentation.assetInProject.name;
-  const basename = AssetMetaDataOps.basename(fullPathname);
+  const displayName = PytchProgramOps.assetPathAffixes(fullPathname).suffix;
   const assetKind = presentation.presentation.kind;
 
   return (
@@ -149,7 +149,7 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
       <DeleteDropdownItem
         assetKind={assetKind}
         fullPathname={fullPathname}
-        displayName={basename}
+        displayName={displayName}
         isAllowed={deleteIsAllowed}
       />
     </DropdownButton>
@@ -190,7 +190,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
     dragProps,
     dropProps
   );
-  const basename = AssetMetaDataOps.basename(fullPathname);
+  const label = PytchProgramOps.assetPathAffixes(fullPathname).suffix;
 
   const dragPreview =
     assetKind === "image" ? ImageAssetPreview : SoundAssetPreview;
@@ -223,7 +223,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                     <AssetThumbnail presentationData={presentation} />
                   </div>
                   <div className="label">
-                    <pre>{basename}</pre>
+                    <pre>{label}</pre>
                   </div>
                 </div>
                 {indexLabel}
