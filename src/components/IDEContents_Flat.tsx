@@ -1,7 +1,7 @@
 import React from "react";
 import { useStoreState } from "../store";
 import { EmptyProps, assertNever } from "../utils";
-import CodeEditor from "./CodeEditor";
+import { CodeEditor } from "./CodeEditor";
 import { DivSettingWindowTitle } from "./DivSettingWindowTitle";
 import InfoPanel from "./InfoPanel";
 import { StageWithControls } from "./StageWithControls";

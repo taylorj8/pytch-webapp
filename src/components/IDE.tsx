@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 import { useStoreState, useStoreActions } from "../store";
 
+import { EmptyProps, assertNever } from "../utils";
 import { ProjectId } from "../model/project-core";
 import { equalILoadSaveStatus } from "../model/project";
 import Button from "react-bootstrap/Button";
 import { Link } from "./LinkWithinApp";
-import { EmptyProps, assertNever } from "../utils";
 import { DivSettingWindowTitle } from "./DivSettingWindowTitle";
-import { useParams } from "react-router-dom";
 import { IDEContents_Flat } from "./IDEContents_Flat";
 import { IDEContents as IDEContents_Junior } from "./Junior/IDEContents";
 import { ExceptionDisplay } from "./ExceptionDisplay";
