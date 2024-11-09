@@ -148,7 +148,7 @@ const contextLUT = new Map<AssetOperationContextKey, AssetOperationContext>([
     },
   ],
   [
-    "flat/sound",
+    "flat/audio",
     {
       scope: "your project",
       assetIndefinite: "a sound",
@@ -172,7 +172,7 @@ const contextLUT = new Map<AssetOperationContextKey, AssetOperationContext>([
     },
   ],
   [
-    "sprite/sound",
+    "sprite/audio",
     {
       scope: "this sprite",
       assetIndefinite: "a Sound",
@@ -188,7 +188,7 @@ const contextLUT = new Map<AssetOperationContextKey, AssetOperationContext>([
     },
   ],
   [
-    "stage/sound",
+    "stage/audio",
     {
       scope: "the stage",
       assetIndefinite: "a Sound",

@@ -32,8 +32,8 @@ const SoundsContent = ({ actorKind, sounds }: SoundsContentProps) => {
       {sounds.map((a, idx) => (
         <AssetCard
           key={a.name}
-          assetKind="sound"
-          expectedPresentationKind="sound"
+          assetKind="audio"
+          expectedPresentationKind="audio"
           actorKind={actorKind}
           displayIndex={idx}
           assetPresentation={a}
@@ -65,7 +65,7 @@ export const SoundsList = () => {
 
   const runAddAssets = useRunFlow((f) => f.addAssetsFlow);
   const assetNamePrefix = `${focusedActorId}/`;
-  const operationContextKey = `${focusedActor.kind}/sound` as const;
+  const operationContextKey = `${focusedActor.kind}/audio` as const;
   const addSound = () =>
     runAddAssets({ projectId, operationContextKey, assetNamePrefix });
 
