@@ -118,7 +118,7 @@ export interface ImageAssetPresentationData
 
 export interface SoundAssetPresentationData
   extends DiscriminatedByAssetMimeType {
-  kind: "sound";
+  kind: "audio";
   audioBuffer: AudioBuffer | null;
 }
 
