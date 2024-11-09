@@ -9,8 +9,7 @@ import { equalILoadSaveStatus } from "../model/project";
 import Button from "react-bootstrap/Button";
 import { Link } from "./LinkWithinApp";
 import { DivSettingWindowTitle } from "./DivSettingWindowTitle";
-import { IDEContents_Flat } from "./IDEContents_Flat";
-import { IDEContents as IDEContents_Junior } from "./Junior/IDEContents";
+import { IDELayout } from "./IDELayout";
 import { ExceptionDisplay } from "./ExceptionDisplay";
 
 import "./ace-theme-pytch";
@@ -32,21 +31,6 @@ const ProjectLoadFailureScreen: React.FC<EmptyProps> = () => (
     </Link>
   </DivSettingWindowTitle>
 );
-
-const IDEContents: React.FC<EmptyProps> = () => {
-  const programKind = useStoreState(
-    (state) => state.activeProject.project.program.kind
-  );
-
-  switch (programKind) {
-    case "flat":
-      return <IDEContents_Flat />;
-    case "per-method":
-      return <IDEContents_Junior />;
-    default:
-      return assertNever(programKind);
-  }
-};
 
 const validProjectIdString = new RegExp("^[1-9][0-9]*$");
 function strictParseProjectId(s: string): ProjectId | null {
@@ -123,7 +107,7 @@ const IDE: React.FC<EmptyProps> = () => {
     case "succeeded": {
       return (
         <ErrorBoundary FallbackComponent={ExceptionDisplay}>
-          <IDEContents />
+          <IDELayout />
         </ErrorBoundary>
       );
     }
