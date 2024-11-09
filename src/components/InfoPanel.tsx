@@ -3,7 +3,7 @@ import { useStoreState, useStoreActions } from "../store";
 import { Tabs, TabWithTypedKey } from "./TabWithTypedKey";
 import Tutorial from "./Tutorial";
 import { ErrorReportList } from "./ErrorReportList";
-import ProjectAssetList from "./ProjectAssetList";
+import { ProjectAssetList } from "./ProjectAssetList";
 import EditorWebSocketInfo from "./EditorWebSocketInfo";
 import { LayoutChooser } from "./LayoutChooser";
 import { isEnabled as liveReloadEnabled } from "../model/live-reload";

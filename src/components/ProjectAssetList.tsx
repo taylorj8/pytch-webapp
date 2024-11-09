@@ -101,7 +101,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   );
 };
 
-const ProjectAssetList = () => {
+export const ProjectAssetList = () => {
   const projectId = useStoreState((state) => state.activeProject.project.id);
   const loadState = useStoreState(
     (state) => state.activeProject.syncState.loadState
@@ -160,5 +160,3 @@ const ProjectAssetList = () => {
     </div>
   );
 };
-
-export default ProjectAssetList;
