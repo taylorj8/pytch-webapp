@@ -129,7 +129,7 @@ const CodeAceEditor = () => {
   );
 };
 
-const CodeEditor = () => {
+export const CodeEditor = () => {
   return (
     <div className="CodeEditor">
       <LinkedContentBar />
@@ -143,5 +143,3 @@ const CodeEditor = () => {
     </div>
   );
 };
-
-export default CodeEditor;
