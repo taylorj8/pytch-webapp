@@ -150,3 +150,7 @@ const ProgressTrail_PerMethod: React.FC<EmptyProps> = () => {
 
   return <GenericProgressTrail {...props} />;
 };
+
+export const ProgressTrail = {
+  PerMethod: ProgressTrail_PerMethod,
+};
