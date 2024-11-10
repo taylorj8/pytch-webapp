@@ -62,6 +62,7 @@ export const ProjectAssetList = () => {
     />
   );
 
+  // TODO: Should we split this into two tabs: Images, Sounds?
   return (
     <div className="AssetCardPane-container compact-tablist-container">
       <SingleTab title="Images and sounds">
