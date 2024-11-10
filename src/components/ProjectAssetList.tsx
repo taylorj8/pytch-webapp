@@ -66,23 +66,23 @@ export const ProjectAssetList = () => {
     <div className="AssetCardPane-container compact-tablist-container">
       <SingleTab title="Images and sounds">
         <div className="abs-0000">
-    <div className="AssetCardPane">
-      {maybeNoContentHelp}
-      <div className="AssetCardList">
-        {assets.map((asset) => (
-          <AssetCard key={asset.name} asset={asset} />
-        ))}
-      </div>
-      <div className="buttons">
-        <Button className="assets-button" onClick={launchUploadModal}>
-          Add an image or sound
-        </Button>
-        or
-        <Button className="assets-button" onClick={launchClipArtModal}>
-          Choose from library
-        </Button>
-      </div>
-    </div>
+          <div className="AssetCardPane">
+            {maybeNoContentHelp}
+            <div className="AssetCardList">
+              {assets.map((asset) => (
+                <AssetCard key={asset.name} asset={asset} />
+              ))}
+            </div>
+            <div className="buttons">
+              <Button className="assets-button" onClick={launchUploadModal}>
+                Add an image or sound
+              </Button>
+              or
+              <Button className="assets-button" onClick={launchClipArtModal}>
+                Choose from library
+              </Button>
+            </div>
+          </div>
         </div>
       </SingleTab>
     </div>
