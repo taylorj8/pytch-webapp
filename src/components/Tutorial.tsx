@@ -81,7 +81,7 @@ const TutorialElement = ({ element }: TutorialElementProps) => {
     element.firstChild instanceof HTMLElement &&
     element.firstChild.classList.contains("language-scratch")
   ) {
-    const sbSvg = makeScratchSVG(element.innerText, 1.0);
+    const sbSvg = makeScratchSVG(element.innerText, 0.8);
     return <RawElement className="scratchblocks" element={sbSvg} />;
   }
   return <RawElement element={element} />;
