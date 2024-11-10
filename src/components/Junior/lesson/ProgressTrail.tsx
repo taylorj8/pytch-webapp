@@ -96,3 +96,57 @@ const GenericProgressTrail: React.FC<GenericProgressTrailProps> = ({
     </>
   );
 };
+
+const ProgressTrail_PerMethod: React.FC<EmptyProps> = () => {
+  const linkedTutorial = useLinkedJrTutorial();
+  const allowRandomChapterAccess = useStoreState(
+    (state) => state.tutorialCollection.allowRandomChapterAccess
+  );
+  const setChapterIndex = useStoreActions(
+    (actions) => actions.activeProject.setLinkedLessonChapterIndex
+  );
+
+  const tutorialContent = linkedTutorial.content;
+  const chapters = tutorialContent.chapters;
+
+  // Only some of the chapters count as "progress stages".  (We might
+  // exclude the "Challenges" and "Asset credits" chapters, for
+  // example.)
+  const progressStages = chapters.filter((chap) => chap.includeInProgressTrail);
+  const nProgressStages = progressStages.length;
+
+  const activeChapterIndex = linkedTutorial.interactionState.chapterIndex;
+
+  function nodeKindFromIndex(idx: number) {
+    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+    const nTasksInclChapter = tutorialContent.nTasksBeforeChapter[idx + 1];
+    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
+
+    return nTasksDone >= nTasksInclChapter
+      ? "completed"
+      : nTasksDone >= nTasksBeforeChapter
+      ? "current"
+      : "future";
+  }
+
+  function cloneChapterTitleElt(idx: number) {
+    return chapters[idx].titleElt.cloneNode(true) as HTMLElement;
+  }
+
+  function canJumpHereFromIndex(idx: number) {
+    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
+    return nTasksDone >= nTasksBeforeChapter || allowRandomChapterAccess;
+  }
+
+  const props: GenericProgressTrailProps = {
+    nProgressStages,
+    activeChapterIndex,
+    setChapterIndex,
+    nodeKindFromIndex,
+    cloneChapterTitleElt,
+    canJumpHereFromIndex,
+  };
+
+  return <GenericProgressTrail {...props} />;
+};
