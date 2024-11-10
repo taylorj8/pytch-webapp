@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 import { useLinkedJrTutorial } from "./hooks";
-import { EmptyProps, range } from "../../../utils";
+import { EmptyProps, failIfNull, range } from "../../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RawElement from "../../RawElement";
 import { useStoreActions, useStoreState } from "../../../store";
@@ -137,6 +137,45 @@ const ProgressTrail_PerMethod: React.FC<EmptyProps> = () => {
     const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
     const nTasksDone = linkedTutorial.interactionState.nTasksDone;
     return nTasksDone >= nTasksBeforeChapter || allowRandomChapterAccess;
+  }
+
+  const props: GenericProgressTrailProps = {
+    nProgressStages,
+    activeChapterIndex,
+    setChapterIndex,
+    nodeKindFromIndex,
+    cloneChapterTitleElt,
+    canJumpHereFromIndex,
+  };
+
+  return <GenericProgressTrail {...props} />;
+};
+
+const ProgressTrail_Flat: React.FC<EmptyProps> = () => {
+  const maybeTutorial = useStoreState(
+    (state) => state.activeProject.project?.trackedTutorial
+  );
+  const setChapterIndex = useStoreActions(
+    (actions) => actions.activeProject.setActiveTutorialChapter
+  );
+  const tutorial = failIfNull(maybeTutorial, "no tutorial to construct ToC");
+
+  const nProgressStages = tutorial.content.chapters.length;
+  const activeChapterIndex = tutorial.activeChapterIndex;
+
+  function nodeKindFromIndex(_idx: number): ProgressNodeKind {
+    return "plain";
+  }
+
+  function cloneChapterTitleElt(idx: number) {
+    // Hm; bit of a fudge:
+    let h2Elt = document.createElement("h2");
+    h2Elt.textContent = tutorial.content.chapters[idx].title;
+    return h2Elt;
+  }
+
+  function canJumpHereFromIndex(_idx: number) {
+    return true;
   }
 
   const props: GenericProgressTrailProps = {
