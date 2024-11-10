@@ -172,6 +172,12 @@
     background-color: $main-bg-color;
     padding: 6px;
   }
+
+  > *:nth-child(2) {
+    position: relative;
+    background-color: $panel-background;
+    border-top: $panel-divider-border-spec;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
