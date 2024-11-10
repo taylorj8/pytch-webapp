@@ -192,4 +192,5 @@ const ProgressTrail_Flat: React.FC<EmptyProps> = () => {
 
 export const ProgressTrail = {
   PerMethod: ProgressTrail_PerMethod,
+  Flat: ProgressTrail_Flat,
 };
