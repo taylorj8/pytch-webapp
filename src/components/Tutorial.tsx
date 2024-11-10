@@ -7,7 +7,12 @@ import React, {
 import { useStoreState, useStoreActions } from "../store";
 import RawElement from "./RawElement";
 import Button from "react-bootstrap/Button";
-import { assertNever, failIfNull, isDivOfClass } from "../utils";
+import {
+  assertNever,
+  copyTextToClipboard,
+  failIfNull,
+  isDivOfClass,
+} from "../utils";
 import { DiffHelpSamples } from "../model/user-interactions/code-diff-help";
 import { makeScratchSVG } from "../model/scratchblocks-render";
 
@@ -217,21 +222,58 @@ const showLeadingSpaces = (table: HTMLTableElement) => {
 };
 
 const insertAddAndDelSymbols = (table: HTMLTableElement) => {
+  table.querySelectorAll("tbody tr").forEach((tr) => {
+    tr.removeChild(tr.childNodes[1]);
+    let lastTd = tr.lastChild as HTMLTableCellElement;
+    lastTd.classList.add("code-text");
+  });
+
   let addSpan = document.createElement("span");
   addSpan.classList.add("add-or-del");
   addSpan.innerText = "+";
+
   let delSpan = document.createElement("span");
   delSpan.classList.add("add-or-del");
   delSpan.innerText = "−";
 
-  console.log("add", addSpan);
-  table.querySelectorAll("tbody.diff-add tr td:first-child").forEach((td) => {
-    td.insertBefore(addSpan.cloneNode(true), td.firstChild);
+  table.querySelectorAll("tbody.diff-add").forEach((tbody_) => {
+    const tbody = tbody_ as HTMLTableSectionElement;
+    let firstRow = true;
+    tbody.querySelectorAll("tr").forEach((tr) => {
+      if (firstRow) {
+        let td0 = tr.firstChild as HTMLTableCellElement;
+        td0.setAttribute("rowspan", "0");
+        const addSpanClone = addSpan.cloneNode(true) as HTMLSpanElement;
+        td0.appendChild(addSpanClone);
+        addSpanClone.addEventListener("click", () => {
+          copyTextToClipboard(tbody.dataset.addedText ?? "UNKNOWN CODE SORRY");
+          addSpanClone.innerText = "✓";
+          setTimeout(() => {
+            addSpanClone.innerText = "+";
+          }, 800);
+        });
+        firstRow = false;
+      } else {
+        tr.removeChild(tr.firstChild!);
+      }
+    });
   });
-  console.log("add", addSpan);
-  table.querySelectorAll("tbody.diff-del tr td:nth-child(2)").forEach((td) => {
-    td.insertBefore(delSpan.cloneNode(true), td.firstChild);
+
+  table.querySelectorAll("tbody.diff-del").forEach((tbody) => {
+    let firstRow = true;
+    tbody.querySelectorAll("tr").forEach((tr) => {
+      if (firstRow) {
+        let td0 = tr.firstChild as HTMLTableCellElement;
+        td0.setAttribute("rowspan", "0");
+        td0.innerHTML = "";
+        td0.insertBefore(delSpan.cloneNode(true), null);
+        firstRow = false;
+      } else {
+        tr.removeChild(tr.firstChild!);
+      }
+    });
   });
+
   return table;
 };
 
