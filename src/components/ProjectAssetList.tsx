@@ -4,6 +4,7 @@ import { AssetPresentation } from "../model/asset";
 import Button from "react-bootstrap/Button";
 import { useRunFlow } from "../model";
 import { NoContentHelp } from "./Junior/NoContentHelp";
+import { SingleTab } from "./SingleTab";
 import { AssetCard as JrAssetCard } from "./Junior/AssetCard";
 import { AssetMetaDataOps } from "../model/junior/structured-program";
 
@@ -62,6 +63,9 @@ export const ProjectAssetList = () => {
   );
 
   return (
+    <div className="AssetCardPane-container compact-tablist-container">
+      <SingleTab title="Images and sounds">
+        <div className="abs-0000">
     <div className="AssetCardPane">
       {maybeNoContentHelp}
       <div className="AssetCardList">
@@ -78,6 +82,9 @@ export const ProjectAssetList = () => {
           Choose from library
         </Button>
       </div>
+    </div>
+        </div>
+      </SingleTab>
     </div>
   );
 };
