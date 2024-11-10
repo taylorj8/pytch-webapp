@@ -107,7 +107,7 @@ export const AppearancesList = () => {
   const addWhat = `${focusedActorKind}-asset` as const;
 
   return (
-    <div className="abs-0000-oflow">
+    <div className="Junior-AppearancesList">
       <div className={classes}>{content}</div>
       <AddSomethingButtonStrip>
         <AddSomethingButton
