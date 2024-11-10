@@ -541,39 +541,6 @@ div.spacer-instead-of-resizer {
   }
 }
 
-.AssetCardList {
-  margin: 1rem 0px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-
-  .AssetCard {
-    width: 20rem;
-    margin: 1rem 3rem;
-    background-color: #afa;
-
-    .card-header {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-
-      code {
-        font-size: 1.25rem;
-        color: black;
-      }
-    }
-
-    .asset-preview {
-      text-align: center;
-
-      img {
-        background-color: #bbb;
-      }
-    }
-  }
-}
-
 .dropdown-item .with-icon {
   display: flex;
   flex-direction: row;
