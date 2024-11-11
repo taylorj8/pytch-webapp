@@ -4,8 +4,6 @@
   .Junior-LessonContent {
     .content {
       .TutorialChapter {
-        margin: 2rem 2rem 8rem 2rem;
-
         h3 {
           font-size: 1.625rem;
         }
@@ -76,7 +74,7 @@ div.patch-container {
   clear: both;
   margin: 0px 1rem 1rem 1rem;
   margin-left: 1em;
-  background-color: #f7f7f7;
+  background-color: white;
   border-spacing: 0px;
   padding: 0.5rem 1rem;
 
@@ -87,7 +85,6 @@ div.patch-container {
     h1.decoration {
       padding: 1.5ex 1em;
       margin: 0px;
-      background-color: #f7f7f7;
       text-align: left;
       font-weight: bold;
       font-size: 100%;
@@ -128,6 +125,8 @@ div.patch-container {
     }
 
     pre {
+      font-family: $monospace-fonts;
+      font-size: 14px;
       line-height: 120%;
       padding: 4px 0px 2px;
       margin: 0px;
@@ -209,7 +208,7 @@ div.patch-container {
     }
 
     tbody tr td span.add-or-del {
-      font-size: 112.5%;
+      font-size: 14px;
       padding: 0px 6px;
       border-radius: 6px;
       margin-right: -3px;
