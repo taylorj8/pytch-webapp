@@ -1,23 +1,8 @@
-.tutorial-pane {
-  display: flex;
-  flex-direction: row;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
+@import "./pytch-variables.scss";
 
-  font-size: 18px;
-
-  .TutorialChapter-scrollable {
-    flex-grow: 1;
-
-    .TutorialChapter-container {
-      height: 100%;
-      overflow-y: auto;
-      margin: 0px;
-      padding: 0px;
-
+.Junior-LessonContent-inner-container {
+  .Junior-LessonContent {
+    .content {
       .TutorialChapter {
         margin: 2rem 2rem 8rem 2rem;
 
