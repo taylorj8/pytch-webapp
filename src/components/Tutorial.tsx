@@ -396,11 +396,16 @@ const TutorialChapter = () => {
   const chapterIndex = Math.min(rawChapterIndex, maxValidIndex);
   const activeChapter = allChapters[chapterIndex];
 
+  // Discard the first item in contentElements, which is the heading
+  // element.  The chapter title is already shown in the header bar
+  // (progress trail).
+  const contentBodyElements = activeChapter.contentElements.slice(1);
+
   return (
     <div className="TutorialChapter-scrollable">
       <div className="TutorialChapter-container" ref={chapterContainerRef}>
         <div className="TutorialChapter" tabIndex={-1}>
-          {activeChapter.contentElements.map((element, idx) => (
+          {contentBodyElements.map((element, idx) => (
             <TutorialElement key={idx} element={element} />
           ))}
           <div className="navigation-buttons">
