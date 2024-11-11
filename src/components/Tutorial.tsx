@@ -478,6 +478,15 @@ const TutorialTableOfContents = () => {
   );
 };
 
+const ActiveTutorial = () => {
+  return (
+    <div className="tutorial-pane">
+      <TutorialTableOfContents />
+      <TutorialChapter />
+    </div>
+  );
+};
+
 const Tutorial = () => {
   const loadState = useStoreState(
     (state) => state.activeProject.syncState.loadState
@@ -495,12 +504,7 @@ const Tutorial = () => {
       throw new Error(`unknown loadState "${loadState}"`);
   }
 
-  return (
-    <div className="tutorial-pane">
-      <TutorialTableOfContents />
-      <TutorialChapter />
-    </div>
-  );
+  return <ActiveTutorial />;
 };
 
 export default Tutorial;
