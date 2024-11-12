@@ -71,6 +71,10 @@
 }
 
 div.patch-container {
+  .patch-contents {
+    overflow-x: auto;
+  }
+
   clear: both;
   margin: 0px 0px 1rem;
   background-color: white;

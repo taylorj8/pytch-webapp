@@ -343,7 +343,7 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
           <FontAwesomeIcon icon="question-circle" />
         </Button>
       </div>
-      {contentDivs}
+      <div className="patch-contents">{contentDivs}</div>
     </div>
   );
 };
