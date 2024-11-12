@@ -72,6 +72,7 @@
 
 div.patch-container {
   .patch-contents {
+    container: patch-table / inline-size;
     overflow-x: auto;
   }
 
@@ -129,7 +130,13 @@ div.patch-container {
 
     pre {
       font-family: $monospace-fonts;
-      font-size: 14px;
+      font-size: 13px;
+      @container patch-table (min-width: 440px) {
+        font-size: 14px;
+      }
+      @container patch-table (min-width: 520px) {
+        font-size: 15px;
+      }
       line-height: 120%;
       padding: 4px 0px 2px;
       margin: 0px;
