@@ -72,11 +72,10 @@
 
 div.patch-container {
   clear: both;
-  margin: 0px 1rem 1rem 1rem;
-  margin-left: 1em;
+  margin: 0px 0px 1rem;
   background-color: white;
   border-spacing: 0px;
-  padding: 0.5rem 1rem;
+  padding: 1rem 0.5rem;
 
   .header {
     display: flex;
@@ -118,8 +117,8 @@ div.patch-container {
 
     td.linenum {
       width: 3em;
-      padding-left: 1em;
-      padding-right: 1em;
+      padding-left: 0px;
+      padding-right: 0.5em;
       text-align: right;
       color: #666;
     }
