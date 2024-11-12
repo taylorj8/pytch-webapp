@@ -122,10 +122,16 @@ div.patch-container {
 
     td.linenum {
       width: 3em;
+      font-style: italic;
       padding-left: 0px;
       padding-right: 0.5em;
       text-align: right;
       color: #666;
+
+      pre {
+        // Italic font rendering is truncated on the right without this:
+        padding-right: 2px;
+      }
     }
 
     pre {
@@ -218,7 +224,7 @@ div.patch-container {
     }
 
     tbody tr td span.add-or-del {
-      font-size: 14px;
+      font-style: normal;
       padding: 0px 6px;
       border-radius: 6px;
       margin-right: -3px;
