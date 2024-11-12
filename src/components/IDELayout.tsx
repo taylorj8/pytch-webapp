@@ -59,6 +59,7 @@ export const IDELayout: React.FC<EmptyProps> = () => {
       windowTitle={`Pytch: ${projectName}`}
       data-project-id={projectId}
     >
+      <Modals />
       <ActivityBar />
       <ActivityContent />
       <EditorAndOutErr />
