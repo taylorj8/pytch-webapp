@@ -17,6 +17,7 @@ const Modals: React.FC<EmptyProps> = () => {
   );
   switch (programKind) {
     case "flat":
+      // TODO: Move the "flat" modals here?
       return false;
     case "per-method":
       return <PerMethodModals />;
