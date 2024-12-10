@@ -326,6 +326,10 @@ $progress-node-backgrounds-strip-x-margin: calc(
     }
 
     .progress-node-tooltip {
+      // Do not reveal tooltip when hovering over the tooltip itself
+      // (only when hovering over the "hover target" div):
+      pointer-events: none;
+
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -355,6 +359,7 @@ $progress-node-backgrounds-strip-x-margin: calc(
 
     &:hover {
       background-color: rgba($color: $pytch-colour-main-yellow, $alpha: 0.2);
+      z-index: 5; // On top of script line-numbers.
       .progress-node-tooltip {
         transition-delay: 0.5s;
         transition-duration: 0.15s;
