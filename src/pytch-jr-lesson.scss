@@ -326,6 +326,10 @@ $progress-node-backgrounds-strip-x-margin: calc(
     }
 
     .progress-node-tooltip {
+      // Do not reveal tooltip when hovering over the tooltip itself
+      // (only when hovering over the "hover target" div):
+      pointer-events: none;
+
       display: flex;
       flex-direction: row;
       align-items: center;
