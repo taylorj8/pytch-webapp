@@ -280,7 +280,10 @@ $progress-track-x-margin: calc(
 );
 $progress-track-thickness: 2px;
 
-$progress-node-background-box-size: 34px;
+// It would look better if these were bigger, but if they're too big, a
+// 12-chapter tutorial's progress trail is too wide when the viewport is
+// narrow.
+$progress-node-background-box-size: 30px;
 
 $progress-node-backgrounds-strip-x-margin: calc(
   $progress-node-strip-x-margin -
