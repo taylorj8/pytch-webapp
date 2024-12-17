@@ -91,10 +91,10 @@ Cypress.Commands.add("pytchResetDatabase", (options?: ResetDatabaseOptions) => {
 
   if (
     effectiveOptions.initialUrl === "/" &&
-    effectiveOptions.uiVersion === "v2"
+    effectiveOptions.uiVersion === "v1"
   ) {
-    cy.get(".ToggleUiStylePanel").contains("Try it").click();
-    cy.get(".ToggleUiStylePanel").contains("back to classic Pytch");
+    cy.get(".ToggleUiStylePanel").contains("back to classic Pytch").click();
+    cy.get(".ToggleUiStylePanel").contains("Try it");
   }
 });
 
