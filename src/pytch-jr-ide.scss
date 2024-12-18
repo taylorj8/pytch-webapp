@@ -107,6 +107,7 @@
     }
     &.isActive {
       color: $pytch-colour-main-blue;
+      background-color: $pytch-colour-main-yellow;
     }
     > .tabkey-tooltip {
       position: absolute;
