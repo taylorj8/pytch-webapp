@@ -41,7 +41,7 @@ export type VersionOptIn = {
 };
 
 export let versionOptIn: VersionOptIn = {
-  activeUiVersion: "v1",
+  activeUiVersion: "v2",
   setActiveUiVersion: propSetterAction("activeUiVersion"),
 
   bootFromQuery: thunk((actions) => {
