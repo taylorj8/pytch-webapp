@@ -55,7 +55,7 @@ context("Navigation of per-method lesson", () => {
 
   // This will need updating if we change the "Script by script catch
   // apple" lesson used for the test:
-  const nTasksByChapter = [0, 2, 2, 3, 2, 2, 1, 3, 2, 4, 2, 4, 0, 0];
+  const nTasksByChapter = [0, 5, 1, 3, 5, 2, 1, 5, 2, 4, 2, 4, 0];
 
   function advanceToNextChapter(iCurrentChapter: number) {
     const nTasks = nTasksByChapter[iCurrentChapter];
@@ -225,11 +225,11 @@ context("Navigation of per-method lesson", () => {
     requestMoreHelp(-1, "Hint");
     requestMoreHelp(-1, "Show me");
 
-    assertActiveCodeDiffViewKindCounts({ nContext: 6 });
+    assertActiveCodeDiffViewKindCounts({ nContext: 7 });
     selectDiffViewKind("old-diff");
-    assertActiveCodeDiffViewKindCounts({ nContext: 6, nAddPadding: 3 });
+    assertActiveCodeDiffViewKindCounts({ nContext: 7, nAddPadding: 3 });
     selectDiffViewKind("new-diff");
-    assertActiveCodeDiffViewKindCounts({ nContext: 6, nAdd: 3 });
+    assertActiveCodeDiffViewKindCounts({ nContext: 7, nAdd: 3 });
 
     // Wind back to fresh state of chapter.
     markPreviousTaskNotDone(2);
@@ -240,11 +240,11 @@ context("Navigation of per-method lesson", () => {
     markInitialTasksDone(2);
 
     requestMoreHelp(-1, "Show me");
-    assertActiveCodeDiffViewKindCounts({ nContext: 7 });
+    assertActiveCodeDiffViewKindCounts({ nContext: 8 });
     selectDiffViewKind("old-diff");
-    assertActiveCodeDiffViewKindCounts({ nContext: 6, nChange: 1 });
+    assertActiveCodeDiffViewKindCounts({ nContext: 7, nChange: 1 });
     selectDiffViewKind("new-diff");
-    assertActiveCodeDiffViewKindCounts({ nContext: 6, nChange: 1 });
+    assertActiveCodeDiffViewKindCounts({ nContext: 7, nChange: 1 });
   });
 
   it("activity bar switching works", () => {

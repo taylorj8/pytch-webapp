@@ -156,14 +156,14 @@ context("Work with suggested tutorials", () => {
 context("Tutorial share feature", () => {
   it("Allows user to copy links", () => {
     cy.visit("/tutorials");
-    launchShareTutorialModal("Boing");
+    launchShareTutorialModal("Bunner");
     cy.get("button[title*='only']").click();
     cy.waitUntil(() =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cy.window().then((win: any) => {
         const copiedText: string =
           win["PYTCH_CYPRESS"]["latestTextCopied"] ?? "";
-        return copiedText.endsWith("suggested-tutorial/boing");
+        return copiedText.endsWith("suggested-tutorial/bunner");
       })
     );
   });
