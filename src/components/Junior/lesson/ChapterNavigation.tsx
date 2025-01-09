@@ -2,7 +2,7 @@ import React from "react";
 import { EmptyProps } from "../../../utils";
 import { Button } from "react-bootstrap";
 import { useMappedLinkedJrTutorial } from "./hooks";
-import { useStoreActions } from "../../../store";
+import { useStoreActions, useStoreState } from "../../../store";
 import {
   LinkedJrTutorial,
   allTasksDoneInCurrentChapter,
@@ -41,11 +41,14 @@ function eqState(
 
 export const ChapterNavigation: React.FC<EmptyProps> = () => {
   const state = useMappedLinkedJrTutorial(mapTutorial, eqState);
+  const allowRandomChapterAccess = useStoreState(
+    (state) => state.tutorialCollection.allowRandomChapterAccess
+  );
   const setChapterIndex = useStoreActions(
     (actions) => actions.activeProject.setLinkedLessonChapterIndex
   );
 
-  if (!state.allChapterTasksDone) return null;
+  if (!state.allChapterTasksDone && !allowRandomChapterAccess) return null;
 
   const nextChapterTitle = state.mNextChapterTitle;
   if (nextChapterTitle == null) return null;
