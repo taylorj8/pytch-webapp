@@ -17,6 +17,7 @@ import {
   assertNever,
   fetchArrayBuffer,
   fetchMimeTypedArrayBuffer,
+  propSetterAction,
 } from "../utils";
 import { urlWithinApp } from "../env-utils";
 import { tutorialResourceParsedJson, tutorialUrl } from "./tutorial";
@@ -42,11 +43,13 @@ export interface ITutorialCollection {
   syncState: SyncState;
   available: Array<ITutorialSummary>;
   maybeSlugCreating: string | undefined;
+  allowRandomChapterAccess: boolean;
 
   setSyncState: Action<ITutorialCollection, SyncState>;
   setAvailable: Action<ITutorialCollection, Array<ITutorialSummary>>;
   setSlugCreating: Action<ITutorialCollection, string>;
   clearSlugCreating: Action<ITutorialCollection>;
+  setAllowRandomChapterAccess: Action<ITutorialCollection, boolean>;
   loadSummaries: Thunk<ITutorialCollection>;
 
   createProjectFromTutorial: Thunk<
@@ -128,6 +131,7 @@ export const tutorialCollection: ITutorialCollection = {
   syncState: SyncState.SyncNotStarted,
   available: [],
   maybeSlugCreating: undefined,
+  allowRandomChapterAccess: false,
 
   setSyncState: action((state, syncState) => {
     state.syncState = syncState;
@@ -143,6 +147,8 @@ export const tutorialCollection: ITutorialCollection = {
   clearSlugCreating: action((state) => {
     state.maybeSlugCreating = undefined;
   }),
+
+  setAllowRandomChapterAccess: propSetterAction("allowRandomChapterAccess"),
 
   loadSummaries: thunk(async (actions) => {
     actions.setSyncState(SyncState.SyncingFromBackEnd);
