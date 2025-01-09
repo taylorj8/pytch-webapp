@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const kExpectedNTutorialTags = 18;
+import { kExpNTutorials as kExpectedNTutorialTags } from "./utils";
 
 context("can filter media library by tags", () => {
   before(() => {

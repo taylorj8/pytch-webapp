@@ -1,6 +1,6 @@
-context("Demos of all tutorials", () => {
-  const kNumberOfTutorials = 18;
+import { kExpNTutorials as kNumberOfTutorials } from "./utils";
 
+context("Demos of all tutorials", () => {
   function assertNTutorials() {
     cy.get("ul.tutorial-list li").should("have.length", kNumberOfTutorials);
   }
