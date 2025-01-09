@@ -197,7 +197,7 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
     switch (kind) {
       case "old":
       case "future":
-        // Shouldn't happen.
+        // Ignore.
         break;
       case "previous":
         markPreviousTaskNotDone();
