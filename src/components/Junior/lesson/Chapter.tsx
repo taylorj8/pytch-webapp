@@ -4,7 +4,7 @@ import {
   LinkedJrTutorial,
 } from "../../../model/junior/jr-tutorial";
 import { EmptyProps, assertNever } from "../../../utils";
-import { LearnerTask } from "./LearnerTask";
+import { LearnerTask, TaskInteractivityKind } from "./LearnerTask";
 import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useMappedLinkedJrTutorial } from "./hooks";
 import { useStoreState } from "../../../store";
@@ -87,7 +87,10 @@ function eqState(s1: ChapterState, s2: ChapterState): boolean {
   );
 }
 
-function taskInteractionKind(state: ChapterState, taskIdx: number) {
+function taskInteractionKind(
+  state: ChapterState,
+  taskIdx: number
+): TaskInteractivityKind {
   return taskIdx === state.nTasksDone
     ? "current"
     : taskIdx === state.nTasksDone - 1
