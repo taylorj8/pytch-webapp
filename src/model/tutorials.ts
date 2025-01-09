@@ -17,6 +17,7 @@ import {
   assertNever,
   fetchArrayBuffer,
   fetchMimeTypedArrayBuffer,
+  propSetterAction,
 } from "../utils";
 import { urlWithinApp } from "../env-utils";
 import { tutorialResourceParsedJson, tutorialUrl } from "./tutorial";
@@ -25,6 +26,9 @@ import {
   IEmbodyContext,
   StructuredProgramOps,
 } from "./junior/structured-program";
+
+const kAllowRandomChapterAccessSearchParam =
+  "allowRandomChapterAccessInTutorials";
 
 export type SingleTutorialDisplayKind =
   | "tutorial-only"
@@ -42,11 +46,13 @@ export interface ITutorialCollection {
   syncState: SyncState;
   available: Array<ITutorialSummary>;
   maybeSlugCreating: string | undefined;
+  allowRandomChapterAccess: boolean;
 
   setSyncState: Action<ITutorialCollection, SyncState>;
   setAvailable: Action<ITutorialCollection, Array<ITutorialSummary>>;
   setSlugCreating: Action<ITutorialCollection, string>;
   clearSlugCreating: Action<ITutorialCollection>;
+  setAllowRandomChapterAccess: Action<ITutorialCollection, boolean>;
   loadSummaries: Thunk<ITutorialCollection>;
 
   createProjectFromTutorial: Thunk<
@@ -61,6 +67,8 @@ export interface ITutorialCollection {
     void,
     IPytchAppModel
   >;
+
+  bootAllowRandomChapterAccessFromQuery: Thunk<ITutorialCollection>;
 }
 
 type ProjectCreationArgs = {
@@ -128,6 +136,7 @@ export const tutorialCollection: ITutorialCollection = {
   syncState: SyncState.SyncNotStarted,
   available: [],
   maybeSlugCreating: undefined,
+  allowRandomChapterAccess: false,
 
   setSyncState: action((state, syncState) => {
     state.syncState = syncState;
@@ -143,6 +152,8 @@ export const tutorialCollection: ITutorialCollection = {
   clearSlugCreating: action((state) => {
     state.maybeSlugCreating = undefined;
   }),
+
+  setAllowRandomChapterAccess: propSetterAction("allowRandomChapterAccess"),
 
   loadSummaries: thunk(async (actions) => {
     actions.setSyncState(SyncState.SyncingFromBackEnd);
@@ -262,6 +273,19 @@ export const tutorialCollection: ITutorialCollection = {
         helpers.getStoreActions().ideLayout.initiateButtonTour();
       },
     });
+  }),
+
+  bootAllowRandomChapterAccessFromQuery: thunk((actions) => {
+    let url = new URL(window.location.href);
+    let params = new URLSearchParams(url.searchParams);
+    if (params.has(kAllowRandomChapterAccessSearchParam)) {
+      // Enable in app:
+      actions.setAllowRandomChapterAccess(true);
+      // And remove (just) that search param from URL:
+      params.delete(kAllowRandomChapterAccessSearchParam);
+      url.search = params.toString();
+      window.history.replaceState(null, "", url);
+    }
   }),
 };
 

@@ -4,7 +4,7 @@ import { useLinkedJrTutorial } from "./hooks";
 import { EmptyProps, range } from "../../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RawElement from "../../RawElement";
-import { useStoreActions } from "../../../store";
+import { useStoreActions, useStoreState } from "../../../store";
 
 type ProgressNodeKind = "completed" | "current" | "future";
 
@@ -30,6 +30,9 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
   const activeChapterIndex = linkedTutorial.interactionState.chapterIndex;
   const setChapterIndex = useStoreActions(
     (actions) => actions.activeProject.setLinkedLessonChapterIndex
+  );
+  const allowRandomChapterAccess = useStoreState(
+    (state) => state.tutorialCollection.allowRandomChapterAccess
   );
 
   // Only some of the chapters count as "progress stages".  (We might
@@ -69,7 +72,8 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
   const nodeHoverTargets = range(nProgressStages).map((idx) => {
     const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
     const nTasksDone = linkedTutorial.interactionState.nTasksDone;
-    const canJumpHere = nTasksDone >= nTasksBeforeChapter;
+    const canJumpHere =
+      nTasksDone >= nTasksBeforeChapter || allowRandomChapterAccess;
 
     const contentElt = chapters[idx].titleElt.cloneNode(true) as HTMLElement;
     const tooltip = (

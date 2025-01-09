@@ -4,9 +4,10 @@ import {
   LinkedJrTutorial,
 } from "../../../model/junior/jr-tutorial";
 import { EmptyProps, assertNever } from "../../../utils";
-import { LearnerTask } from "./LearnerTask";
+import { LearnerTask, TaskInteractivityKind } from "./LearnerTask";
 import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useMappedLinkedJrTutorial } from "./hooks";
+import { useStoreState } from "../../../store";
 
 // This is more fiddly, but just using a <RawElement> inside the <UL>
 // for the ToC leads to poor DOM structure (UL/LI/DIV/H2/text), which
@@ -86,8 +87,13 @@ function eqState(s1: ChapterState, s2: ChapterState): boolean {
   );
 }
 
-function taskInteractionKind(state: ChapterState, taskIdx: number) {
-  return taskIdx === state.nTasksDone
+function taskInteractionKind(
+  state: ChapterState,
+  taskIdx: number
+): TaskInteractivityKind {
+  return taskIdx > state.nTasksDone
+    ? "future"
+    : taskIdx === state.nTasksDone
     ? "current"
     : taskIdx === state.nTasksDone - 1
     ? "previous"
@@ -96,6 +102,9 @@ function taskInteractionKind(state: ChapterState, taskIdx: number) {
 
 export const Chapter: React.FC<EmptyProps> = () => {
   const state = useMappedLinkedJrTutorial(mapTutorial, eqState);
+  const allowRandomChapterAccess = useStoreState(
+    (state) => state.tutorialCollection.allowRandomChapterAccess
+  );
 
   let body: Array<React.JSX.Element> = [];
   let chunkIdx = 0;
@@ -130,7 +139,7 @@ export const Chapter: React.FC<EmptyProps> = () => {
         return assertNever(chunk);
     }
 
-    if (taskIdx > state.nTasksDone) {
+    if (taskIdx > state.nTasksDone && !allowRandomChapterAccess) {
       break;
     }
 
@@ -142,7 +151,7 @@ export const Chapter: React.FC<EmptyProps> = () => {
     body.push(<LessonTableOfContents key={key} />);
   }
 
-  if (!state.allChapterTasksDone) {
+  if (!state.allChapterTasksDone && !allowRandomChapterAccess) {
     const key = `${state.chapterIndex}/hint`;
     body.push(
       <div key={key} className="hint-do-task-to-see-more">
