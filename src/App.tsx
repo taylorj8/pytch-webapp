@@ -75,6 +75,11 @@ function App() {
     (actions) => actions.versionOptIn.bootFromQuery
   );
 
+  const bootRandomChapterAccessInTutorials = useStoreActions(
+    (actions) =>
+      actions.tutorialCollection.bootAllowRandomChapterAccessFromQuery
+  );
+
   const router = createBrowserRouter([
     {
       path: basepath,
@@ -130,6 +135,7 @@ function App() {
 
   useEffect(() => {
     bootUiVersion();
+    bootRandomChapterAccessInTutorials();
     fireAndForgetEvent("render", "");
   });
 
