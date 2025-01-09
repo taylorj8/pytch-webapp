@@ -1,3 +1,5 @@
+export const kExpNTutorials = 18;
+
 /** Set up request intercepts for a specimen for use in tests. */
 export function initSpecimenIntercepts() {
   cy.intercept("GET", "**/hello-world-lesson.zip", {
