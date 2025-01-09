@@ -27,6 +27,9 @@ import {
   StructuredProgramOps,
 } from "./junior/structured-program";
 
+const kAllowRandomChapterAccessSearchParam =
+  "allowRandomChapterAccessInTutorials";
+
 export type SingleTutorialDisplayKind =
   | "tutorial-only"
   | "tutorial-and-demo"
@@ -64,6 +67,8 @@ export interface ITutorialCollection {
     void,
     IPytchAppModel
   >;
+
+  bootAllowRandomChapterAccessFromQuery: Thunk<ITutorialCollection>;
 }
 
 type ProjectCreationArgs = {
@@ -268,6 +273,19 @@ export const tutorialCollection: ITutorialCollection = {
         helpers.getStoreActions().ideLayout.initiateButtonTour();
       },
     });
+  }),
+
+  bootAllowRandomChapterAccessFromQuery: thunk((actions) => {
+    let url = new URL(window.location.href);
+    let params = new URLSearchParams(url.searchParams);
+    if (params.has(kAllowRandomChapterAccessSearchParam)) {
+      // Enable in app:
+      actions.setAllowRandomChapterAccess(true);
+      // And remove (just) that search param from URL:
+      params.delete(kAllowRandomChapterAccessSearchParam);
+      url.search = params.toString();
+      window.history.replaceState(null, "", url);
+    }
   }),
 };
 
