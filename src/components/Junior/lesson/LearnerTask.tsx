@@ -14,7 +14,7 @@ import { RawOrCodeSnippet, withCodeSnippetsRendered } from "./RawOrCodeSnippet";
 import { useStoreActions } from "../../../store";
 import { useMappedLinkedJrTutorial } from "./hooks";
 
-type TaskInteractivityKind = "old" | "previous" | "current";
+export type TaskInteractivityKind = "old" | "previous" | "current";
 
 type HelpStageFragmentProps = { fragment: LearnerTaskHelpStageFragment };
 const HelpStageFragment: React.FC<HelpStageFragmentProps> = ({ fragment }) => {
