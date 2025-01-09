@@ -14,7 +14,7 @@ import { RawOrCodeSnippet, withCodeSnippetsRendered } from "./RawOrCodeSnippet";
 import { useStoreActions } from "../../../store";
 import { useMappedLinkedJrTutorial } from "./hooks";
 
-export type TaskInteractivityKind = "old" | "previous" | "current";
+export type TaskInteractivityKind = "old" | "previous" | "current" | "future";
 
 type HelpStageFragmentProps = { fragment: LearnerTaskHelpStageFragment };
 const HelpStageFragment: React.FC<HelpStageFragmentProps> = ({ fragment }) => {
@@ -100,6 +100,8 @@ const CheckboxHelp: React.FC<CheckboxHelpProps> = ({ interactivityKind }) => {
       );
     case "old":
       return <span>Done!</span>;
+    case "future":
+      return <span>(This is a task preview)</span>;
     default:
       return assertNever(interactivityKind);
   }
@@ -194,6 +196,7 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
   const onCheckboxClick = () => {
     switch (kind) {
       case "old":
+      case "future":
         // Shouldn't happen.
         break;
       case "previous":

@@ -91,7 +91,9 @@ function taskInteractionKind(
   state: ChapterState,
   taskIdx: number
 ): TaskInteractivityKind {
-  return taskIdx === state.nTasksDone
+  return taskIdx > state.nTasksDone
+    ? "future"
+    : taskIdx === state.nTasksDone
     ? "current"
     : taskIdx === state.nTasksDone - 1
     ? "previous"
