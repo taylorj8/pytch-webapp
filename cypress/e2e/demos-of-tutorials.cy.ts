@@ -1,8 +1,8 @@
-import { kExpNTutorials as kNumberOfTutorials } from "./utils";
+import { kExpNTutorials } from "./utils";
 
 context("Demos of all tutorials", () => {
   function assertNTutorials() {
-    cy.get("ul.tutorial-list li").should("have.length", kNumberOfTutorials);
+    cy.get("ul.tutorial-list li").should("have.length", kExpNTutorials);
   }
 
   function launchNthTutorialDemo(tutorialIndex: number) {
@@ -17,7 +17,7 @@ context("Demos of all tutorials", () => {
     cy.pytchResetDatabase({ initialUrl: "/tutorials/" });
     assertNTutorials();
 
-    for (let tutIdx = 0; tutIdx != kNumberOfTutorials; ++tutIdx) {
+    for (let tutIdx = 0; tutIdx != kExpNTutorials; ++tutIdx) {
       launchNthTutorialDemo(tutIdx);
       cy.contains("Click the green flag to run");
       cy.pytchHomeFromIDE();
