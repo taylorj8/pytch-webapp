@@ -288,10 +288,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 .Junior-ActorsList-container {
-  position: relative;
-  background-color: $panel-background;
-  border-top: $panel-divider-border-spec;
-
   .ActorsList {
     display: flex;
     flex-direction: row;
