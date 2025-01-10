@@ -287,6 +287,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+.AssetCardPane .AssetCardList,
 .Junior-ActorsList-container .ActorsList {
   display: flex;
   flex-direction: row;
@@ -316,6 +317,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+.AssetCardList > .AssetCard,
 .Junior-AssetsList > .AssetCard,
 .ActorCard {
   .drag-masked-card {
@@ -422,6 +424,7 @@
     @include border-and-label-bg($stage-card-background);
   }
 
+  &.kind-flat .AssetCardContent,
   &.kind-sprite .AssetCardContent,
   &.kind-sprite .ActorCardContent {
     @include border-and-label-bg($sprite-card-background);
