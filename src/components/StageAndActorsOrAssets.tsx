@@ -2,6 +2,7 @@ import React from "react";
 import { useStoreState } from "../store";
 import { EmptyProps, assertNever } from "../utils";
 import { StageWithControls } from "./StageWithControls";
+import { ProjectAssetList } from "./ProjectAssetList";
 import { ActorsList } from "./Junior/ActorsList";
 
 const ActorsOrAssets: React.FC<EmptyProps> = () => {
@@ -11,7 +12,7 @@ const ActorsOrAssets: React.FC<EmptyProps> = () => {
 
   switch (programKind) {
     case "flat":
-      return <div>TODO: Assets for "flat" program.</div>;
+      return <ProjectAssetList />;
     case "per-method":
       return <ActorsList />;
     default:
