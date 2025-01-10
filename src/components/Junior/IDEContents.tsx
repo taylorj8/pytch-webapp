@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { DivSettingWindowTitle } from "../DivSettingWindowTitle";
-import { EditorAndInfo } from "./EditorAndInfo";
+import { EditorAndOutErr } from "../EditorAndOutErr";
 import { StageAndActorsOrAssets } from "../StageAndActorsOrAssets";
 import { EmptyProps } from "../../utils";
 import { useStoreActions, useStoreState } from "../../store";
@@ -59,7 +59,7 @@ export const IDEContents: React.FC<EmptyProps> = () => {
         >
           <ActivityBar />
           <ActivityContent />
-          <EditorAndInfo />
+          <EditorAndOutErr />
           <StageAndActorsOrAssets />
         </DivSettingWindowTitle>
       </>
