@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { DivSettingWindowTitle } from "../DivSettingWindowTitle";
 import { EditorAndInfo } from "./EditorAndInfo";
-import { StageAndActorsList } from "./StageAndActorsList";
+import { StageAndActorsOrAssets } from "../StageAndActorsOrAssets";
 import { EmptyProps } from "../../utils";
 import { useStoreActions, useStoreState } from "../../store";
 import { Modals } from "./Modals";
@@ -60,7 +60,7 @@ export const IDEContents: React.FC<EmptyProps> = () => {
           <ActivityBar />
           <ActivityContent />
           <EditorAndInfo />
-          <StageAndActorsList />
+          <StageAndActorsOrAssets />
         </DivSettingWindowTitle>
       </>
     );
