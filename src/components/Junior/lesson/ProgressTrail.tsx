@@ -23,45 +23,31 @@ const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({ kind }) => {
   return <div className={nodeClasses}>{objContent}</div>;
 };
 
-export const ProgressTrail: React.FC<EmptyProps> = () => {
-  const linkedTutorial = useLinkedJrTutorial();
-  const tutorialContent = linkedTutorial.content;
-  const chapters = tutorialContent.chapters;
-  const activeChapterIndex = linkedTutorial.interactionState.chapterIndex;
-  const setChapterIndex = useStoreActions(
-    (actions) => actions.activeProject.setLinkedLessonChapterIndex
+type GenericProgressTrailProps = {
+  nProgressStages: number;
+  activeChapterIndex: number;
+  setChapterIndex(idx: number): void;
+  nodeKindFromIndex(idx: number): ProgressNodeKind;
+  cloneChapterTitleElt(idx: number): HTMLElement;
+  canJumpHereFromIndex(idx: number): boolean;
+};
+const GenericProgressTrail: React.FC<GenericProgressTrailProps> = ({
+  nProgressStages,
+  activeChapterIndex,
+  setChapterIndex,
+  nodeKindFromIndex,
+  cloneChapterTitleElt,
+  canJumpHereFromIndex,
+}) => {
+  const chapterTitleElt = cloneChapterTitleElt(activeChapterIndex);
+
+  const nodeDivs = range(nProgressStages).map((idx) => (
+    <ProgressTrailNode key={idx} kind={nodeKindFromIndex(idx)} />
+  ));
+
+  const maybeChapterNumberLabel = activeChapterIndex > 0 && (
+    <span className="chapter-number">{activeChapterIndex} —</span>
   );
-  const allowRandomChapterAccess = useStoreState(
-    (state) => state.tutorialCollection.allowRandomChapterAccess
-  );
-
-  // Only some of the chapters count as "progress stages".  (We might
-  // exclude the "Challenges" and "Asset credits" chapters, for
-  // example.)
-  const progressStages = chapters.filter((chap) => chap.includeInProgressTrail);
-  const nProgressStages = progressStages.length;
-
-  const chapterTitleElt = chapters[activeChapterIndex].titleElt;
-
-  const nodeDivs = range(nProgressStages).map((idx) => {
-    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
-    const nTasksInclChapter = tutorialContent.nTasksBeforeChapter[idx + 1];
-    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
-
-    const kind: ProgressNodeKind =
-      nTasksDone >= nTasksInclChapter
-        ? "completed"
-        : nTasksDone >= nTasksBeforeChapter
-        ? "current"
-        : "future";
-
-    return <ProgressTrailNode key={idx} kind={kind} />;
-  });
-
-  const maybeChapterNumberLabel =
-    activeChapterIndex > 0 ? (
-      <span className="chapter-number">{activeChapterIndex} —</span>
-    ) : null;
 
   const nodeBackgrounds = range(nProgressStages).map((idx) => {
     const isActive = idx === activeChapterIndex;
@@ -70,12 +56,9 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
   });
 
   const nodeHoverTargets = range(nProgressStages).map((idx) => {
-    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
-    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
-    const canJumpHere =
-      nTasksDone >= nTasksBeforeChapter || allowRandomChapterAccess;
+    const canJumpHere = canJumpHereFromIndex(idx);
+    const contentElt = cloneChapterTitleElt(idx);
 
-    const contentElt = chapters[idx].titleElt.cloneNode(true) as HTMLElement;
     const tooltip = (
       <div className="progress-node-tooltip">
         {!canJumpHere && <FontAwesomeIcon className="locked" icon="lock" />}
@@ -112,4 +95,62 @@ export const ProgressTrail: React.FC<EmptyProps> = () => {
       </div>
     </>
   );
+};
+
+const ProgressTrail_PerMethod: React.FC<EmptyProps> = () => {
+  const linkedTutorial = useLinkedJrTutorial();
+  const allowRandomChapterAccess = useStoreState(
+    (state) => state.tutorialCollection.allowRandomChapterAccess
+  );
+  const setChapterIndex = useStoreActions(
+    (actions) => actions.activeProject.setLinkedLessonChapterIndex
+  );
+
+  const tutorialContent = linkedTutorial.content;
+  const chapters = tutorialContent.chapters;
+
+  // Only some of the chapters count as "progress stages".  (We might
+  // exclude the "Challenges" and "Asset credits" chapters, for
+  // example.)
+  const progressStages = chapters.filter((chap) => chap.includeInProgressTrail);
+  const nProgressStages = progressStages.length;
+
+  const activeChapterIndex = linkedTutorial.interactionState.chapterIndex;
+
+  function nodeKindFromIndex(idx: number) {
+    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+    const nTasksInclChapter = tutorialContent.nTasksBeforeChapter[idx + 1];
+    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
+
+    return nTasksDone >= nTasksInclChapter
+      ? "completed"
+      : nTasksDone >= nTasksBeforeChapter
+      ? "current"
+      : "future";
+  }
+
+  function cloneChapterTitleElt(idx: number) {
+    return chapters[idx].titleElt.cloneNode(true) as HTMLElement;
+  }
+
+  function canJumpHereFromIndex(idx: number) {
+    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
+    return nTasksDone >= nTasksBeforeChapter || allowRandomChapterAccess;
+  }
+
+  const props: GenericProgressTrailProps = {
+    nProgressStages,
+    activeChapterIndex,
+    setChapterIndex,
+    nodeKindFromIndex,
+    cloneChapterTitleElt,
+    canJumpHereFromIndex,
+  };
+
+  return <GenericProgressTrail {...props} />;
+};
+
+export const ProgressTrail = {
+  PerMethod: ProgressTrail_PerMethod,
 };

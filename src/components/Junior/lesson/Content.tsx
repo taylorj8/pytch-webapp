@@ -26,7 +26,7 @@ export const Content: React.FC<EmptyProps> = () => {
     <div className="Junior-LessonContent-container">
       <WidthMonitor nonStageWd={1100} />
       <div className="Junior-LessonContent-HeaderBar">
-        <ProgressTrail />
+        <ProgressTrail.PerMethod />
       </div>
       <div className="Junior-LessonContent-inner-container">
         <DivScroller containerDivRef={contentRef} />
