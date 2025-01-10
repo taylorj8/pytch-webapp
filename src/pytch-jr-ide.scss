@@ -287,8 +287,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-.Junior-ActorsList-container {
-  .ActorsList {
+.Junior-ActorsList-container .ActorsList {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -296,7 +295,6 @@
     align-content: flex-start;
 
     margin-top: 0.5rem;
-  }
 }
 
 .Junior-CodeEditor.hasDragItemOver,
