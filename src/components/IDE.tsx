@@ -12,6 +12,13 @@ import { DivSettingWindowTitle } from "./DivSettingWindowTitle";
 import { IDELayout } from "./IDELayout";
 import { ExceptionDisplay } from "./ExceptionDisplay";
 
+// Import order for "ace-theme-pytch" is fragile.  The code in
+// ace-theme-pytch.js expects a global "ace" to exist.  These imports
+// from ace-builds seem to ensure that this global exists.  A better
+// understanding of how this works would be welcome.
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/ext-searchbox";
 import "./ace-theme-pytch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
