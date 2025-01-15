@@ -481,6 +481,15 @@ const TutorialTableOfContents = () => {
 };
 
 const ActiveTutorial = () => {
+  //
+  // TODO: Review the nested structure and simplify if possible.  Also
+  // change class names to reflect fact that they no longer apply to
+  // just "per-method lessons".
+  //
+  // TODO: Implement scrolling behaviour whereby scroll position is
+  // preserved within a chapter but reset when moving to another
+  // chapter.
+
   return (
     <div className="Junior-LessonContent-container">
       <WidthMonitor nonStageWd={1100} />
