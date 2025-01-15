@@ -8,6 +8,7 @@ import { ActivityBar } from "./Junior/ActivityBar";
 import { ActivityContent } from "./Junior/ActivityContent";
 import { EditorAndOutErr } from "./EditorAndOutErr";
 import { StageAndActorsOrAssets } from "./StageAndActorsOrAssets";
+import { FullScreenLayout } from "./FullScreenLayout";
 
 export const IDELayout: React.FC<EmptyProps> = () => {
   const projectId = useStoreState((state) => state.activeProject.project.id);
@@ -17,11 +18,18 @@ export const IDELayout: React.FC<EmptyProps> = () => {
   const activityContentFullStateLabel = useJrEditState(
     (s) => s.activityContentFullStateLabel
   );
+  const isFullScreen = useStoreState(
+    (state) => state.ideLayout.fullScreenState.isFullScreen
+  );
   const maybeConnectToLiveReloadServer = useStoreActions(
     (actions) => actions.reloadServer.maybeConnect
   );
 
   useEffect(() => maybeConnectToLiveReloadServer());
+
+  if (isFullScreen) {
+    return <FullScreenLayout />;
+  }
 
   const classes = classNames(
     "IDELayout",
