@@ -430,38 +430,6 @@ const TutorialChapter = () => {
   );
 };
 
-interface TutorialTableOfContentsEntryProps {
-  chapterIndex: number;
-  chapterTitle: string;
-}
-
-const TutorialTableOfContentsEntry = ({
-  chapterIndex,
-  chapterTitle,
-}: TutorialTableOfContentsEntryProps) => {
-  const maybeActiveIndex = useStoreState(
-    (state) => state.activeProject.project?.trackedTutorial?.activeChapterIndex
-  );
-  const navigateToChapter = useStoreActions(
-    (actions) => actions.activeProject.setActiveTutorialChapter
-  );
-
-  const activeIndex = failIfNull(
-    maybeActiveIndex,
-    "no tutorial to construct ToC entry"
-  );
-
-  const navigate = () => navigateToChapter(chapterIndex);
-  return (
-    <li
-      onClick={navigate}
-      className={chapterIndex === activeIndex ? "active" : undefined}
-    >
-      {chapterTitle}
-    </li>
-  );
-};
-
 const ActiveTutorial = () => {
   //
   // TODO: Review the nested structure and simplify if possible.  Also
