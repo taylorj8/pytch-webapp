@@ -875,6 +875,7 @@ export const activeProject: IActiveProject = {
         );
       }
 
+      // TODO: How should this be updated in unified IDE?
       storeActions.ideLayout.helpSidebar.hideAllContent();
 
       if (content.program.kind === "per-method") {
