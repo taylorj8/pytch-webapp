@@ -47,6 +47,7 @@
   // The special-casing for each type of activity is a bit clunky but
   // it will do for now.
 
+  &.activity-content-expanded-tutorial,
   &.activity-content-expanded-lesson {
     @include grid-hstack-four(
       $activity-bar-width,

@@ -16,6 +16,7 @@ type TabKeyUiDetails = { icon: IconName; tooltip: string };
 const uiDetailsFromTabKeyLut = new Map<ActivityBarTabKey, TabKeyUiDetails>([
   ["helpsidebar", { icon: "question-circle", tooltip: "Scratch/Python help" }],
   ["lesson", { icon: "book", tooltip: "Lesson content" }],
+  ["tutorial", { icon: "book", tooltip: "Tutorial content" }],
   ["specimen", { icon: "book", tooltip: "Lesson information" }],
 ]);
 
@@ -59,11 +60,16 @@ export const ActivityBar: React.FC<EmptyProps> = () => {
   // be part of the model?
   const hasLinkedLesson = useHasLinkedLesson();
   const hasLinkedSpecimen = useHasLinkedSpecimen();
+  const hasLinkedTutorial = useStoreState(
+    (state) => state.activeProject.project?.trackedTutorial != null
+  );
 
   const tabs: Array<ActivityBarTabKey> = hasLinkedLesson
     ? ["helpsidebar", "lesson"]
     : hasLinkedSpecimen
     ? ["helpsidebar", "specimen"]
+    : hasLinkedTutorial
+    ? ["helpsidebar", "tutorial"]
     : ["helpsidebar"];
 
   const syncClasses = classNames("sync-indicator", { pendingActionsExist });

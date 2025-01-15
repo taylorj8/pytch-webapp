@@ -5,6 +5,7 @@ import { MaybeContent as MaybeLessonContent } from "./lesson/MaybeContent";
 import { aceControllerMap } from "../../skulpt-connection/code-editor";
 import { WidthMonitor } from "./WidthMonitor";
 import { HelpSidebar } from "../HelpSidebar";
+import Tutorial from "../Tutorial";
 
 export const ActivityContent: React.FC<EmptyProps> = () => {
   const s = useJrEditState((s) => s.activityContentState);
@@ -41,6 +42,8 @@ export const ActivityContent: React.FC<EmptyProps> = () => {
         // and then within MaybeContentLesson distinguish between
         // tutorials and specimens.
         return <MaybeLessonContent />;
+      case "tutorial":
+        return <Tutorial />;
       default:
         return assertNever(s.tab);
     }
