@@ -14,6 +14,7 @@ import {
   PurePythonElementDescriptor,
   PythonCodeFromKind,
   showEntryInContext,
+  useHelpDisplayContext,
 } from "../model/help-sidebar";
 import { assertNever, copyTextToClipboard, failIfNull } from "../utils";
 import classNames from "classnames";
@@ -417,9 +418,9 @@ const HelpSidebarSection: React.FC<HelpSidebarSectionProps> = ({
 type HelpSidebarInnerContentProps = {
   displayContext: HelpDisplayContext;
 };
-export const HelpSidebarInnerContent: React.FC<
-  HelpSidebarInnerContentProps
-> = ({ displayContext }) => {
+const HelpSidebarInnerContent: React.FC<HelpSidebarInnerContentProps> = ({
+  displayContext,
+}) => {
   const contentFetchState = useStoreState(
     (state) => state.ideLayout.helpSidebar.contentFetchState
   );
@@ -495,50 +496,22 @@ export const HelpSidebarInnerContent: React.FC<
 };
 
 export const HelpSidebar = () => {
-  const { helpSidebar } = useStoreState((state) => state.ideLayout);
-  const { toggleVisibility, ensureHaveContent } = useStoreActions(
-    (actions) => actions.ideLayout.helpSidebar
+  const ensureHaveContent = useStoreActions(
+    (actions) => actions.ideLayout.helpSidebar.ensureHaveContent
   );
+  const displayContext = useHelpDisplayContext();
 
   useEffect(() => {
     ensureHaveContent();
   });
 
-  const visibilityClass = helpSidebar.isVisible ? "shown" : "hidden";
-
   return (
-    <div className={`content-wrapper ${visibilityClass}`}>
-      <Button
-        variant="outline-secondary"
-        className="dismiss-help"
-        onClick={() => toggleVisibility()}
-      >
-        <p>
-          <FontAwesomeIcon className="fa-lg" icon={["far", "times-circle"]} />
-        </p>
-      </Button>
+    <div className="HelpSidebar">
       <div className="content">
         <div className="inner-content">
-          <HelpSidebarInnerContent displayContext={{ programKind: "flat" }} />
+          <HelpSidebarInnerContent displayContext={displayContext} />
         </div>
       </div>
-    </div>
-  );
-};
-
-export const HelpSidebarOpenControl = () => {
-  const isVisible = useStoreState(
-    (state) => state.ideLayout.helpSidebar.isVisible
-  );
-  const { toggleVisibility } = useStoreActions(
-    (actions) => actions.ideLayout.helpSidebar
-  );
-
-  return isVisible ? null : (
-    <div className="control" onClick={() => toggleVisibility()}>
-      <p>
-        <FontAwesomeIcon icon="question-circle" />
-      </p>
     </div>
   );
 };

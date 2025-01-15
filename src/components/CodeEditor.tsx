@@ -7,11 +7,10 @@ import {
 } from "../skulpt-connection/code-editor";
 import { PytchAceAutoCompleter } from "../skulpt-connection/code-completion";
 import { failIfNull } from "../utils";
-import { HelpSidebar, HelpSidebarOpenControl } from "./HelpSidebar";
 import { equalILoadSaveStatus } from "../model/project";
-import { LinkedContentBar } from "./LinkedContentBar";
 import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
+import { SingleTab } from "./SingleTab";
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -114,7 +113,7 @@ const CodeAceEditor = () => {
         enableBasicAutocompletion={completers}
         value={codeText}
         name="pytch-ace-editor"
-        fontSize={16}
+        fontSize={14}
         width="100%"
         height="100%"
         onLoad={setFlatAceController}
@@ -128,15 +127,12 @@ const CodeAceEditor = () => {
 
 export const CodeEditor = () => {
   return (
-    <div className="CodeEditor">
-      <LinkedContentBar />
-      <div className="editor-itself">
-        <div className="help-sidebar">
-          <HelpSidebar />
-          <HelpSidebarOpenControl />
+    <div className="CodeEditor compact-tablist-container">
+      <SingleTab title="Code">
+        <div className="abs-0000">
+          <CodeAceEditor />
         </div>
-        <CodeAceEditor />
-      </div>
+      </SingleTab>
     </div>
   );
 };

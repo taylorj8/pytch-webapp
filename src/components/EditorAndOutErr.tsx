@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { useStoreState } from "../store";
 import { useJrEditState } from "./Junior/hooks";
 import { EmptyProps, assertNever } from "../utils";
+import { CodeEditor } from "./CodeEditor";
 import { InfoPanel } from "./Junior/InfoPanel";
 import { ActorProperties } from "./Junior/ActorProperties";
 
@@ -13,7 +14,7 @@ const EditorForProgramKind: React.FC<EmptyProps> = () => {
 
   switch (programKind) {
     case "flat":
-      return <div>TODO: Code editor for "flat" program.</div>;
+      return <CodeEditor />;
     case "per-method":
       return <ActorProperties />;
     default:

@@ -1,33 +1,10 @@
-import React, { KeyboardEventHandler, useEffect } from "react";
+import React, { KeyboardEventHandler } from "react";
 import { EmptyProps, assertNever } from "../../utils";
-import { useStoreActions } from "../../store";
 import { useJrEditState } from "./hooks";
-import { HelpSidebarInnerContent } from "../HelpSidebar";
 import { MaybeContent as MaybeLessonContent } from "./lesson/MaybeContent";
-import { useHelpDisplayContext } from "../../model/help-sidebar";
 import { aceControllerMap } from "../../skulpt-connection/code-editor";
 import { WidthMonitor } from "./WidthMonitor";
-
-const HelpSidebar = () => {
-  const ensureHaveContent = useStoreActions(
-    (actions) => actions.ideLayout.helpSidebar.ensureHaveContent
-  );
-  const displayContext = useHelpDisplayContext();
-
-  useEffect(() => {
-    ensureHaveContent();
-  });
-
-  return (
-    <div className="HelpSidebar">
-      <div className="content">
-        <div className="inner-content">
-          <HelpSidebarInnerContent displayContext={displayContext} />
-        </div>
-      </div>
-    </div>
-  );
-};
+import { HelpSidebar } from "../HelpSidebar";
 
 export const ActivityContent: React.FC<EmptyProps> = () => {
   const s = useJrEditState((s) => s.activityContentState);
