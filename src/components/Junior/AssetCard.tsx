@@ -157,7 +157,7 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 type AssetCardProps = {
   assetKind: AssetMimeType;
   operationScope: AssetOperationScope;
-  displayIndex: number;
+  displayIndex: number | null;
   assetPresentation: AssetPresentation;
   canBeDeleted: boolean;
 };
@@ -200,7 +200,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
   // first time you drag a particular asset.  It works correctly in a
   // static preview or release build.
 
-  const indexLabel = (
+  const mIndexLabel = displayIndex != null && (
     <div className={classNames("asset-card-display-index", operationScope)}>
       <p>
         <code>{displayIndex}</code>
@@ -224,7 +224,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                     <pre>{label}</pre>
                   </div>
                 </div>
-                {indexLabel}
+                {mIndexLabel}
                 <AssetCardDropdown
                   operationScope={operationScope}
                   presentation={assetPresentation}
