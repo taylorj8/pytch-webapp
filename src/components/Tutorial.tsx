@@ -14,6 +14,8 @@ import { makeScratchSVG } from "../model/scratchblocks-render";
 import "../pytch-tutorial.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRunFlow } from "../model";
+import { ProgressTrail } from "./Junior/lesson/ProgressTrail";
+import { WidthMonitor } from "./Junior/WidthMonitor";
 
 type NavigationDirection = "prev" | "next";
 
@@ -480,9 +482,18 @@ const TutorialTableOfContents = () => {
 
 const ActiveTutorial = () => {
   return (
-    <div className="tutorial-pane">
-      <TutorialTableOfContents />
-      <TutorialChapter />
+    <div className="Junior-LessonContent-container">
+      <WidthMonitor nonStageWd={1100} />
+      <div className="Junior-LessonContent-HeaderBar">
+        <ProgressTrail.Flat />
+      </div>
+      <div className="Junior-LessonContent-inner-container">
+        <div className="Junior-LessonContent abs-0000-oflow">
+          <div className="content">
+            <TutorialChapter />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
