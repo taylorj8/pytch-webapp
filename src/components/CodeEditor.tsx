@@ -113,7 +113,7 @@ const CodeAceEditor = () => {
         enableBasicAutocompletion={completers}
         value={codeText}
         name="pytch-ace-editor"
-        fontSize={16}
+        fontSize={14}
         width="100%"
         height="100%"
         onLoad={setFlatAceController}
