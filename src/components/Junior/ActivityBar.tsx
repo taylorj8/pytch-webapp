@@ -16,6 +16,7 @@ type TabKeyUiDetails = { icon: IconName; tooltip: string };
 const uiDetailsFromTabKeyLut = new Map<ActivityBarTabKey, TabKeyUiDetails>([
   ["helpsidebar", { icon: "question-circle", tooltip: "Scratch/Python help" }],
   ["lesson", { icon: "book", tooltip: "Lesson content" }],
+  ["tutorial", { icon: "book", tooltip: "Tutorial content" }],
   ["specimen", { icon: "book", tooltip: "Lesson information" }],
 ]);
 
