@@ -462,29 +462,6 @@ const TutorialTableOfContentsEntry = ({
   );
 };
 
-const TutorialTableOfContents = () => {
-  const maybeTutorial = useStoreState(
-    (state) => state.activeProject.project?.trackedTutorial?.content
-  );
-  const tutorial = failIfNull(maybeTutorial, "no tutorial to construct ToC");
-
-  return (
-    <div className="ToC-scrollable">
-      <div className="ToC-container">
-        <ul className="ToC">
-          {tutorial.chapters.map((chapter, chapterIndex) => (
-            <TutorialTableOfContentsEntry
-              key={chapterIndex}
-              chapterIndex={chapterIndex}
-              chapterTitle={chapter.title}
-            />
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-};
-
 const ActiveTutorial = () => {
   //
   // TODO: Review the nested structure and simplify if possible.  Also
