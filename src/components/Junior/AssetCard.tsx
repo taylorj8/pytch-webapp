@@ -15,6 +15,8 @@ import { ProjectId } from "../../model/project-core";
 import { useRunFlow } from "../../model";
 import { AssetMimeType } from "../../model/junior/structured-program/asset";
 import { AssetOperationScope } from "../../model/asset/core";
+import { copyTextToClipboard } from "../../utils";
+import { pyStringRepr } from "../../skulpt-connection/utils";
 
 type RenameDropdownItemProps = {
   operationScope: AssetOperationScope;
@@ -113,6 +115,22 @@ const CropScaleDropdownItem: React.FC<CropScaleDropdownItemProps> = ({
       <span className="with-icon">
         <span>Crop/scale</span>
         <FontAwesomeIcon icon="crop" />
+      </span>
+    </Dropdown.Item>
+  );
+};
+
+type CopyAssetNameDropdownItemProps = { assetName: string };
+const CopyAssetNameDropdownItem: React.FC<CopyAssetNameDropdownItemProps> = ({
+  assetName,
+}) => {
+  const nameStringLiteral = pyStringRepr(assetName);
+  const onCopyName = () => copyTextToClipboard(nameStringLiteral);
+  return (
+    <Dropdown.Item onClick={onCopyName}>
+      <span className="with-icon">
+        <span>Copy name</span>
+        <FontAwesomeIcon icon="copy" />
       </span>
     </Dropdown.Item>
   );
