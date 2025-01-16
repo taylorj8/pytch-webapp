@@ -886,6 +886,14 @@ export const activeProject: IActiveProject = {
         storeActions.jrEditState.bootForProgram(bootData);
       }
 
+      if (content.program.kind === "flat") {
+        const flatBootData = {
+          linkedContentKind: content.linkedContentRef.kind,
+          isTrackingTutorial: content.trackedTutorial != null,
+        };
+        storeActions.jrEditState.bootForFlatProgram(flatBootData);
+      }
+
       actions.noteLoadRequestOutcome("succeeded");
       fireAndForgetEvent("project-loaded", `${projectId}`);
       storeActions.infoPanel.setActiveTabKey(initialTabKey);
