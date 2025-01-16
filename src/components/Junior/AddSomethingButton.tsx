@@ -3,7 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import { ActorKind } from "../../model/junior/structured-program";
 
-export type AddSomethingButtonWhat = "sprite" | "script" | `${ActorKind}-asset`;
+export type AddSomethingButtonWhat =
+  | "sprite"
+  | "script"
+  | "flat-asset"
+  | `${ActorKind}-asset`;
 
 export type AddSomethingButtonProps = {
   what: AddSomethingButtonWhat;
