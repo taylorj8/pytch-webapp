@@ -322,7 +322,9 @@ context("Create project from specimen", () => {
     cy.visit(lessonUrl);
 
     // Wait for linked content to load.
-    cy.get(".LinkedContentBar.linked-content").contains("Hello World");
+    cy.get(".activity-content-expanded-specimen .specimen-name").contains(
+      "Hello World"
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cy.window().then(async (window: any) => {
