@@ -93,8 +93,10 @@ const juniorComponents: ErrorReportComponents = {
   schedulerStepErrorIntro: SchedulerStepErrorIntro,
 };
 
-export const ErrorReportList: React.FC<EmptyProps> = () => (
-  <componentsContext.Provider value={juniorComponents}>
-    <ErrorReportList_Generic />
-  </componentsContext.Provider>
-);
+export const ErrorReportList: React.FC<EmptyProps> = () => {
+  return (
+    <componentsContext.Provider value={juniorComponents}>
+      <ErrorReportList_Generic />
+    </componentsContext.Provider>
+  );
+};
