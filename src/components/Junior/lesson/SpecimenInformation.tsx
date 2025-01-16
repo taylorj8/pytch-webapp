@@ -17,7 +17,9 @@ export const SpecimenInformation: React.FC<EmptyProps> = () => {
       <div className="Junior-LessonContent-inner-container">
         <div className="Junior-LessonContent abs-0000-oflow">
           <div className="content">
-            This project is based on the code for <em>{specimenName}</em>.
+            <p>
+              This project is based on the code for <em>{specimenName}</em>.
+            </p>
           </div>
         </div>
       </div>
