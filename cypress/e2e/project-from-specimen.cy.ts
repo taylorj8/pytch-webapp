@@ -280,18 +280,23 @@ context("Create project from specimen", () => {
       });
   });
 
-  it("shows linked-content top bar (flat)", () => {
+  it("shows linked-content activity content (flat)", () => {
     cy.pytchResetDatabase();
 
     // Create and open new project from specimen.
     cy.visit(lessonUrl);
-    cy.get(".LinkedContentBar.linked-content").contains("Hello World Specimen");
+    cy.get(".activity-bar-tabs > *").should("have.length", 2);
+    cy.get(".activity-content-expanded-specimen .specimen-name").contains(
+      "Hello World Specimen"
+    );
 
-    // The test seed project should not have a (non-empty) content bar.
+    // The test seed project should not have the option of linked
+    // content information.
     cy.pytchHomeFromIDE();
     cy.contains("My projects").click();
     cy.pytchOpenProject("Test seed project");
-    cy.get(".LinkedContentBar.no-linked-content");
+    cy.get(".activity-content-expanded-helpsidebar");
+    cy.get(".activity-bar-tabs > *").should("have.length", 1);
   });
 
   it("shows linked-content activity pane (per-method)", () => {
