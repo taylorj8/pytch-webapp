@@ -103,11 +103,11 @@ export const ErrorReportList: React.FC<EmptyProps> = () => {
       // The default for the context is suitable for the "flat" IDE.
       return <ErrorReportList_Generic />;
     case "per-method":
-  return (
-    <componentsContext.Provider value={juniorComponents}>
-      <ErrorReportList_Generic />
-    </componentsContext.Provider>
-  );
+      return (
+        <componentsContext.Provider value={juniorComponents}>
+          <ErrorReportList_Generic />
+        </componentsContext.Provider>
+      );
     default:
       return assertNever(programKind);
   }
