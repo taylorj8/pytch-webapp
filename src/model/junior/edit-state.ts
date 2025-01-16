@@ -50,6 +50,13 @@ type BootData = {
   linkedContentKind: LinkedContentKind;
 };
 
+// TODO: This is clunky because we have not yet unified "linked content"
+// with "tracked tutorial".
+type FlatBootData = {
+  linkedContentKind: LinkedContentKind;
+  isTrackingTutorial: boolean;
+};
+
 export type EditState = {
   mostRecentFocusedEditor: string;
   setMostRecentFocusedEditor: Action<EditState, string>;
