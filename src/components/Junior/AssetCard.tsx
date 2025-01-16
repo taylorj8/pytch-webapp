@@ -153,6 +153,7 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 
   return (
     <DropdownButton align="end" title="⋮">
+      <CopyAssetNameDropdownItem assetName={displayName} />
       <CropScaleDropdownItem
         projectId={projectId}
         presentation={presentation}
