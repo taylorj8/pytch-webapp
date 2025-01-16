@@ -12,7 +12,6 @@ type AssetCardProps = {
   asset: AssetPresentation;
 };
 const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
-  // TODO: Put back "copy name" dropdown item.
   const assetKind = AssetMetaDataOps.mimeAssetKind(asset.mimeType);
   return (
     <JrAssetCard
