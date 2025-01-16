@@ -49,6 +49,7 @@ export const SpecimenInformation: React.FC<EmptyProps> = () => {
             <p>
               This project is based on the code for <em>{specimenName}</em>.
             </p>
+            <ActionButtons specimen={specimen} />
           </div>
         </div>
       </div>
