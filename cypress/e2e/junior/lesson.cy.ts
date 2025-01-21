@@ -1,4 +1,5 @@
 import { DiffViewKind, PrettyPrintedLine } from "../../../src/model/code-diff";
+import { assertInIDE } from "../utils";
 import {
   assertActorNames,
   clickUniqueSelected,
@@ -290,7 +291,7 @@ context("launch demo from tutorial card", () => {
     cy.get('.TutorialCard[data-slug="script-by-script-catch-apple"]')
       .contains("Demo")
       .click();
-    cy.get(".Junior-IDEContents");
+    assertInIDE("per-method");
     assertActorNames(["Stage", "Bowl", "Apple", "ScoreKeeper"]);
   });
 });

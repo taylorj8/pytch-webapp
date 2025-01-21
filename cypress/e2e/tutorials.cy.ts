@@ -2,6 +2,7 @@
 
 import {
   assertCopiedText,
+  assertInIDE,
   launchShareTutorialModal,
 } from "./utils";
 
@@ -69,10 +70,8 @@ context("Demo of a tutorial", () => {
   });
 
   it("creates project and launches IDE", () => {
-    cy.get("ul.InfoPanel").within(() => {
-      cy.contains("Tutorial").should("not.exist");
-    });
-    cy.contains("images and sounds");
+    cy.get(".ActivityBar .ActivityBarTab").should("have.length", 1);
+    assertInIDE("flat");
   });
 
   it("launches button tour for demo", () => {
