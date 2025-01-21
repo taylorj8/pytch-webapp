@@ -3,6 +3,10 @@
 import { stageFullScreenBorderPx } from "../../src/constants";
 
 context("Full-screen layout", () => {
+  const goFullScreen = () => {
+    cy.get(".StageControls .full-screen").click();
+  };
+
   before(() => {
     cy.pytchExactlyOneProject();
   });
