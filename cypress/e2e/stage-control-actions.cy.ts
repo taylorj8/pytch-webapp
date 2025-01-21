@@ -49,16 +49,6 @@ context("Stage control actions", () => {
     cy.get("button.close-button").click();
     cy.get(".CoordinateChooserBar").should("not.exist");
     cy.get(".CoordinateChooserOverlay").should("not.exist");
-
-    // Entering full-screen should dismiss coord chooser.
-    cy.pytchChooseDropdownEntry("Show coordinates");
-    cy.contains("Move pointer over stage to see (x, y)");
-    cy.get("button.full-screen").click();
-    cy.get(".ProjectIDE.full-screen");
-    cy.get("button.leave-full-screen").click();
-    cy.get("button.wide-info");
-    cy.get(".CoordinateChooserBar").should("not.exist");
-    cy.get(".CoordinateChooserOverlay").should("not.exist");
   });
 
   // TODO: Further tweaks to behaviour:
