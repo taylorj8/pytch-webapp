@@ -40,7 +40,11 @@ const GenericProgressTrail: React.FC<GenericProgressTrailProps> = ({
   const chapterTitleElt = cloneChapterTitleElt(activeChapterIndex);
 
   const nodeDivs = range(nProgressStages).map((idx) => (
-    <ProgressTrailNode key={idx} kind={nodeKindFromIndex(idx)} />
+    <ProgressTrailNode
+      key={idx}
+      kind={nodeKindFromIndex(idx)}
+      label={`${idx}`}
+    />
   ));
 
   const maybeChapterNumberLabel = activeChapterIndex > 0 && (
