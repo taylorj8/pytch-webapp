@@ -7,6 +7,7 @@ import {
   launchShareTutorialModal,
   selectUniqueProject,
   assertOnHomepage,
+  jumpToTutorialChapter,
 } from "./utils";
 import {
   assertActorNames,
@@ -299,14 +300,17 @@ context("Modals are cancelled when navigating away", () => {
 
   itCanAbandon("add assets (flat)", {
     page: { kind: "ide", projectIdx: kFlatProjectIdx },
-    runModal: () => cy.contains("Add an image").click(),
+    runModal: () =>
+      cy.get("div.AddSomethingButton").contains("Add from this device").click(),
     afterwardsExpect: assertFlatAssetsUnchanged,
   });
 
   itCanAbandon("add clip art (flat)", {
     page: { kind: "ide", projectIdx: kFlatProjectIdx },
     runModal: () => {
-      cy.contains("Choose from library").click();
+      cy.get("div.AddSomethingButton")
+        .contains("Add from media library")
+        .click();
       cy.get(".clipart-card").contains("blocks").click();
     },
     afterwardsExpect: assertFlatAssetsUnchanged,
@@ -455,7 +459,7 @@ context("Modals are cancelled when navigating away", () => {
   itCanAbandon("code diff help", {
     page: { kind: "ide", projectIdx: kTutorialFollowingProjectIdx },
     runModal: () => {
-      cy.get("ul.ToC").contains("Start the bowl").click();
+      jumpToTutorialChapter(2);
       cy.get(".patch-container .header button").eq(0).click();
       cy.contains("What changes should I make to my code?");
     },
@@ -463,10 +467,7 @@ context("Modals are cancelled when navigating away", () => {
 
   itCanAbandon("view code diff", {
     page: { kind: "specimen-linked-project" },
-    runModal: () => {
-      cy.get(".LinkedContentBar.linked-content .dropdown button").click();
-      cy.contains("Compare to original").click();
-    },
+    runModal: () => cy.get("button").contains("Compare to original").click(),
   });
 
   // #endregion
