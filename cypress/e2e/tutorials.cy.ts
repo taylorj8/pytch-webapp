@@ -26,6 +26,16 @@ context("Interact with a tutorial", () => {
     cy.pytchProjectFollowingTutorial();
   });
 
+  const assertActiveChapterIndex = (expActiveIndex: number) => {
+    cy.get(".ProgressTrail .progress-node-background.isActive").should(
+      "have.length",
+      1
+    );
+    const nChild = expActiveIndex + 1;
+    const selector = `.ProgressTrail .progress-node-background:nth-child(${nChild})`;
+    cy.get(selector).should("have.class", "isActive");
+  };
+
   it("can navigate through tutorial", () => {
     cy.contains("Get started:").click();
     cy.get(".ToC > li.active")
