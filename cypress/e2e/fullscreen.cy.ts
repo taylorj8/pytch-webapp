@@ -67,7 +67,7 @@ context("Full-screen layout", () => {
     goFullScreen();
     cy.pytchBuild();
 
-    assertWideInfoWithError(/could not load Sound/);
+    assertNonFullscreenWithError(/could not load Sound/);
   });
 
   it("exits full-screen if runtime error", () => {
@@ -84,7 +84,7 @@ context("Full-screen layout", () => {
     goFullScreen();
     cy.pytchBuild();
 
-    assertWideInfoWithError(/division by zero/);
+    assertNonFullscreenWithError(/division by zero/);
   });
 
   it("exits full-screen if rendering error", () => {
@@ -116,7 +116,7 @@ context("Full-screen layout", () => {
 
     cy.pytchSendKeysToProject("x");
 
-    assertWideInfoWithError(/oh no/);
+    assertNonFullscreenWithError(/oh no/);
   });
 
   it("exits full-screen if variable-watcher error", () => {
@@ -140,7 +140,7 @@ context("Full-screen layout", () => {
 
     cy.pytchSendKeysToProject("x");
 
-    assertWideInfoWithError(/oh no/);
+    assertNonFullscreenWithError(/oh no/);
   });
 
   it("navigating to project exits full-screen", () => {
