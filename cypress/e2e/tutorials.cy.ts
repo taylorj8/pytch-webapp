@@ -3,6 +3,7 @@
 import {
   assertCopiedText,
   assertInIDE,
+  jumpToTutorialChapter,
   launchShareTutorialModal,
 } from "./utils";
 
@@ -59,11 +60,11 @@ context("Interact with a tutorial", () => {
 context("Scratchblocks rendering", () => {
   it("renders scratchblocks", () => {
     cy.pytchProjectFollowingTutorial("ticket-vending-machine");
-    cy.get(".ToC").contains("Show all ticket types").click();
+    jumpToTutorialChapter(3);
     cy.get(".scratchblocks svg").contains("costume");
-    cy.get(".ToC").contains("Remember cost of chosen ticket").click();
+    jumpToTutorialChapter(5);
     cy.get(".scratchblocks svg").contains("sprite");
-    cy.get(".ToC").contains("Test the program so far").click();
+    jumpToTutorialChapter(6);
     cy.get(".scratchblocks svg").contains("variable");
   });
 });
