@@ -395,6 +395,12 @@ $progress-node-backgrounds-strip-x-margin: calc(
 
       @include align-center-middle();
 
+      span.progress-node-label {
+        font-size: 14px;
+        font-weight: bold;
+        color: $pytch-colour-main-yellow;
+      }
+
       &.plain {
         border-radius: 50%;
         background-color: $pytch-colour-main-blue;
