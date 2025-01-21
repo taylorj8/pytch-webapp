@@ -49,11 +49,10 @@ context("Full-screen layout", () => {
     });
   });
 
-  const assertWideInfoWithError = (errorMatch: RegExp) => {
-    cy.get("button.wide-info.btn-primary");
+  const assertNonFullscreenWithError = (errorMatch: RegExp) => {
     cy.get(".CodeEditor");
-    cy.get(".InfoPanel");
-    cy.get(".LayoutChooser");
+    cy.get(".Junior-InfoPanel");
+    cy.get(".ActivityBar");
     cy.pytchShouldShowErrorCard(errorMatch, "user-space");
   };
 
