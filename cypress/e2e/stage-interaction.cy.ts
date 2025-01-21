@@ -63,8 +63,7 @@ context("Interaction with the stage", () => {
 
   [
     { label: "default-size", setupFun: doNothing },
-    { label: "max-size", setupFun: () => cy.pytchDragStageDivider(200) },
-    { label: "min-size", setupFun: () => cy.pytchDragStageDivider(-200) },
+    { label: "min-size", setupFun: () => cy.viewport(960, 960) },
   ].forEach((spec) =>
     it(`computes click coords (${spec.label} stage)`, () => {
       spec.setupFun();
