@@ -284,6 +284,12 @@ const diffSamples = (tables: Array<HTMLTableElement>): DiffHelpSamples => {
   };
 };
 
+const nAddHunks = (tables: Array<HTMLTableElement>): number => {
+  return tables
+    .map((table) => table.querySelectorAll("tbody.diff-add").length)
+    .reduce((a, x) => a + x, 0);
+};
+
 const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
   const runCodeDiffHelp = useRunFlow((f) => f.codeDiffHelpFlow);
 
