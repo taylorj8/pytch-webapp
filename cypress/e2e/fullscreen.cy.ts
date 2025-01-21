@@ -12,7 +12,7 @@ context("Full-screen layout", () => {
   });
 
   it("enters and leaves full-screen layout", () => {
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.get(".CodeEditor").should("not.exist");
     cy.get(".InfoPanel").should("not.exist");
     cy.get(".LayoutChooser").should("not.exist");
@@ -40,7 +40,7 @@ context("Full-screen layout", () => {
   ].forEach((spec) => {
     it(`resizes stage in ${spec.label} full-screen layout`, () => {
       cy.get(".LayoutChooser button.wide-info").click().click();
-      cy.get(".LayoutChooser button.full-screen").click();
+      goFullScreen();
       cy.get(".CodeEditor").should("not.exist");
       cy.viewport(spec.size[0], spec.size[1]);
       cy.get("#pytch-canvas").its(`0.${spec.attr}`).should("eq", spec.expValue);
@@ -65,7 +65,7 @@ context("Full-screen layout", () => {
           Costumes = []
           Sounds = [('splat', 'no-such-file.mp3')]
     `);
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.pytchBuild();
 
     assertWideInfoWithError(/could not load Sound/);
@@ -82,7 +82,7 @@ context("Full-screen layout", () => {
           def erk(self):
               print(1/0)
     `);
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.pytchBuild();
 
     assertWideInfoWithError(/division by zero/);
@@ -112,7 +112,7 @@ context("Full-screen layout", () => {
           self.give_error = True
       `);
 
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.pytchBuild();
 
     cy.pytchSendKeysToProject("x");
@@ -136,7 +136,7 @@ context("Full-screen layout", () => {
           pytch.show_variable(self, "bad_property")
       `);
 
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.pytchBuild();
 
     cy.pytchSendKeysToProject("x");
@@ -150,7 +150,7 @@ context("Full-screen layout", () => {
       "have.class",
       "btn-primary"
     );
-    cy.get(".LayoutChooser button.full-screen").click();
+    goFullScreen();
     cy.get(".AssetCardPane").should("not.exist");
     cy.go("back");
     cy.contains("Test seed project").click();
