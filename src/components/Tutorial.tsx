@@ -287,13 +287,20 @@ const diffSampleOfClass = (
   let maybeSampleRow: HTMLTableRowElement | null = null;
 
   tables.forEach((table) => {
+    // This is fiddly.  We need to save the first row of the tbody
+    // because we only show one [-] or [+] sign spanning the full set of
+    // rows, so the row providing the content might only have one cell.
+    let firstRow: HTMLTableRowElement | null = null;
     table.querySelectorAll(`tbody.${cls} tr`).forEach((row) => {
-      const mCell = row.querySelector("td:nth-child(3) pre");
+      firstRow ??= row as HTMLTableRowElement;
+      const mCell = row.querySelector("td.code-text pre");
       if (mCell != null) {
         const text = mCell.textContent || "";
         if (text.length !== 0) {
           if (maybeSampleRow == null) {
-            maybeSampleRow = row.cloneNode(true) as HTMLTableRowElement;
+            maybeSampleRow = firstRow.cloneNode(true) as HTMLTableRowElement;
+            maybeSampleRow.removeChild(maybeSampleRow.lastChild!);
+            maybeSampleRow.appendChild(mCell.parentElement!.cloneNode(true));
           }
         }
       }
