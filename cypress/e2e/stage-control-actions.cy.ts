@@ -151,7 +151,7 @@ context("Stage control actions", () => {
 
     cy.pytchChooseDropdownEntry("tooltips");
     checkTooltipPosition();
-    cy.get(".layout-icon.tall-code").click();
+    cy.get("button.full-screen").click();
     checkTooltipPosition();
   });
 });
