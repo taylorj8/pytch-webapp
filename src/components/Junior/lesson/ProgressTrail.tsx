@@ -3,13 +3,16 @@ import classNames from "classnames";
 import { useLinkedJrTutorial } from "./hooks";
 import { EmptyProps, range } from "../../../utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RawElement from "../../RawElement";
-import { useStoreActions, useStoreState } from "../../../store";
 
-type ProgressNodeKind = "completed" | "current" | "future";
+type ProgressTrailNodeProps = { idx: number; currentIdx: number };
+const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = (props) => {
+  const kind =
+    props.idx < props.currentIdx
+      ? "completed"
+      : props.idx === props.currentIdx
+      ? "current"
+      : "future";
 
-type ProgressTrailNodeProps = { kind: ProgressNodeKind };
-const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({ kind }) => {
   const nodeClasses = classNames("progress-node", kind);
   const objContent =
     kind === "completed" ? (
@@ -17,7 +20,7 @@ const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({ kind }) => {
         <FontAwesomeIcon icon="check"></FontAwesomeIcon>
       </span>
     ) : kind === "future" ? (
-      <div className="future-node" />
+      <div></div>
     ) : null;
 
   return <div className={nodeClasses}>{objContent}</div>;
@@ -25,90 +28,40 @@ const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({ kind }) => {
 
 export const ProgressTrail: React.FC<EmptyProps> = () => {
   const linkedTutorial = useLinkedJrTutorial();
-  const tutorialContent = linkedTutorial.content;
-  const chapters = tutorialContent.chapters;
   const activeChapterIndex = linkedTutorial.interactionState.chapterIndex;
-  const setChapterIndex = useStoreActions(
-    (actions) => actions.activeProject.setLinkedLessonChapterIndex
-  );
-  const allowRandomChapterAccess = useStoreState(
-    (state) => state.tutorialCollection.allowRandomChapterAccess
-  );
 
   // Only some of the chapters count as "progress stages".  (We might
   // exclude the "Challenges" and "Asset credits" chapters, for
   // example.)
-  const progressStages = chapters.filter((chap) => chap.includeInProgressTrail);
+  const progressStages = linkedTutorial.content.chapters.filter(
+    (chap) => chap.includeInProgressTrail
+  );
   const nProgressStages = progressStages.length;
 
-  const chapterTitleElt = chapters[activeChapterIndex].titleElt;
+  const chapterTitleElt =
+    linkedTutorial.content.chapters[activeChapterIndex].chunks[0];
+  if (chapterTitleElt.kind !== "element") {
+    throw new Error("first chunk is not element");
+  }
 
-  const nodeDivs = range(nProgressStages).map((idx) => {
-    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
-    const nTasksInclChapter = tutorialContent.nTasksBeforeChapter[idx + 1];
-    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
-
-    const kind: ProgressNodeKind =
-      nTasksDone >= nTasksInclChapter
-        ? "completed"
-        : nTasksDone >= nTasksBeforeChapter
-        ? "current"
-        : "future";
-
-    return <ProgressTrailNode key={idx} kind={kind} />;
-  });
+  const nodeDivs = range(nProgressStages).map((idx) => (
+    <ProgressTrailNode key={idx} idx={idx} currentIdx={activeChapterIndex} />
+  ));
 
   const maybeChapterNumberLabel =
     activeChapterIndex > 0 ? (
       <span className="chapter-number">{activeChapterIndex} —</span>
     ) : null;
 
-  const nodeBackgrounds = range(nProgressStages).map((idx) => {
-    const isActive = idx === activeChapterIndex;
-    const classes = classNames("progress-node-background", { isActive });
-    return <div key={idx} className={classes} />;
-  });
-
-  const nodeHoverTargets = range(nProgressStages).map((idx) => {
-    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
-    const nTasksDone = linkedTutorial.interactionState.nTasksDone;
-    const canJumpHere =
-      nTasksDone >= nTasksBeforeChapter || allowRandomChapterAccess;
-
-    const contentElt = chapters[idx].titleElt.cloneNode(true) as HTMLElement;
-    const tooltip = (
-      <div className="progress-node-tooltip">
-        {!canJumpHere && <FontAwesomeIcon className="locked" icon="lock" />}
-        <RawElement element={contentElt} />
-      </div>
-    );
-
-    const onClick = canJumpHere ? () => setChapterIndex(idx) : () => void 0;
-    const classes = classNames("progress-node-hover-target", { canJumpHere });
-
-    return (
-      <div
-        key={idx}
-        data-chapter-index={`${idx}`}
-        className={classes}
-        onClick={onClick}
-      >
-        {tooltip}
-      </div>
-    );
-  });
-
   return (
     <>
       <div className="ProgressTrail">
-        <div className="node-backgrounds">{nodeBackgrounds}</div>
         <div className="track" />
         <div className="nodes">{nodeDivs}</div>
-        <div className="node-hover-targets">{nodeHoverTargets}</div>
       </div>
       <div className="chapter-title">
         {maybeChapterNumberLabel}
-        {chapterTitleElt.innerText}
+        {chapterTitleElt.element.innerText}
       </div>
     </>
   );

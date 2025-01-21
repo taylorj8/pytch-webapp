@@ -10,30 +10,16 @@ import RawElement from "../../RawElement";
 import classNames from "classnames";
 import { assertNever } from "../../../utils";
 import { LearnerTaskCommit } from "./LearnerTaskCommit";
-import { RawOrCodeSnippet, withCodeSnippetsRendered } from "./RawOrCodeSnippet";
+import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useStoreActions } from "../../../store";
 import { useMappedLinkedJrTutorial } from "./hooks";
 
-export type TaskInteractivityKind = "old" | "previous" | "current" | "future";
+type TaskInteractivityKind = "old" | "previous" | "current";
 
 type HelpStageFragmentProps = { fragment: LearnerTaskHelpStageFragment };
 const HelpStageFragment: React.FC<HelpStageFragmentProps> = ({ fragment }) => {
   const content = (() => {
     switch (fragment.kind) {
-      case "error":
-        return (
-          <div className="error-summary">
-            <p>
-              Tutorial error. Please contact the Pytch team if you see this!
-              (Unless you are the author of a tutorial and you understand the
-              message below.)
-            </p>
-            <pre className="error-message">{fragment.message}</pre>
-            <div className="original-node">
-              <RawElement element={fragment.element} />
-            </div>
-          </div>
-        );
       case "element": {
         const element = fragment.element;
         return element instanceof Text ? null : (
@@ -100,15 +86,12 @@ const CheckboxHelp: React.FC<CheckboxHelpProps> = ({ interactivityKind }) => {
       );
     case "old":
       return <span>Done!</span>;
-    case "future":
-      return <span>(This is a task preview)</span>;
     default:
       return assertNever(interactivityKind);
   }
 };
 
 type ShowHelpStageButtonProps = {
-  nStagesTotal: number;
   nStagesStillHidden: number;
   interactivityKind: TaskInteractivityKind;
   showNextHelpStage: () => void;
@@ -116,40 +99,25 @@ type ShowHelpStageButtonProps = {
   onCheckboxClick: () => void;
 };
 const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
-  nStagesTotal,
   nStagesStillHidden,
   interactivityKind,
   showNextHelpStage,
   hideAllHelpStages,
   onCheckboxClick,
 }) => {
-  const maybeButton =
-    nStagesTotal > 0 &&
-    (() => {
-      const label = (() => {
-        switch (nStagesStillHidden) {
-          case 0:
-            return "Hide help";
-          case 1:
-            return "Show me";
-          default:
-            return "Hint";
-        }
-      })();
+  const label = (() => {
+    switch (nStagesStillHidden) {
+      case 0:
+        return "Hide help";
+      case 1:
+        return "Show me";
+      default:
+        return "Hint";
+    }
+  })();
 
-      const onClick =
-        nStagesStillHidden === 0 ? hideAllHelpStages : showNextHelpStage;
-
-      return (
-        <Button
-          key={nStagesStillHidden}
-          variant="outline-success"
-          onClick={onClick}
-        >
-          {label}
-        </Button>
-      );
-    })();
+  const onClick =
+    nStagesStillHidden === 0 ? hideAllHelpStages : showNextHelpStage;
 
   return (
     <div className="ShowNextHelpStageButton-container">
@@ -161,7 +129,13 @@ const ShowNextHelpStageButton: React.FC<ShowHelpStageButtonProps> = ({
         />
         <CheckboxHelp interactivityKind={interactivityKind} />
       </div>
-      {maybeButton}
+      <Button
+        key={nStagesStillHidden}
+        variant="outline-success"
+        onClick={onClick}
+      >
+        {label}
+      </Button>
     </div>
   );
 };
@@ -196,8 +170,7 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
   const onCheckboxClick = () => {
     switch (kind) {
       case "old":
-      case "future":
-        // Ignore.
+        // Shouldn't happen.
         break;
       case "previous":
         markPreviousTaskNotDone();
@@ -229,7 +202,6 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
       {taskHelpStages}
       <div className="help-stage-divider" />
       <ShowNextHelpStageButton
-        nStagesTotal={task.helpStages.length}
         nStagesStillHidden={nStagesStillHidden}
         interactivityKind={kind}
         showNextHelpStage={() => showNextHelpStage(task.index)}
@@ -241,20 +213,11 @@ export const LearnerTask: React.FC<LearnerTaskProps> = ({
 
   const alertVariant = kind === "current" ? "success" : "light";
   const classes = classNames("LearnerTask", `learner-task-${kind}`);
-
-  // Suppress the usual Bootstrap Alert transition.  We manage this
-  // ourselves, to fade between the "done" and "not done" states of a
-  // LearnerTask as the user marks a task as done.
   return (
-    <Alert
-      transition={false}
-      key={keyPath}
-      variant={alertVariant}
-      className={classes}
-    >
+    <Alert key={keyPath} variant={alertVariant} className={classes}>
       <div className="task-outline">
         <div className="task-intro-content">
-          <RawElement element={withCodeSnippetsRendered(task.intro)} />
+          <RawElement element={task.intro} />
         </div>
       </div>
       {helpContent}

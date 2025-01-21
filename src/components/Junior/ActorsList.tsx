@@ -150,7 +150,7 @@ const ActorCard: React.FC<ActorCardProps> = ({ isFocused, kind, id, name }) => {
 
   const className = classNames("ActorCard", `kind-${kind}`, { isFocused });
   return (
-    <div className={className} onClick={setFocusedActor} data-actor-id={id}>
+    <div className={className} onClick={setFocusedActor}>
       <div className="ActorCardContent">
         <ActorThumbnail id={id} />
         <div className="label">{name}</div>

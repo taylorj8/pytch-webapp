@@ -16,8 +16,6 @@
  * be kept in sync.
  */
 
-/* eslint-disable no-undef */
-
 ace.define(
   "ace/theme/pytch-css",
   ["require", "exports", "module"],
@@ -144,7 +142,7 @@ ace.define(
 ace.define(
   "ace/theme/pytch",
   ["require", "exports", "module", "ace/theme/pytch-css", "ace/lib/dom"],
-  function (require, exports, _module) {
+  function (require, exports, module) {
     "use strict";
     exports.isDark = false;
     exports.cssClass = "ace-pytch";

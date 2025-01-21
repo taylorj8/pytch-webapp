@@ -16,7 +16,6 @@ import {
   stateHasProject,
 } from "../model/standalone-play-demo";
 
-import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import Stage from "./Stage";
 import QuestionInputPanel from "./QuestionInputPanel";
@@ -176,9 +175,9 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
     }
 
     const handleResize = () => {
-      // This "36" is the height of the controls; ideally we would get
+      // This "28" is the height of the controls; ideally we would get
       // this from somewhere definitive, not hard-code it.
-      const layout = fullScreenStageDisplaySize(36);
+      const layout = fullScreenStageDisplaySize(28);
       setStageDisplayWidth(layout.width);
     };
 
@@ -219,12 +218,9 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
   };
 
   const greenFlag = (
-    <Button
-      className="StageControlPseudoButton GreenFlag"
-      onClick={onGreenFlag}
-    >
+    <div className="StageControlPseudoButton GreenFlag" onClick={onGreenFlag}>
       <FontAwesomeIcon icon="play" />
-    </Button>
+    </div>
   );
 
   return (

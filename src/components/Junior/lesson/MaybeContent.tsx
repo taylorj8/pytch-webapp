@@ -4,7 +4,6 @@ import { useLinkedContentLoadingStateSummary } from "../../../model/linked-conte
 
 import { Content } from "./Content";
 import { ContentLoadingSpinner } from "./ContentLoadingSpinner";
-import { SpecimenInformation } from "./SpecimenInformation";
 
 export const MaybeContent: React.FC<EmptyProps> = () => {
   const linkedContentState = useLinkedContentLoadingStateSummary();
@@ -20,7 +19,12 @@ export const MaybeContent: React.FC<EmptyProps> = () => {
         case "jr-tutorial":
           return <Content />;
         case "specimen":
-          return <SpecimenInformation />;
+          // This shouldn't happen (yet).  Only Pytch-Sr projects
+          // should have a linked specimen.
+          console.log(
+            "per-method project should not be linked to specimen (succeeded)"
+          );
+          return null;
         default:
           return assertNever(contentKind);
       }
@@ -34,8 +38,14 @@ export const MaybeContent: React.FC<EmptyProps> = () => {
         case "none":
           return null;
         case "jr-tutorial":
-        case "specimen":
           return <ContentLoadingSpinner />;
+        case "specimen":
+          // This shouldn't happen (yet).  Only Pytch-Sr projects
+          // should have a linked specimen.
+          console.log(
+            "per-method project should not be linked to specimen (pending)"
+          );
+          return null;
         default:
           return assertNever(contentKind);
       }

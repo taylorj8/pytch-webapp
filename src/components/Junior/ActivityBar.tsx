@@ -7,7 +7,7 @@ import { useJrEditActions, useJrEditState } from "./hooks";
 import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-common-types";
-import { useHasLinkedLesson, useHasLinkedSpecimen } from "./lesson/hooks";
+import { useHasLinkedLesson } from "./lesson/hooks";
 import { EmptyProps } from "../../utils";
 import { useStoreState } from "../../store";
 
@@ -16,7 +16,6 @@ type TabKeyUiDetails = { icon: IconName; tooltip: string };
 const uiDetailsFromTabKeyLut = new Map<ActivityBarTabKey, TabKeyUiDetails>([
   ["helpsidebar", { icon: "question-circle", tooltip: "Scratch/Python help" }],
   ["lesson", { icon: "book", tooltip: "Lesson content" }],
-  ["specimen", { icon: "book", tooltip: "Lesson information" }],
 ]);
 
 function uiDetailsFromTabKey(tab: ActivityBarTabKey): TabKeyUiDetails {
@@ -37,7 +36,7 @@ const ActivityBarTab: React.FC<ActivityBarTabProps> = ({ tab, isActive }) => {
 
   const onClick = isActive ? () => collapseAction() : () => expandAction(tab);
   const uiDetails = uiDetailsFromTabKey(tab);
-  const classes = classNames("ActivityBarTab", { isActive }, `tab-key-${tab}`);
+  const classes = classNames("ActivityBarTab", { isActive });
 
   return (
     <div className={classes} onClick={onClick}>
@@ -58,12 +57,8 @@ export const ActivityBar: React.FC<EmptyProps> = () => {
   // TODO: Should the computation of the list of valid activity-tab-keys
   // be part of the model?
   const hasLinkedLesson = useHasLinkedLesson();
-  const hasLinkedSpecimen = useHasLinkedSpecimen();
-
   const tabs: Array<ActivityBarTabKey> = hasLinkedLesson
     ? ["helpsidebar", "lesson"]
-    : hasLinkedSpecimen
-    ? ["helpsidebar", "specimen"]
     : ["helpsidebar"];
 
   const syncClasses = classNames("sync-indicator", { pendingActionsExist });

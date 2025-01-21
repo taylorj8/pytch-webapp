@@ -67,7 +67,7 @@ const OpenExistingOptionCard: React.FC<OpenExistingOptionCardProps> = ({
             <p className="project-name">{projectSummary.name}</p>
             <MtimeDisplay mtime={projectSummary.mtime} />
             {
-              /* We'll omit the <P> for an empty summary; this is OK. */
+              /*If summary is the empty string, we'll omit the <P>; this is OK.*/
               projectSummary.summary && (
                 <p className="project-summary">{projectSummary.summary}</p>
               )

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import AceEditor from "react-ace";
+import { Range } from "ace-builds";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-searchbox";
@@ -47,6 +48,9 @@ const CodeAceEditor = () => {
   const saveIsPending = useStoreState(
     (state) => state.activeProject.syncState.loadState === "pending"
   );
+  const inDebugMode = useStoreState(
+    (state) => state.ideLayout.editMode === "debug"
+  )
   const editSeqNum = useStoreState((state) => state.activeProject.editSeqNum);
   const lastSyncFromStorageSeqNum = useStoreState(
     (state) => state.activeProject.lastSyncFromStorageSeqNum
@@ -80,6 +84,18 @@ const CodeAceEditor = () => {
       },
     });
 
+    ace.editor.session.addMarker(
+      new Range(10, 0, 11, 1),
+      "line-11-marker",
+      "fullLine"
+    );
+
+    ace.editor.session.addMarker(
+      new Range(0, 0, 1, 1),
+      "error-marker",
+      "text"
+    );
+
     // It seems common to have not ever heard of "overwrite" mode.  If
     // it gets turned on by mistake, people often get confused.  Ensure
     // we are in "insert" mode, and also remove any bindings for the
@@ -108,6 +124,15 @@ const CodeAceEditor = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const completers = [new PytchAceAutoCompleter() as any];
 
+  const markers = [{
+    startRow: 0,
+    startCol: 0,
+    endRow: 1,
+    endCol: 1,
+    className: 'error-marker',
+    type: 'text'
+  }];
+
   return (
     <>
       <AceEditor
@@ -122,7 +147,7 @@ const CodeAceEditor = () => {
         height="100%"
         onLoad={setFlatAceController}
         onChange={updateCodeText}
-        readOnly={saveIsPending}
+        readOnly={saveIsPending || inDebugMode}
       />
       <ReadOnlyOverlay />
     </>

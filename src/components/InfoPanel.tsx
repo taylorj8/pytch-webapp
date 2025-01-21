@@ -8,6 +8,7 @@ import EditorWebSocketInfo from "./EditorWebSocketInfo";
 import { LayoutChooser } from "./LayoutChooser";
 import { isEnabled as liveReloadEnabled } from "../model/live-reload";
 import { InfoPanelTabKey } from "../model/ui";
+import { DebugPane } from "./DebugPane";
 
 const StandardOutput = () => {
   const text = useStoreState((state) => state.standardOutputPane.text);
@@ -53,6 +54,8 @@ const InfoPanel = () => {
   );
   const layoutKind = useStoreState((state) => state.ideLayout.kind);
 
+  const setEditMode = useStoreActions(actions => actions.ideLayout.setEditMode);
+
   if (isSyncingFromBackEnd) {
     return null;
   }
@@ -65,7 +68,10 @@ const InfoPanel = () => {
         className={`InfoPanel ${layoutKind}`}
         transition={false}
         activeKey={activeKey}
-        onSelect={(k) => setActiveKey(k as InfoPanelTabKey)}
+        onSelect={(k) => {
+          setActiveKey(k as InfoPanelTabKey)
+          setEditMode(k === "debug" ? "debug" : "edit")
+        }}
       >
         {isTrackingTutorial && (
           <Tab className="InfoPane" eventKey="tutorial" title="Tutorial">
@@ -81,6 +87,12 @@ const InfoPanel = () => {
         <Tab className="InfoPane" eventKey="errors" title="Errors">
           <Errors />
         </Tab>
+
+        <Tab className="InfoPane" eventKey="debug" title="Debug">
+          <DebugPane />
+		    </Tab>
+
+        {/* <DebugTab className="InfoPane" eventKey="debug" title="Debug" mode="edit"></DebugTab> */}
         {liveReloadEnabled() ? (
           <Tab
             className="InfoPane"

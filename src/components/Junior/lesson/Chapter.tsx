@@ -1,51 +1,28 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   JrTutorialChapter,
   LinkedJrTutorial,
 } from "../../../model/junior/jr-tutorial";
 import { EmptyProps, assertNever } from "../../../utils";
-import { LearnerTask, TaskInteractivityKind } from "./LearnerTask";
+import { LearnerTask } from "./LearnerTask";
 import { RawOrCodeSnippet } from "./RawOrCodeSnippet";
 import { useMappedLinkedJrTutorial } from "./hooks";
-import { useStoreState } from "../../../store";
-
-// This is more fiddly, but just using a <RawElement> inside the <UL>
-// for the ToC leads to poor DOM structure (UL/LI/DIV/H2/text), which
-// (reasonably enough) renders poorly on Safari.
-type ToCEntryProps = { key: React.Key; titleElt: HTMLElement };
-const ToCEntry: React.FC<ToCEntryProps> = (props) => {
-  const liRef = React.createRef<HTMLLIElement>();
-
-  useEffect(() => {
-    let liElt = liRef.current;
-    if (liElt == null) return;
-
-    props.titleElt.childNodes.forEach((node) => {
-      liElt.appendChild(node.cloneNode(true));
-    });
-
-    return () => {
-      liElt.innerHTML = "";
-    };
-  }, [liRef]);
-
-  return <li ref={liRef} />;
-};
+import RawElement from "../../RawElement";
 
 const LessonTableOfContents: React.FC<{ key: React.Key }> = () => {
-  const chapters = useMappedLinkedJrTutorial(
-    (tutorial) => tutorial.content.chapters
+  const chapterTitles = useMappedLinkedJrTutorial(
+    (tutorial) => tutorial.content.realChapterTitles
   );
-
-  // Omit first "chapter", which is the overall summary.
-  const realChapters = chapters.slice(1);
-
   return (
     <div className="LessonTableOfContents">
       <h1 className="title">Summary of this project’s steps:</h1>
       <ul className="toc-contents">
-        {realChapters.map((chapter, idx) => (
-          <ToCEntry key={idx} titleElt={chapter.titleElt} />
+        {chapterTitles.map((chapterTitle, idx) => (
+          <li key={idx}>
+            <RawElement
+              element={chapterTitle.cloneNode(true) as HTMLHeadingElement}
+            />
+          </li>
         ))}
       </ul>
     </div>
@@ -87,13 +64,8 @@ function eqState(s1: ChapterState, s2: ChapterState): boolean {
   );
 }
 
-function taskInteractionKind(
-  state: ChapterState,
-  taskIdx: number
-): TaskInteractivityKind {
-  return taskIdx > state.nTasksDone
-    ? "future"
-    : taskIdx === state.nTasksDone
+function taskInteractionKind(state: ChapterState, taskIdx: number) {
+  return taskIdx === state.nTasksDone
     ? "current"
     : taskIdx === state.nTasksDone - 1
     ? "previous"
@@ -102,9 +74,6 @@ function taskInteractionKind(
 
 export const Chapter: React.FC<EmptyProps> = () => {
   const state = useMappedLinkedJrTutorial(mapTutorial, eqState);
-  const allowRandomChapterAccess = useStoreState(
-    (state) => state.tutorialCollection.allowRandomChapterAccess
-  );
 
   let body: Array<React.JSX.Element> = [];
   let chunkIdx = 0;
@@ -139,7 +108,7 @@ export const Chapter: React.FC<EmptyProps> = () => {
         return assertNever(chunk);
     }
 
-    if (taskIdx > state.nTasksDone && !allowRandomChapterAccess) {
+    if (taskIdx > state.nTasksDone) {
       break;
     }
 
@@ -151,10 +120,10 @@ export const Chapter: React.FC<EmptyProps> = () => {
     body.push(<LessonTableOfContents key={key} />);
   }
 
-  if (!state.allChapterTasksDone && !allowRandomChapterAccess) {
+  if (!state.allChapterTasksDone) {
     const key = `${state.chapterIndex}/hint`;
     body.push(
-      <div key={key} className="hint-do-task-to-see-more">
+      <div key={key} className="my-3 hint-do-task-to-see-more">
         (You’ll see the next step once you’ve marked this task as done.)
       </div>
     );

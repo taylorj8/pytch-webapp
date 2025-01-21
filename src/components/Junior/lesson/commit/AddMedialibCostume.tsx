@@ -1,22 +1,21 @@
 import React from "react";
 import {
   ActorIdentifierOps,
-  LearnerTaskCommitAddMedialibAppearancesEntry,
+  LearnerTaskCommitAddMedialibAppearance,
 } from "../../../../model/junior/jr-tutorial";
 import { ActorKindOps } from "../../../../model/junior/structured-program";
 import { InlineAddSomethingButton } from "../../AddSomethingButton";
 
 // TODO: Include thumbnail of required costume?
 
-export const AddMedialibAppearancesEntry: React.FC<
-  LearnerTaskCommitAddMedialibAppearancesEntry
-> = ({ actor, displayIdentifier, nItems }) => {
+export const AddMedialibAppearance: React.FC<
+  LearnerTaskCommitAddMedialibAppearance
+> = ({ actor, displayIdentifier }) => {
   const actorKindNames = ActorKindOps.names(actor.kind);
   const actorNounPhrase = ActorIdentifierOps.nounPhrase(actor);
-  const entryNoun = nItems === 1 ? "image" : "images";
 
   return (
-    <div className="JrCommit Commit-AddMedialibAppearancesEntry">
+    <div className="JrCommit Commit-AddMedialibCostume">
       <p>
         In the <i>Stage and Sprites</i> pane, select {actorNounPhrase}.
       </p>
@@ -33,8 +32,9 @@ export const AddMedialibAppearancesEntry: React.FC<
         button.
       </p>
       <p>
-        Find the “<strong>{displayIdentifier}</strong>” {entryNoun}, and click
-        the “Add {nItems} to project” button.
+        Find the <code>{displayIdentifier}</code>{" "}
+        {actorKindNames.appearanceDisplay}, and click the “Add 1 to project”
+        button.
       </p>
     </div>
   );

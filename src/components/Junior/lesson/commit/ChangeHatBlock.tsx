@@ -29,7 +29,7 @@ export const ChangeHatBlock: React.FC<LearnerTaskCommitChangeHatBlock> = ({
 
   return (
     <div className="JrCommit Commit-ChangeHatBlock">
-      <p>Find and select {actorNounPhrase}, and then find this script:</p>
+      <p>Find {actorNounPhrase}, and then find this script:</p>
       <DisplayScript
         actorKind={actorKind}
         event={oldEvent}
