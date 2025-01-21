@@ -207,7 +207,7 @@ const createTutorialProject = (
 
   // More/less as per pytchOpenProject() above, except don't let it get
   // fooled by the buttons on the tutorials page:
-  cy.contains("images and sounds");
+  cy.get(".Junior-InfoPanel");
   cy.get(".ReadOnlyOverlay").should("not.exist");
 
   cy.pytchHomeFromIDE();
@@ -230,10 +230,7 @@ Cypress.Commands.add(
   "pytchShouldShowAssets",
   (expectedNames: Array<string>) => {
     const nExpNames = expectedNames.length;
-    cy.get(".InfoPanel .nav-link")
-      .contains("Images and sounds")
-      .should("have.class", "active");
-    cy.get(".AssetCard .card-header code")
+    cy.get(".AssetCardContent .label pre")
       .should("have.length", nExpNames)
       .then(($codes) => {
         const orderedExpectedNames = [...expectedNames];
@@ -276,7 +273,7 @@ Cypress.Commands.add("pytchBuild", () => {
 
 Cypress.Commands.add("pytchBuildCode", (rawCodeText: string) => {
   cy.pytchSetCodeWithDeIndent(rawCodeText);
-  cy.contains("Images and sounds").click();
+  cy.get(".Junior-InfoPanel .nav-link").contains("Output").click();
   cy.pytchBuild();
 });
 
@@ -339,7 +336,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("pytchShouldHaveBuiltWithoutErrors", () => {
-  cy.get(".InfoPanel .nav-link")
+  cy.get(".Junior-InfoPanel .nav-link")
     .contains("Errors")
     .should("not.have.class", "active")
     .click();
@@ -347,7 +344,7 @@ Cypress.Commands.add("pytchShouldHaveBuiltWithoutErrors", () => {
   cy.get(".ErrorReportAlert").should("not.exist");
 });
 
-const shouldBeShowingErrorPane = (infoPanelClass = "InfoPanel") => {
+const shouldBeShowingErrorPane = (infoPanelClass = "Junior-InfoPanel") => {
   cy.get(`.${infoPanelClass} .nav-link`)
     .contains("Errors")
     .should("have.class", "active");
@@ -466,8 +463,10 @@ function doNothing() {
 Cypress.Commands.add(
   "pytchActivateAssetDropdown",
   (assetName: string, maybeChooseItem = doNothing) => {
-    cy.get(".card-header")
+    cy.get(".AssetCardContent .label")
       .contains(assetName)
+      .parent()
+      .parent()
       .parent()
       .within(() => {
         cy.get(".dropdown").click();
