@@ -8,19 +8,17 @@ import { useStoreActions, useStoreState } from "../../../store";
 
 type ProgressNodeKind = "plain" | "completed" | "current" | "future";
 
-type ProgressTrailNodeProps = { kind: ProgressNodeKind };
-const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({ kind }) => {
+type ProgressTrailNodeProps = { kind: ProgressNodeKind; label: string };
+const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({
+  kind,
+  label,
+}) => {
   const nodeClasses = classNames("progress-node", kind);
-  const objContent =
-    kind === "completed" ? (
-      <span>
-        <FontAwesomeIcon icon="check"></FontAwesomeIcon>
-      </span>
-    ) : kind === "future" ? (
-      <div className="future-node" />
-    ) : null;
-
-  return <div className={nodeClasses}>{objContent}</div>;
+  return (
+    <div className={nodeClasses}>
+      <span className="progress-node-label">{label}</span>
+    </div>
+  );
 };
 
 type GenericProgressTrailProps = {
