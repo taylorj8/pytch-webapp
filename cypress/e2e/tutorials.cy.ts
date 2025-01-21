@@ -38,19 +38,13 @@ context("Interact with a tutorial", () => {
 
   it("can navigate through tutorial", () => {
     cy.contains("Get started:").click();
-    cy.get(".ToC > li.active")
-      .should("have.length", 1)
-      .contains("Make the playing area");
+    assertActiveChapterIndex(1);
     cy.contains("Back:").click();
-    cy.get(".ToC > li.active")
-      .should("have.length", 1)
-      .contains("Make a Pong-like game");
+    assertActiveChapterIndex(0);
     cy.contains("Get started:").click();
     cy.contains("Next:").click();
     cy.contains("Next:").click();
-    cy.get(".ToC > li.active")
-      .should("have.length", 1)
-      .contains("Add the ball");
+    assertActiveChapterIndex(3);
   });
 
   it("gives feedback when Copy button clicked", () => {
