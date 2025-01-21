@@ -142,56 +142,6 @@ interface TutorialPatchElementProps {
 // well as avoiding this kind of hybrid React / direct DOM
 // manipulation.
 
-/* Modifies the passed-in element; returns array of tables found. */
-const addCopyButtons = (div: HTMLDivElement): Array<HTMLTableElement> => {
-  const tableElements = div.querySelectorAll("div.patch table");
-  tableElements.forEach((tableElement) => {
-    const table = tableElement as HTMLTableElement;
-
-    let tbodyAddElts = table.querySelectorAll("tbody.diff-add");
-
-    tbodyAddElts.forEach((tbodyElement) => {
-      const tbody = tbodyElement as HTMLTableSectionElement;
-      let copyButton = document.createElement("div");
-      copyButton.className = "copy-button";
-      copyButton.innerHTML =
-        '<p class="content">COPY</p><p class="feedback">✓&nbsp;Copied!</p>';
-      copyButton.onclick = async (evt: MouseEvent) => {
-        console.log(evt);
-        const pContent = evt.target as HTMLElement;
-        const parentElement = failIfNull(pContent.parentElement, "no parent");
-        parentElement.querySelectorAll("p").forEach((node) => {
-          const elt = node as HTMLParagraphElement;
-          elt.classList.add("active");
-          elt.addEventListener("animationend", () => {
-            elt.classList.remove("active");
-          });
-        });
-        try {
-          const text = tbody.dataset.addedText;
-          if (text != null) {
-            await navigator.clipboard.writeText(text);
-          }
-        } catch (err) {
-          console.log(
-            "Could not copy to clipboard",
-            "(an error is expected if running under Cypress):",
-            err
-          );
-        }
-      };
-
-      let topRightCell = failIfNull(
-        tbody.querySelector("tr > td:last-child"),
-        "top-right cell not found"
-      );
-      topRightCell.appendChild(copyButton);
-    });
-  });
-
-  return Array.from(tableElements) as Array<HTMLTableElement>;
-};
-
 const VerticalEllipsis = () => {
   return (
     <div className="patch-hunk-spacer">
@@ -339,7 +289,9 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
 
   let divCopy = div.cloneNode(true) as HTMLDivElement;
 
-  const tableElts = addCopyButtons(divCopy);
+  const tableElts = Array.from(
+    divCopy.querySelectorAll("div.patch table")
+  ) as Array<HTMLTableElement>;
 
   if (tableElts.length === 0) {
     // Maybe this is a warning, e.g., for slug-not-found?  Don't crash,
