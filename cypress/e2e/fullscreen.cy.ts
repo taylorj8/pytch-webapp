@@ -14,13 +14,11 @@ context("Full-screen layout", () => {
   it("enters and leaves full-screen layout", () => {
     goFullScreen();
     cy.get(".CodeEditor").should("not.exist");
-    cy.get(".InfoPanel").should("not.exist");
-    cy.get(".LayoutChooser").should("not.exist");
+    cy.get(".Junior-InfoPanel").should("not.exist");
 
     cy.get(".leave-full-screen").click();
     cy.get(".CodeEditor");
-    cy.get(".InfoPanel");
-    cy.get(".LayoutChooser");
+    cy.get(".Junior-InfoPanel");
   });
 
   [
@@ -39,7 +37,6 @@ context("Full-screen layout", () => {
     },
   ].forEach((spec) => {
     it(`resizes stage in ${spec.label} full-screen layout`, () => {
-      cy.get(".LayoutChooser button.wide-info").click().click();
       goFullScreen();
       cy.get(".CodeEditor").should("not.exist");
       cy.viewport(spec.size[0], spec.size[1]);
@@ -144,11 +141,6 @@ context("Full-screen layout", () => {
   });
 
   it("navigating to project exits full-screen", () => {
-    cy.get(".LayoutChooser button.tall-code").click();
-    cy.get(".LayoutChooser button.tall-code").should(
-      "have.class",
-      "btn-primary"
-    );
     goFullScreen();
     cy.get(".AssetCardPane").should("not.exist");
     cy.go("back");
