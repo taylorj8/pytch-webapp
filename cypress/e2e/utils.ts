@@ -142,3 +142,11 @@ export function assertCopiedText(textIsExpected: (text: string) => boolean) {
     })
   );
 }
+
+/** Assuming that the webapp is in the IDE for a project which is
+ * tracking (or linked to) a tutorial, use the progress trail to jump to
+ * the chapter at the given `chapterIndex`. */
+export function jumpToTutorialChapter(chapterIndex: number) {
+  const selector = `.progress-node-hover-target[data-chapter-index="${chapterIndex}"]`;
+  cy.get(selector).click();
+}
