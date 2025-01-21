@@ -342,6 +342,26 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
     }
   };
 
+  const nAdds = nAddHunks(tableElts);
+  const mHintDiv =
+    nAdds === 0 ? (
+      false
+    ) : nAdds === 1 ? (
+      <div className="copy-hint">
+        <p>
+          Hint: Click on the <span className="add-code-icon">+</span> button to
+          copy the new code.
+        </p>
+      </div>
+    ) : (
+      <div className="copy-hint">
+        <p>
+          Hint: Click on a <span className="add-code-icon">+</span> button to
+          copy that chunk of new code.
+        </p>
+      </div>
+    );
+
   return (
     <div className="patch-container" onCopy={convertDotsToSpaces}>
       <div className="header">
@@ -351,6 +371,7 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
         </Button>
       </div>
       <div className="patch-contents">{contentDivs}</div>
+      {mHintDiv}
     </div>
   );
 };

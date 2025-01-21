@@ -76,6 +76,19 @@ div.patch-container {
     overflow-x: auto;
   }
 
+  .copy-hint {
+    margin-top: 1rem;
+    p {
+      margin: 0px;
+      font-style: italic;
+    }
+    span.add-code-icon {
+      background-color: #8aef8a;
+      padding: 0px 6px;
+      border-radius: 6px;
+    }
+  }
+
   clear: both;
   margin: 0px 0px 1rem;
   background-color: white;
