@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { jumpToTutorialChapter } from "./utils";
+
 context("Work with pop-up diff help", () => {
   beforeEach(() => {
     cy.pytchProjectFollowingTutorial();
@@ -9,7 +11,7 @@ context("Work with pop-up diff help", () => {
     `.modal-body .patch-container .diff-${kind}`;
 
   it("can summon and dismiss diff help", () => {
-    cy.get("ul.ToC").contains("Add the player's bat").click();
+    jumpToTutorialChapter(2);
 
     // Check can repeatedly summon and dismiss:
     for (let _i = 0; _i !== 3; ++_i) {
