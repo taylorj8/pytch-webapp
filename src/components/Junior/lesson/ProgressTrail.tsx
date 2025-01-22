@@ -109,27 +109,32 @@ const GenericProgressTrail: React.FC<GenericProgressTrailProps> = ({
     nodeKindFromIndex
   );
 
-  const nodeDivs = range(nProgressStages).map((idx) => (
-    <ProgressTrailNode
-      key={idx}
-      kind={nodeKindFromIndex(idx)}
-      label={`${idx}`}
-    />
+  const nodeDivs = nodeDescriptors.map((d) => (
+    <ProgressTrailNode key={d.key} descriptor={d} />
   ));
 
   const maybeChapterNumberLabel = activeChapterIndex > 0 && (
     <span className="chapter-number">{activeChapterIndex} —</span>
   );
 
-  const nodeBackgrounds = range(nProgressStages).map((idx) => {
-    const isActive = idx === activeChapterIndex;
+  const nodeBackgrounds = nodeDescriptors.map((d, idx) => {
+    const isActive = d.kind !== "ellipsis" && d.index === activeChapterIndex;
     const classes = classNames("progress-node-background", { isActive });
     return <div key={idx} className={classes} />;
   });
 
-  const nodeHoverTargets = range(nProgressStages).map((idx) => {
-    const canJumpHere = canJumpHereFromIndex(idx);
-    const contentElt = cloneChapterTitleElt(idx);
+  const nodeHoverTargets = nodeDescriptors.map((d, displayedIdx) => {
+    if (d.kind === "ellipsis") {
+      return (
+        <div
+          key={`ellipsis-${displayedIdx}`}
+          className="progress-node-no-hover"
+        />
+      );
+    }
+
+    const canJumpHere = canJumpHereFromIndex(d.index);
+    const contentElt = cloneChapterTitleElt(d.index);
 
     const tooltip = (
       <div className="progress-node-tooltip">
@@ -138,13 +143,13 @@ const GenericProgressTrail: React.FC<GenericProgressTrailProps> = ({
       </div>
     );
 
-    const onClick = canJumpHere ? () => setChapterIndex(idx) : () => void 0;
+    const onClick = canJumpHere ? () => setChapterIndex(d.index) : () => void 0;
     const classes = classNames("progress-node-hover-target", { canJumpHere });
 
     return (
       <div
-        key={idx}
-        data-chapter-index={`${idx}`}
+        key={`labelled-${displayedIdx}`}
+        data-chapter-index={`${d.index}`}
         className={classes}
         onClick={onClick}
       >
