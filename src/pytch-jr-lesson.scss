@@ -270,7 +270,7 @@ $task-checkbox-not-done-colour: #999;
 
 $progress-node-strip-x-margin: 16px;
 
-$progress-node-box-size: 18px;
+$progress-node-box-size: 26px;
 $progress-node-future-size: 10px;
 $progress-node-future-padding: calc(
   ($progress-node-box-size - $progress-node-future-size) / 2
@@ -284,7 +284,7 @@ $progress-track-thickness: 2px;
 // It would look better if these were bigger, but if they're too big, a
 // 12-chapter tutorial's progress trail is too wide when the viewport is
 // narrow.
-$progress-node-background-box-size: 30px;
+$progress-node-background-box-size: 36px;
 
 $progress-node-backgrounds-strip-x-margin: calc(
   $progress-node-strip-x-margin -
