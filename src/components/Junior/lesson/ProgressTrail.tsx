@@ -6,7 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RawElement from "../../RawElement";
 import { useStoreActions, useStoreState } from "../../../store";
 
-type ProgressNodeKind = "plain" | "completed" | "current" | "future";
+type LabelledProgressNodeKind = "normal" | "inverse";
+type ProgressNodeKind = "ellipsis" | LabelledProgressNodeKind;
 
 type ProgressTrailNodeProps = { kind: ProgressNodeKind; label: string };
 const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({
