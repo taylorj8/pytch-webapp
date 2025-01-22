@@ -89,7 +89,7 @@ type GenericProgressTrailProps = {
   nProgressStages: number;
   activeChapterIndex: number;
   setChapterIndex(idx: number): void;
-  nodeKindFromIndex(idx: number): ProgressNodeKind;
+  nodeKindFromIndex(idx: number): LabelledProgressNodeKind;
   cloneChapterTitleElt(idx: number): HTMLElement;
   canJumpHereFromIndex(idx: number): boolean;
 };
