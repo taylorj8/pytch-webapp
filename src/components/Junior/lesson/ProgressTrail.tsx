@@ -32,6 +32,10 @@ const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({
   return <div className={nodeClasses}>{content}</div>;
 };
 
+function ellipsisDescriptor(index: number): ProgressNodeDescriptor {
+  return { kind: "ellipsis", key: `ellipsis-${index}` };
+}
+
 type GenericProgressTrailProps = {
   nProgressStages: number;
   activeChapterIndex: number;
