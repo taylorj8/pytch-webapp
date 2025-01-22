@@ -401,34 +401,6 @@ $progress-node-backgrounds-strip-x-margin: calc(
         color: $pytch-colour-main-yellow;
       }
 
-      &.plain {
-        border-radius: 50%;
-        background-color: $pytch-colour-main-blue;
-        border: 3px solid $pytch-colour-main-yellow;
-      }
-      &.completed {
-        border-radius: 50%;
-        background-color: $pytch-colour-main-yellow;
-        color: $pytch-colour-main-blue;
-        span {
-          position: relative;
-          top: 0.1111rem;
-        }
-      }
-      &.current {
-        border-radius: 50%;
-        background-color: $pytch-colour-main-blue;
-        border: 2px solid $pytch-colour-main-yellow;
-      }
-      &.future {
-        padding: $progress-node-future-padding;
-        div.future-node {
-          width: $progress-node-future-size;
-          height: $progress-node-future-size;
-          border-radius: 50%;
-          background-color: $pytch-colour-main-yellow;
-        }
-      }
     }
   }
 }
