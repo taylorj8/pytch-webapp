@@ -36,6 +36,10 @@ function ellipsisDescriptor(index: number): ProgressNodeDescriptor {
   return { kind: "ellipsis", key: `ellipsis-${index}` };
 }
 
+const kVisibleProgressNodes = 9;
+const kCentralNodeRangeHalfWidth = 2;
+const kCentralProgressNodes = 1 + 2 * kCentralNodeRangeHalfWidth;
+
 type GenericProgressTrailProps = {
   nProgressStages: number;
   activeChapterIndex: number;
