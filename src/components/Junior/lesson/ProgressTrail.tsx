@@ -223,8 +223,8 @@ const ProgressTrail_Flat: React.FC<EmptyProps> = () => {
   const nProgressStages = tutorial.content.chapters.length;
   const activeChapterIndex = tutorial.activeChapterIndex;
 
-  function nodeKindFromIndex(_idx: number): ProgressNodeKind {
-    return "plain";
+  function nodeKindFromIndex(_idx: number): LabelledProgressNodeKind {
+    return "normal";
   }
 
   function cloneChapterTitleElt(idx: number) {
