@@ -40,6 +40,51 @@ const kVisibleProgressNodes = 9;
 const kCentralNodeRangeHalfWidth = 2;
 const kCentralProgressNodes = 1 + 2 * kCentralNodeRangeHalfWidth;
 
+function progressNodeDescriptors(
+  nTotalNodes: number,
+  activeNodeIndex: number,
+  nodeKindFromIndex: (idx: number) => LabelledProgressNodeKind
+): Array<ProgressNodeDescriptor> {
+  const mkLabelled = (nodeIdx: number): ProgressNodeDescriptor => ({
+    key: `labelled-${nodeIdx}`,
+    kind: nodeKindFromIndex(nodeIdx),
+    index: nodeIdx,
+  });
+
+  const lastIdx = nTotalNodes - 1;
+
+  if (nTotalNodes <= kVisibleProgressNodes) {
+    return range(nTotalNodes).map(mkLabelled);
+  }
+
+  if (activeNodeIndex < kCentralProgressNodes) {
+    return [
+      ...range(kCentralProgressNodes + 2).map(mkLabelled),
+      ellipsisDescriptor(1),
+      mkLabelled(lastIdx),
+    ];
+  }
+
+  if (activeNodeIndex >= nTotalNodes - kCentralProgressNodes) {
+    const tailStartIdx = nTotalNodes - kCentralProgressNodes - 2;
+    return [
+      mkLabelled(0),
+      ellipsisDescriptor(0),
+      ...range(tailStartIdx, nTotalNodes).map(mkLabelled),
+    ];
+  }
+
+  const centralIdx0 = activeNodeIndex - kCentralNodeRangeHalfWidth;
+  const centralIdx1 = activeNodeIndex + kCentralNodeRangeHalfWidth + 1;
+  return [
+    mkLabelled(0),
+    ellipsisDescriptor(0),
+    ...range(centralIdx0, centralIdx1).map(mkLabelled),
+    ellipsisDescriptor(1),
+    mkLabelled(lastIdx),
+  ];
+}
+
 type GenericProgressTrailProps = {
   nProgressStages: number;
   activeChapterIndex: number;
