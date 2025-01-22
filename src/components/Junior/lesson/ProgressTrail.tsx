@@ -103,6 +103,12 @@ const GenericProgressTrail: React.FC<GenericProgressTrailProps> = ({
 }) => {
   const chapterTitleElt = cloneChapterTitleElt(activeChapterIndex);
 
+  const nodeDescriptors = progressNodeDescriptors(
+    nProgressStages,
+    activeChapterIndex,
+    nodeKindFromIndex
+  );
+
   const nodeDivs = range(nProgressStages).map((idx) => (
     <ProgressTrailNode
       key={idx}
