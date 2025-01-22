@@ -14,17 +14,22 @@ type ProgressNodeDescriptor = { kind: ProgressNodeKind; key: string } & (
   | { kind: "ellipsis" }
 );
 
-type ProgressTrailNodeProps = { kind: ProgressNodeKind; label: string };
+type ProgressTrailNodeProps = { descriptor: ProgressNodeDescriptor };
 const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({
-  kind,
-  label,
+  descriptor,
 }) => {
-  const nodeClasses = classNames("progress-node", kind);
-  return (
-    <div className={nodeClasses}>
-      <span className="progress-node-label">{label}</span>
-    </div>
-  );
+  const nodeClasses = classNames("progress-node", `kind-${descriptor.kind}`);
+  const content =
+    descriptor.kind === "ellipsis" ? (
+      <>
+        <div className="ellipsis-dot" />
+        <div className="ellipsis-dot" />
+        <div className="ellipsis-dot" />
+      </>
+    ) : (
+      <span className="progress-node-label">{descriptor.index}</span>
+    );
+  return <div className={nodeClasses}>{content}</div>;
 };
 
 type GenericProgressTrailProps = {
