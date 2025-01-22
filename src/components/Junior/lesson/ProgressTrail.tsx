@@ -9,6 +9,11 @@ import { useStoreActions, useStoreState } from "../../../store";
 type LabelledProgressNodeKind = "normal" | "inverse";
 type ProgressNodeKind = "ellipsis" | LabelledProgressNodeKind;
 
+type ProgressNodeDescriptor = { kind: ProgressNodeKind; key: string } & (
+  | { kind: "normal" | "inverse"; index: number }
+  | { kind: "ellipsis" }
+);
+
 type ProgressTrailNodeProps = { kind: ProgressNodeKind; label: string };
 const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({
   kind,
