@@ -401,6 +401,29 @@ $progress-node-backgrounds-strip-x-margin: calc(
         color: $pytch-colour-main-yellow;
       }
 
+      border-radius: 30%;
+      border: 2px solid $pytch-colour-main-yellow;
+
+      &.kind-normal {
+        background-color: $pytch-colour-main-blue;
+        color: $pytch-colour-main-yellow;
+      }
+      &.kind-inverse {
+        background-color: $pytch-colour-main-yellow;
+        color: $pytch-colour-main-blue;
+      }
+      &.kind-ellipsis {
+        background-color: $pytch-colour-main-blue;
+        border-color: transparent;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        .ellipsis-dot {
+          width: 2px;
+          height: 2px;
+          background-color: $pytch-colour-main-yellow;
+        }
+      }
     }
   }
 }
