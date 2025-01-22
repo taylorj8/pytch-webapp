@@ -183,16 +183,10 @@ const ProgressTrail_PerMethod: React.FC<EmptyProps> = () => {
 
   const activeChapterIndex = linkedTutorial.interactionState.chapterIndex;
 
-  function nodeKindFromIndex(idx: number) {
-    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+  function nodeKindFromIndex(idx: number): LabelledProgressNodeKind {
     const nTasksInclChapter = tutorialContent.nTasksBeforeChapter[idx + 1];
     const nTasksDone = linkedTutorial.interactionState.nTasksDone;
-
-    return nTasksDone >= nTasksInclChapter
-      ? "completed"
-      : nTasksDone >= nTasksBeforeChapter
-      ? "current"
-      : "future";
+    return nTasksDone >= nTasksInclChapter ? "inverse" : "normal";
   }
 
   function cloneChapterTitleElt(idx: number) {
