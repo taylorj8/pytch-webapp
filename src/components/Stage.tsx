@@ -89,8 +89,8 @@ const Stage = () => {
     };
   });
 
-  const runState = useStoreState((state) => state.activeProject.runState)
-  projectEngineRef.current?.setRunState(runState);
+  const debugState = useStoreState((state) => state.activeProject.debugState)
+  projectEngineRef.current?.setDebugState(debugState);
 
   const sizeStyle = {
     width: `${displaySize.width}px`,

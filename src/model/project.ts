@@ -259,6 +259,7 @@ type NoteChangeAugArgs = {
 };
 
 type LoadPhase = "booting" | "booted";
+export type DebugState = "running" | "paused" | "stepping"
 
 export interface IActiveProject {
   changesManager: NotableChangesManager;
@@ -414,6 +415,10 @@ export interface IActiveProject {
   nPendingSyncActions: number;
   pendingSyncActionsExist: Computed<IActiveProject, boolean>;
   increaseNPendingSyncActions: Action<IActiveProject, number>;
+
+  // DEBUGGING
+  debugState: DebugState;
+  setDebugState: Action<IActiveProject, DebugState>;
 }
 
 const dummyPytchProgram = PytchProgramOps.fromPythonCode(
@@ -1299,5 +1304,12 @@ export const activeProject: IActiveProject = {
       );
       state.nPendingSyncActions = 0;
     }
+  }),
+
+  // DEBUGGING
+  debugState: "running",
+  setDebugState: action((state, newDebugState) => {
+    console.log("setDebugState(): ", newDebugState);
+    state.debugState = newDebugState;
   }),
 };

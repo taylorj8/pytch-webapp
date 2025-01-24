@@ -1,16 +1,16 @@
 import { Tab } from "react-bootstrap";
-import { EditMode } from "../model/ui";
+import { DebugMode } from "../model/ui";
 import { useStoreActions } from "../store";
 
 type DebugTabProps = {
   className: string | undefined;
   eventKey: string | undefined;
   title: string
-	mode: EditMode;
+	mode: DebugMode;
 }
 
 export const DebugTab = (props: DebugTabProps) => {
-	const setMode = useStoreActions(actions => actions.ideLayout.setEditMode)
+	const setMode = useStoreActions(actions => actions.ideLayout.setDebugMode)
 
 	return (
 		<Tab className={props.className} eventKey={props.eventKey} title={props.title} onSelect={

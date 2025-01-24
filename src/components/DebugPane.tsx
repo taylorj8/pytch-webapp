@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 // import { IAceEditorProps } from "react-ace";
-import { EmptyProps } from "../utils";
+import { delaySeconds, EmptyProps } from "../utils";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { useStoreActions, useStoreState } from "../store";
@@ -59,7 +59,8 @@ export const DebugPane: React.FC<EmptyProps> = () => {
     (state) => PytchProgramOps.ensureKind("DebugPane", state.activeProject.project.program, "flat")
   );
 
-  const setRunState = useStoreActions((actions) => actions.activeProject.setRunState)
+  const debugState = useStoreState((state) => state.activeProject.debugState)
+  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState)
 
   const actors = extractNames(code.text)
   if (!actors) {
@@ -97,11 +98,13 @@ export const DebugPane: React.FC<EmptyProps> = () => {
               }
 
               if (buttonName === "Pause") {
-                setRunState("pause")
+                console.log("pausing")
+                setDebugState("paused")
                 setButtonName("Play")
                 setShowVars(true)
               } else {
-                setRunState("run")
+                console.log("running")
+                setDebugState("running")
                 setButtonName("Pause")
                 setShowVars(false)
               }
@@ -110,15 +113,16 @@ export const DebugPane: React.FC<EmptyProps> = () => {
             {buttonName === "Play" && (
             <Button className="StepButton" variant="warning" onClick={
               () => {
-              const project = Sk.pytch.current_live_project;
-              if (project === Sk.default_pytch_environment.current_live_project) {
-                console.log("no real live project; bailing");
-                return;
-              }
-              Sk.pytch.sound_manager.one_frame();
-              const projectState = project.one_frame();
-              
-              // setRunState("step")
+                const project = Sk.pytch.current_live_project;
+                if (project === Sk.default_pytch_environment.current_live_project) {
+                  console.log("no real live project; bailing");
+                  return;
+                }
+                // Sk.pytch.sound_manager.one_frame();
+                // const projectState = project.one_frame();
+                window.requestAnimationFrame(project.one_frame);
+                console.log("!!!!! " + debugState)
+                setDebugState("stepping")
               }
             } style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Step</Button>
             )}

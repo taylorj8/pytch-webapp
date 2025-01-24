@@ -116,6 +116,7 @@ type UpdatePointerOverStageArgs = {
 };
 
 type EnsureNotFullScreenAction = "restore-layout" | "force-wide-info-pane";
+export type DebugMode = "normal" | "debug";
 
 export interface IIDELayout {
   kind: IDELayoutKind;
@@ -142,6 +143,8 @@ export interface IIDELayout {
   dismissButtonTour: Action<IIDELayout>;
   initiateButtonTour: Action<IIDELayout>;
   maybeAdvanceTour: Action<IIDELayout, ButtonTourStage>;
+  debugMode: DebugMode;
+  setDebugMode: Action<IIDELayout, DebugMode>;
 }
 
 export const fullScreenStageDisplaySize = (controlsHeight = 36) => {
@@ -324,6 +327,10 @@ export const ideLayout: IIDELayout = {
   }),
 
   helpSidebar,
+  debugMode: "normal",
+  setDebugMode: action((state, mode) => {
+    state.debugMode = mode;
+  }),
 };
 
 export interface IUserConfirmations {
@@ -426,7 +433,8 @@ export type InfoPanelTabKey =
   | "assets"
   | "output"
   | "errors"
-  | "websocket-log";
+  | "websocket-log"
+  | "debug";
 
 export interface IInfoPanel {
   activeTabKey: InfoPanelTabKey;

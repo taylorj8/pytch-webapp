@@ -13,6 +13,7 @@ import {
   IQuestionFromVM,
   MaybeUserAnswerSubmissionToVM,
 } from "../model/user-text-input";
+import { DebugState } from "../model/project";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -64,6 +65,7 @@ export class ProjectEngine {
   shouldRun: boolean;
   liveSpeechBubbles: Map<SpeakerId, LiveSpeechBubble>;
   webAppAPI: IWebAppAPI;
+  debugState: DebugState;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -110,6 +112,7 @@ export class ProjectEngine {
     this.liveSpeechBubbles = newSpeechBubblesMap();
 
     this.shouldRun = true;
+    this.debugState = "running"
 
     this.oneFrame = this.oneFrame.bind(this);
     console.log(
@@ -307,9 +310,13 @@ export class ProjectEngine {
     };
   }
 
+  setDebugState(debugState: DebugState) {
+    this.debugState = debugState;
+  }
+
   oneFrame() {
     const logIntro = `ProjectEngine[${this.id}].oneFrame()`;
-
+    
     if (!this.shouldRun) {
       console.log(`${logIntro}: halt was requested; bailing`);
       return;
@@ -349,13 +356,19 @@ export class ProjectEngine {
     const renderResult = this.render(project);
     renderResult.webApiCalls.forEach((f) => f());
 
-    if (renderResult.succeeded) {
-      window.requestAnimationFrame(this.oneFrame);
-    } else {
-      console.log(`${logIntro}: error while rendering; bailing`);
-      this.webAppAPI.clearUserQuestion();
-      this.webAppAPI.setVariableWatchers([]);
-      this.webAppAPI.ensureNotFullScreen();
+    if (this.debugState !== "paused") {
+      if (renderResult.succeeded) {
+        window.requestAnimationFrame(this.oneFrame);
+      } else {
+        console.log(`${logIntro}: error while rendering; bailing`);
+        this.webAppAPI.clearUserQuestion();
+        this.webAppAPI.setVariableWatchers([]);
+        this.webAppAPI.ensureNotFullScreen();
+      }
+    }
+
+    if (this.debugState === "stepping") {
+      this.debugState = "paused";
     }
   }
 
