@@ -43,10 +43,9 @@ const GreenFlag = () => {
   );
   const build = useStoreActions((actions) => actions.activeProject.build);
   const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
-
   const handleClick = () => {
-    setDebugState("not_debugging");
-    build("running-project");
+    build({ focusDestination: "running-project", inDebugMode: false });
+    setDebugState("running");
   };
 
   const tooltipIsVisible = buttonTourProgressStage === "green-flag";
@@ -69,12 +68,10 @@ const GreenFlag = () => {
 const YellowDebug = () => {
   const build = useStoreActions((actions) => actions.activeProject.build);
   const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
-
   const handleClick = () => {
-    setDebugState("running");
-    build("running-project");
+    build({ focusDestination: "running-project", inDebugMode: true });
+    setDebugState("debugging");
   };
-
   return (
     <div className="tooltipped-elt">
       <Button
@@ -88,9 +85,11 @@ const YellowDebug = () => {
 };
 
 export const RedStop = () => {
+  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
   const redStop = () => {
     Sk.pytch.current_live_project.on_red_stop_clicked();
     focusStage();
+    setDebugState("stopped");
   };
   return (
     <Button className="StageControlPseudoButton RedStop" onClick={redStop}>

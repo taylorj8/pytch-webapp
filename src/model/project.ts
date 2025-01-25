@@ -259,7 +259,7 @@ type NoteChangeAugArgs = {
 };
 
 type LoadPhase = "booting" | "booted";
-export type DebugState = "not_debugging" | "running" | "paused" | "stepping"
+export type DebugState = "stopped" | "running" | "debugging" | "paused" | "stepping"
 
 export interface IActiveProject {
   changesManager: NotableChangesManager;
@@ -407,7 +407,7 @@ export interface IActiveProject {
   setActiveTutorialChapter: Action<IActiveProject, number>;
 
   incrementBuildSeqnum: Action<IActiveProject>;
-  build: Thunk<IActiveProject, FocusDestination, void, IPytchAppModel>;
+  build: Thunk<IActiveProject, { focusDestination: FocusDestination; inDebugMode: boolean }, void, IPytchAppModel>;
 
   ////////////////////////////////////////////////////////////////////////
   // Background sync
@@ -772,7 +772,7 @@ export const activeProject: IActiveProject = {
 
   setCodeTextAndBuild: thunk(async (actions, payload) => {
     actions.setCodeText(payload.codeText);
-    await actions.build(payload.focusDestination);
+    await actions.build({ focusDestination: payload.focusDestination, inDebugMode: false });
   }),
 
   syncDummyProject: action((state) => {
@@ -1193,7 +1193,7 @@ export const activeProject: IActiveProject = {
   }),
 
   build: thunk(
-    async (actions, focusDestination, helpers): Promise<BuildOutcome> => {
+    async (actions, {focusDestination, inDebugMode}, helpers): Promise<BuildOutcome> => {
       const project = helpers.getState().project;
       failIfDummy(project, "build");
 
@@ -1235,7 +1235,7 @@ export const activeProject: IActiveProject = {
       // which does mean we need to do this bit ourselves too, ugh:
       helpers.getStoreActions().projectCollection.noteDatabaseChange();
 
-      const buildOutcome = await build(project, appendOutput, recordError);
+      const buildOutcome = await build(project, appendOutput, recordError, inDebugMode);
 
       const programKind = project.program.kind;
       const outcomeKind = BuildOutcomeKindOps.displayName(buildOutcome.kind);
@@ -1308,11 +1308,11 @@ export const activeProject: IActiveProject = {
   }),
 
   // DEBUGGING
-  debugState: "not_debugging",
+  debugState: "stopped",
   inDebugMode: false,
   setDebugState: action((state, newDebugState) => {
     console.log("setDebugState(): ", newDebugState);
     state.debugState = newDebugState;
-    state.inDebugMode = newDebugState !== "not_debugging";
+    state.inDebugMode = newDebugState !== "running" && newDebugState !== "stopped";
   }),
 };

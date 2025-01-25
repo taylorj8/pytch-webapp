@@ -4,6 +4,8 @@ import { assetServer } from "./asset-server";
 import { ensureSoundManager } from "./sound-manager";
 import { ProjectContent } from "../model/project-core";
 import { AssetPresentation } from "../model/asset";
+import { useStoreActions } from "../store";
+import { set } from "date-fns";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -53,7 +55,8 @@ export const build = async (
   project: ProjectContent<AssetPresentation>,
   addOutputChunk: (chunk: string) => void,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handleError: (pytchError: any, errorContext: any) => void
+  handleError: (pytchError: any, errorContext: any) => void,
+  inDebugMode: boolean
 ): Promise<BuildOutcome> => {
   // This also resets the current_live_project slot.
   Sk.configure({
@@ -61,7 +64,7 @@ export const build = async (
     read: builtinRead,
     output: addOutputChunk,
     pytch: { on_exception: handleError },
-    // debugging: true,
+    debugging: inDebugMode,
   });
   try {
     ensureSoundManager();

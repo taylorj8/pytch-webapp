@@ -69,12 +69,12 @@ const CodeAceEditor = () => {
     ace.editor.commands.addCommand({
       name: "buildAndGreenFlag",
       bindKey: { mac: "Ctrl-Enter", win: "Ctrl-Enter" },
-      exec: () => build("running-project"),
+      exec: () => build({focusDestination: "running-project", inDebugMode: false}),
     });
     ace.editor.commands.addCommand({
       name: "buildAndGreenFlagKeepFocus",
       bindKey: { mac: "Ctrl-Shift-Enter", win: "Ctrl-Shift-Enter" },
-      exec: () => build("editor"),
+      exec: () => build({focusDestination: "editor", inDebugMode: false}),
     });
     ace.editor.commands.addCommand({
       name: "copySelectionAsHtml",
