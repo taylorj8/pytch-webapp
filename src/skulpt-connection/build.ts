@@ -61,6 +61,7 @@ export const build = async (
     read: builtinRead,
     output: addOutputChunk,
     pytch: { on_exception: handleError },
+    // debugging: true,
   });
   try {
     ensureSoundManager();

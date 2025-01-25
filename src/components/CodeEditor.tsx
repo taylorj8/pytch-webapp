@@ -49,7 +49,7 @@ const CodeAceEditor = () => {
     (state) => state.activeProject.syncState.loadState === "pending"
   );
   const inDebugMode = useStoreState(
-    (state) => state.ideLayout.debugMode === "debug"
+    (state) => state.activeProject.inDebugMode
   )
   const editSeqNum = useStoreState((state) => state.activeProject.editSeqNum);
   const lastSyncFromStorageSeqNum = useStoreState(

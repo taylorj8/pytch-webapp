@@ -669,6 +669,10 @@ div.spacer-instead-of-resizer {
     @include as-bootstrap-button(#2c2, #1a1);
   }
 
+  &.YellowDebug {
+    @include as-bootstrap-button(rgb(201, 204, 34), rgb(170, 168, 17));
+  }
+
   &.RedStop {
     @include as-bootstrap-button(#e33, #c11);
   }

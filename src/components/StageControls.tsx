@@ -5,11 +5,13 @@ import { useStoreActions, useStoreState } from "../store";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBug } from '@fortawesome/free-solid-svg-icons';
 import { EmptyProps } from "../utils";
 import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content";
 import { pathWithinApp } from "../env-utils";
 import { useNavigate } from "react-router-dom";
 import { useRunFlow } from "../model";
+import { action } from "easy-peasy";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -40,8 +42,12 @@ const GreenFlag = () => {
     (state) => state.ideLayout.buttonTourProgressStage
   );
   const build = useStoreActions((actions) => actions.activeProject.build);
+  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
 
-  const handleClick = () => build("running-project");
+  const handleClick = () => {
+    setDebugState("not_debugging");
+    build("running-project");
+  };
 
   const tooltipIsVisible = buttonTourProgressStage === "green-flag";
 
@@ -56,6 +62,27 @@ const GreenFlag = () => {
       <StaticTooltip visible={tooltipIsVisible}>
         <p>Click the green flag to run the project</p>
       </StaticTooltip>
+    </div>
+  );
+};
+
+const YellowDebug = () => {
+  const build = useStoreActions((actions) => actions.activeProject.build);
+  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
+
+  const handleClick = () => {
+    setDebugState("running");
+    build("running-project");
+  };
+
+  return (
+    <div className="tooltipped-elt">
+      <Button
+        className="StageControlPseudoButton YellowDebug"
+        onClick={handleClick}
+      >
+        <FontAwesomeIcon icon={faBug} />
+      </Button>
     </div>
   );
 };
@@ -167,6 +194,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
     <div className="StageControls">
       <div className="run-stop-controls">
         <GreenFlag />
+        <YellowDebug />
         <RedStop />
       </div>
       <Button
@@ -180,6 +208,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
   ) : (
     <div className="StageControls">
       <GreenFlag />
+      <YellowDebug />
       <RedStop />
       <Button
         className={`save-button ${codeStateVsStorage}`}

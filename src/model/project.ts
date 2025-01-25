@@ -259,7 +259,7 @@ type NoteChangeAugArgs = {
 };
 
 type LoadPhase = "booting" | "booted";
-export type DebugState = "running" | "paused" | "stepping"
+export type DebugState = "not_debugging" | "running" | "paused" | "stepping"
 
 export interface IActiveProject {
   changesManager: NotableChangesManager;
@@ -418,6 +418,7 @@ export interface IActiveProject {
 
   // DEBUGGING
   debugState: DebugState;
+  inDebugMode: boolean;
   setDebugState: Action<IActiveProject, DebugState>;
 }
 
@@ -1307,9 +1308,11 @@ export const activeProject: IActiveProject = {
   }),
 
   // DEBUGGING
-  debugState: "running",
+  debugState: "not_debugging",
+  inDebugMode: false,
   setDebugState: action((state, newDebugState) => {
     console.log("setDebugState(): ", newDebugState);
     state.debugState = newDebugState;
+    state.inDebugMode = newDebugState !== "not_debugging";
   }),
 };
