@@ -14,6 +14,8 @@ import { makeScratchSVG } from "../model/scratchblocks-render";
 import "../pytch-tutorial.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRunFlow } from "../model";
+import { ProgressTrail } from "./Junior/lesson/ProgressTrail";
+import { WidthMonitor } from "./Junior/WidthMonitor";
 
 type NavigationDirection = "prev" | "next";
 
@@ -79,7 +81,7 @@ const TutorialElement = ({ element }: TutorialElementProps) => {
     element.firstChild instanceof HTMLElement &&
     element.firstChild.classList.contains("language-scratch")
   ) {
-    const sbSvg = makeScratchSVG(element.innerText, 1.0);
+    const sbSvg = makeScratchSVG(element.innerText, 0.8);
     return <RawElement className="scratchblocks" element={sbSvg} />;
   }
   return <RawElement element={element} />;
@@ -341,7 +343,7 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
           <FontAwesomeIcon icon="question-circle" />
         </Button>
       </div>
-      {contentDivs}
+      <div className="patch-contents">{contentDivs}</div>
     </div>
   );
 };
@@ -394,11 +396,16 @@ const TutorialChapter = () => {
   const chapterIndex = Math.min(rawChapterIndex, maxValidIndex);
   const activeChapter = allChapters[chapterIndex];
 
+  // Discard the first item in contentElements, which is the heading
+  // element.  The chapter title is already shown in the header bar
+  // (progress trail).
+  const contentBodyElements = activeChapter.contentElements.slice(1);
+
   return (
     <div className="TutorialChapter-scrollable">
       <div className="TutorialChapter-container" ref={chapterContainerRef}>
         <div className="TutorialChapter" tabIndex={-1}>
-          {activeChapter.contentElements.map((element, idx) => (
+          {contentBodyElements.map((element, idx) => (
             <TutorialElement key={idx} element={element} />
           ))}
           <div className="navigation-buttons">
@@ -423,56 +430,28 @@ const TutorialChapter = () => {
   );
 };
 
-interface TutorialTableOfContentsEntryProps {
-  chapterIndex: number;
-  chapterTitle: string;
-}
-
-const TutorialTableOfContentsEntry = ({
-  chapterIndex,
-  chapterTitle,
-}: TutorialTableOfContentsEntryProps) => {
-  const maybeActiveIndex = useStoreState(
-    (state) => state.activeProject.project?.trackedTutorial?.activeChapterIndex
-  );
-  const navigateToChapter = useStoreActions(
-    (actions) => actions.activeProject.setActiveTutorialChapter
-  );
-
-  const activeIndex = failIfNull(
-    maybeActiveIndex,
-    "no tutorial to construct ToC entry"
-  );
-
-  const navigate = () => navigateToChapter(chapterIndex);
-  return (
-    <li
-      onClick={navigate}
-      className={chapterIndex === activeIndex ? "active" : undefined}
-    >
-      {chapterTitle}
-    </li>
-  );
-};
-
-const TutorialTableOfContents = () => {
-  const maybeTutorial = useStoreState(
-    (state) => state.activeProject.project?.trackedTutorial?.content
-  );
-  const tutorial = failIfNull(maybeTutorial, "no tutorial to construct ToC");
+const ActiveTutorial = () => {
+  //
+  // TODO: Review the nested structure and simplify if possible.  Also
+  // change class names to reflect fact that they no longer apply to
+  // just "per-method lessons".
+  //
+  // TODO: Implement scrolling behaviour whereby scroll position is
+  // preserved within a chapter but reset when moving to another
+  // chapter.
 
   return (
-    <div className="ToC-scrollable">
-      <div className="ToC-container">
-        <ul className="ToC">
-          {tutorial.chapters.map((chapter, chapterIndex) => (
-            <TutorialTableOfContentsEntry
-              key={chapterIndex}
-              chapterIndex={chapterIndex}
-              chapterTitle={chapter.title}
-            />
-          ))}
-        </ul>
+    <div className="Junior-LessonContent-container">
+      <WidthMonitor nonStageWd={1100} />
+      <div className="Junior-LessonContent-HeaderBar">
+        <ProgressTrail.Flat />
+      </div>
+      <div className="Junior-LessonContent-inner-container">
+        <div className="Junior-LessonContent abs-0000-oflow">
+          <div className="content">
+            <TutorialChapter />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -495,12 +474,7 @@ const Tutorial = () => {
       throw new Error(`unknown loadState "${loadState}"`);
   }
 
-  return (
-    <div className="tutorial-pane">
-      <TutorialTableOfContents />
-      <TutorialChapter />
-    </div>
-  );
+  return <ActiveTutorial />;
 };
 
 export default Tutorial;
