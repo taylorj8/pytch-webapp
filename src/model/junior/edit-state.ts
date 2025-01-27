@@ -50,6 +50,13 @@ type BootData = {
   linkedContentKind: LinkedContentKind;
 };
 
+// TODO: This is clunky because we have not yet unified "linked content"
+// with "tracked tutorial".
+type FlatBootData = {
+  linkedContentKind: LinkedContentKind;
+  isTrackingTutorial: boolean;
+};
+
 export type EditState = {
   mostRecentFocusedEditor: string;
   setMostRecentFocusedEditor: Action<EditState, string>;
@@ -100,6 +107,7 @@ export type EditState = {
 
   expandAndSetActive: Thunk<EditState, InfoPanelTabKey>;
 
+  bootForFlatProgram: Thunk<EditState, FlatBootData>;
   bootForProgram: Thunk<EditState, BootData>;
 
   assetReorderInProgress: boolean;
@@ -186,6 +194,42 @@ export const editState: EditState = {
     actions.setInfoPanelState("expanded");
     actions.setInfoPanelActiveTab(tabKey);
   }),
+
+  bootForFlatProgram: thunk(
+    (actions, { linkedContentKind, isTrackingTutorial }) => {
+      actions.setInfoPanelActiveTab("output");
+      actions.setInfoPanelState("expanded");
+
+      const hasLinkedContent = linkedContentKind !== "none";
+      if (isTrackingTutorial) {
+        if (hasLinkedContent) {
+          // Warn but proceed anyway with tracking tutorial.
+          console.log(
+            `unexpected linked content "${linkedContentKind}"` +
+              " for isTrackingTutorial"
+          );
+        }
+        actions.expandActivityContent("tutorial");
+      } else {
+        switch (linkedContentKind) {
+          case "none":
+            actions.expandActivityContent("helpsidebar");
+            break;
+          case "jr-tutorial":
+            console.log(
+              'unexpected "jr-tutorial" linked-content for flat program'
+            );
+            actions.expandActivityContent("helpsidebar");
+            break;
+          case "specimen":
+            actions.expandActivityContent("specimen");
+            break;
+          default:
+            assertNever(linkedContentKind);
+        }
+      }
+    }
+  ),
 
   bootForProgram: thunk((actions, { program, linkedContentKind }) => {
     // Where is the right place to enforce the invariant that the [0]th
