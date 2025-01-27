@@ -70,6 +70,13 @@
   outline: none;
 }
 
+.CodeDiffHelpModal span.add-code-icon,
+div.patch-container .copy-hint span.add-code-icon {
+  background-color: #8aef8a;
+  padding: 0px 6px;
+  border-radius: 6px;
+}
+
 div.patch-container {
   .patch-contents {
     container: patch-table / inline-size;
@@ -81,11 +88,6 @@ div.patch-container {
     p {
       margin: 0px;
       font-style: italic;
-    }
-    span.add-code-icon {
-      background-color: #8aef8a;
-      padding: 0px 6px;
-      border-radius: 6px;
     }
   }
 
