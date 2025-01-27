@@ -16,6 +16,7 @@ export const CodeDiffHelpModal = () => {
       <Modal
         show={true}
         onHide={settle.cancel}
+        className="CodeDiffHelpModal"
         animation={false}
         centered
         size="lg"
