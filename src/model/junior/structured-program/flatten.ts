@@ -35,7 +35,8 @@ const pushActorLines = (
   lines: Array<string>,
   mapEntries: Array<SourceMapEntry>,
   actor: Actor,
-  allAssets: Array<AssetMetaData>
+  allAssets: Array<AssetMetaData>,
+  context: FlattenProgramContext
 ): void => {
   const kindNames = ActorKindOps.names(actor.kind);
 
@@ -45,13 +46,13 @@ const pushActorLines = (
 
   lines.push(`    ${kindNames.appearancesAttribute} = [`);
   actorAssets.appearances.forEach((a) => {
-    lines.push(`        ("${a.basename}", "${a.fullPathname}"),`);
+    lines.push(`        ${context.assetNamesTupleLiteral(a)},`);
   });
   lines.push("    ]");
 
   lines.push("    Sounds = [");
   actorAssets.sounds.forEach((s) => {
-    lines.push(`        ("${s.basename}", "${s.fullPathname}"),`);
+    lines.push(`        ${context.assetNamesTupleLiteral(s)},`);
   });
   lines.push("    ]");
 
