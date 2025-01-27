@@ -65,7 +65,8 @@ export class PytchProgramOps {
     return { kind: "per-method", program };
   }
 
-  /** Return a flat-text Python equivalent of the given `program`. */
+  /** Return a flat-text Python equivalent of the given `program` having
+   * the given `assets`. */
   static flatCodeText(
     program: PytchProgram,
     assets: Array<AssetMetaData>
