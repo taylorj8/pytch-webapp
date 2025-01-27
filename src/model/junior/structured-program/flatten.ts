@@ -1,7 +1,7 @@
 // Conversion of structured program into flat Python code.
 
 import { Actor, ActorKindOps } from "./actor";
-import { AssetMetaData, AssetMetaDataOps } from "./asset";
+import { AssetMetaData, AssetMetaDataOps, AssetNames } from "./asset";
 import { EventDescriptorOps } from "./event";
 import { StructuredProgram } from "./program";
 import { SourceMapEntry } from "./source-map";
@@ -23,6 +23,13 @@ const gensym = (() => {
   let nextId = 90001;
   return () => `f${nextId++}`;
 })();
+
+/** Dependencies required for the flattening process, supplied in a
+ * context object rather than explicitly creating a dependency on Sk
+ * here. */
+type FlattenProgramContext = {
+  assetNamesTupleLiteral: (assetNames: AssetNames) => string;
+};
 
 const pushActorLines = (
   lines: Array<string>,
