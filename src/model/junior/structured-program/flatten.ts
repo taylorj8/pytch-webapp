@@ -84,7 +84,8 @@ const pushActorLines = (
  * code). */
 export const flattenProgram = (
   program: StructuredProgram,
-  assets: Array<AssetMetaData>
+  assets: Array<AssetMetaData>,
+  context: FlattenProgramContext
 ): FlattenResults => {
   // TODO: What's the right way to handle "extensions"?  As another
   // property of a StructuredProgram?
@@ -92,7 +93,9 @@ export const flattenProgram = (
 
   let mapEntries: Array<SourceMapEntry> = [];
 
-  program.actors.forEach((a) => pushActorLines(lines, mapEntries, a, assets));
+  program.actors.forEach((a) =>
+    pushActorLines(lines, mapEntries, a, assets, context)
+  );
   const codeText = lines.join("\n");
 
   return { codeText, mapEntries };
