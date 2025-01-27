@@ -32,7 +32,7 @@ context("Stage control actions", () => {
       stageHalfHeight - clientY,
     ];
 
-    cy.get(".CoordinateChooserOverlay").click(80, 60);
+    cy.get(".CoordinateChooserOverlay").click(clientX, clientY);
 
     const coordsRegExp = new RegExp("^\\(([-0-9]+), ([-0-9]+)\\)$");
 
