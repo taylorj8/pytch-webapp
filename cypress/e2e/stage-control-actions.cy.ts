@@ -36,8 +36,6 @@ context("Stage control actions", () => {
 
     const coordsRegExp = new RegExp("^\\(([-0-9]+), ([-0-9]+)\\)$");
 
-    // TODO: Pull out utility function for matching copied text?  Also
-    // used in "Tutorial share feature" test.
     assertCopiedText((text) => {
       const match = coordsRegExp.exec(text);
       if (match == null) {
