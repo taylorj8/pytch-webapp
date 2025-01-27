@@ -6,28 +6,90 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RawElement from "../../RawElement";
 import { useStoreActions, useStoreState } from "../../../store";
 
-type ProgressNodeKind = "plain" | "completed" | "current" | "future";
+type LabelledProgressNodeKind = "normal" | "inverse";
+type ProgressNodeKind = "ellipsis" | LabelledProgressNodeKind;
 
-type ProgressTrailNodeProps = { kind: ProgressNodeKind };
-const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({ kind }) => {
-  const nodeClasses = classNames("progress-node", kind);
-  const objContent =
-    kind === "completed" ? (
-      <span>
-        <FontAwesomeIcon icon="check"></FontAwesomeIcon>
-      </span>
-    ) : kind === "future" ? (
-      <div className="future-node" />
-    ) : null;
+type ProgressNodeDescriptor = { kind: ProgressNodeKind; key: string } & (
+  | { kind: "normal" | "inverse"; index: number }
+  | { kind: "ellipsis" }
+);
 
-  return <div className={nodeClasses}>{objContent}</div>;
+type ProgressTrailNodeProps = { descriptor: ProgressNodeDescriptor };
+const ProgressTrailNode: React.FC<ProgressTrailNodeProps> = ({
+  descriptor,
+}) => {
+  const nodeClasses = classNames("progress-node", `kind-${descriptor.kind}`);
+  const content =
+    descriptor.kind === "ellipsis" ? (
+      <>
+        <div className="ellipsis-dot" />
+        <div className="ellipsis-dot" />
+        <div className="ellipsis-dot" />
+      </>
+    ) : (
+      <span className="progress-node-label">{descriptor.index}</span>
+    );
+  return <div className={nodeClasses}>{content}</div>;
 };
+
+function ellipsisDescriptor(index: number): ProgressNodeDescriptor {
+  return { kind: "ellipsis", key: `ellipsis-${index}` };
+}
+
+const kVisibleProgressNodes = 9;
+const kCentralNodeRangeHalfWidth = 2;
+const kCentralProgressNodes = 1 + 2 * kCentralNodeRangeHalfWidth;
+
+function progressNodeDescriptors(
+  nTotalNodes: number,
+  activeNodeIndex: number,
+  nodeKindFromIndex: (idx: number) => LabelledProgressNodeKind
+): Array<ProgressNodeDescriptor> {
+  const mkLabelled = (nodeIdx: number): ProgressNodeDescriptor => ({
+    key: `labelled-${nodeIdx}`,
+    kind: nodeKindFromIndex(nodeIdx),
+    index: nodeIdx,
+  });
+
+  const lastIdx = nTotalNodes - 1;
+
+  if (nTotalNodes <= kVisibleProgressNodes) {
+    return range(nTotalNodes).map(mkLabelled);
+  }
+
+  if (activeNodeIndex < kCentralProgressNodes) {
+    return [
+      ...range(kCentralProgressNodes + 2).map(mkLabelled),
+      ellipsisDescriptor(1),
+      mkLabelled(lastIdx),
+    ];
+  }
+
+  if (activeNodeIndex >= nTotalNodes - kCentralProgressNodes) {
+    const tailStartIdx = nTotalNodes - kCentralProgressNodes - 2;
+    return [
+      mkLabelled(0),
+      ellipsisDescriptor(0),
+      ...range(tailStartIdx, nTotalNodes).map(mkLabelled),
+    ];
+  }
+
+  const centralIdx0 = activeNodeIndex - kCentralNodeRangeHalfWidth;
+  const centralIdx1 = activeNodeIndex + kCentralNodeRangeHalfWidth + 1;
+  return [
+    mkLabelled(0),
+    ellipsisDescriptor(0),
+    ...range(centralIdx0, centralIdx1).map(mkLabelled),
+    ellipsisDescriptor(1),
+    mkLabelled(lastIdx),
+  ];
+}
 
 type GenericProgressTrailProps = {
   nProgressStages: number;
   activeChapterIndex: number;
   setChapterIndex(idx: number): void;
-  nodeKindFromIndex(idx: number): ProgressNodeKind;
+  nodeKindFromIndex(idx: number): LabelledProgressNodeKind;
   cloneChapterTitleElt(idx: number): HTMLElement;
   canJumpHereFromIndex(idx: number): boolean;
 };
@@ -41,23 +103,38 @@ const GenericProgressTrail: React.FC<GenericProgressTrailProps> = ({
 }) => {
   const chapterTitleElt = cloneChapterTitleElt(activeChapterIndex);
 
-  const nodeDivs = range(nProgressStages).map((idx) => (
-    <ProgressTrailNode key={idx} kind={nodeKindFromIndex(idx)} />
+  const nodeDescriptors = progressNodeDescriptors(
+    nProgressStages,
+    activeChapterIndex,
+    nodeKindFromIndex
+  );
+
+  const nodeDivs = nodeDescriptors.map((d) => (
+    <ProgressTrailNode key={d.key} descriptor={d} />
   ));
 
   const maybeChapterNumberLabel = activeChapterIndex > 0 && (
     <span className="chapter-number">{activeChapterIndex} —</span>
   );
 
-  const nodeBackgrounds = range(nProgressStages).map((idx) => {
-    const isActive = idx === activeChapterIndex;
+  const nodeBackgrounds = nodeDescriptors.map((d, idx) => {
+    const isActive = d.kind !== "ellipsis" && d.index === activeChapterIndex;
     const classes = classNames("progress-node-background", { isActive });
     return <div key={idx} className={classes} />;
   });
 
-  const nodeHoverTargets = range(nProgressStages).map((idx) => {
-    const canJumpHere = canJumpHereFromIndex(idx);
-    const contentElt = cloneChapterTitleElt(idx);
+  const nodeHoverTargets = nodeDescriptors.map((d, displayedIdx) => {
+    if (d.kind === "ellipsis") {
+      return (
+        <div
+          key={`ellipsis-${displayedIdx}`}
+          className="progress-node-no-hover"
+        />
+      );
+    }
+
+    const canJumpHere = canJumpHereFromIndex(d.index);
+    const contentElt = cloneChapterTitleElt(d.index);
 
     const tooltip = (
       <div className="progress-node-tooltip">
@@ -66,13 +143,13 @@ const GenericProgressTrail: React.FC<GenericProgressTrailProps> = ({
       </div>
     );
 
-    const onClick = canJumpHere ? () => setChapterIndex(idx) : () => void 0;
+    const onClick = canJumpHere ? () => setChapterIndex(d.index) : () => void 0;
     const classes = classNames("progress-node-hover-target", { canJumpHere });
 
     return (
       <div
-        key={idx}
-        data-chapter-index={`${idx}`}
+        key={`labelled-${displayedIdx}`}
+        data-chapter-index={`${d.index}`}
         className={classes}
         onClick={onClick}
       >
@@ -117,16 +194,10 @@ const ProgressTrail_PerMethod: React.FC<EmptyProps> = () => {
 
   const activeChapterIndex = linkedTutorial.interactionState.chapterIndex;
 
-  function nodeKindFromIndex(idx: number) {
-    const nTasksBeforeChapter = tutorialContent.nTasksBeforeChapter[idx];
+  function nodeKindFromIndex(idx: number): LabelledProgressNodeKind {
     const nTasksInclChapter = tutorialContent.nTasksBeforeChapter[idx + 1];
     const nTasksDone = linkedTutorial.interactionState.nTasksDone;
-
-    return nTasksDone >= nTasksInclChapter
-      ? "completed"
-      : nTasksDone >= nTasksBeforeChapter
-      ? "current"
-      : "future";
+    return nTasksDone >= nTasksInclChapter ? "inverse" : "normal";
   }
 
   function cloneChapterTitleElt(idx: number) {
@@ -163,8 +234,8 @@ const ProgressTrail_Flat: React.FC<EmptyProps> = () => {
   const nProgressStages = tutorial.content.chapters.length;
   const activeChapterIndex = tutorial.activeChapterIndex;
 
-  function nodeKindFromIndex(_idx: number): ProgressNodeKind {
-    return "plain";
+  function nodeKindFromIndex(_idx: number): LabelledProgressNodeKind {
+    return "normal";
   }
 
   function cloneChapterTitleElt(idx: number) {
