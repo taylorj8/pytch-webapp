@@ -48,12 +48,14 @@ context("Interact with a tutorial", () => {
     assertActiveChapterIndex(3);
   });
 
-  it("gives feedback when Copy button clicked", () => {
+  it("copies text when [+] label clicked", () => {
     cy.contains("Get started:").click();
     cy.contains("Next:").click();
-    cy.contains("COPY").click();
-    cy.contains("Copied!");
-    cy.waitUntil(() => cy.contains("Copied!").should("not.be.visible"));
+    cy.get("tbody.diff-add span.add-or-del").eq(0).click();
+    assertCopiedText(
+      (text) =>
+        text.includes("class PlayerBat") && text.includes("player-normal.png")
+    );
   });
 });
 
