@@ -6,7 +6,7 @@ export interface AssetMetaData {
   assetInProject: { mimeType: string };
 }
 
-type AssetNames = { fullPathname: string; basename: string };
+export type AssetNames = { fullPathname: string; basename: string };
 
 export type AssetMimeType = "image" | "audio";
 
