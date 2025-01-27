@@ -76,6 +76,19 @@ div.patch-container {
     overflow-x: auto;
   }
 
+  .copy-hint {
+    margin-top: 1rem;
+    p {
+      margin: 0px;
+      font-style: italic;
+    }
+    span.add-code-icon {
+      background-color: #8aef8a;
+      padding: 0px 6px;
+      border-radius: 6px;
+    }
+  }
+
   clear: both;
   margin: 0px 0px 1rem;
   background-color: white;
@@ -111,6 +124,7 @@ div.patch-container {
   }
 
   table {
+    width: 100%;
     padding-bottom: 2.5ex;
 
     tr,
@@ -144,7 +158,7 @@ div.patch-container {
         font-size: 15px;
       }
       line-height: 120%;
-      padding: 4px 0px 2px;
+      padding: 2px 0px 1px;
       margin: 0px;
       border: none;
       border-radius: 0px;
@@ -217,13 +231,18 @@ div.patch-container {
       }
     }
 
-    td:nth-child(3) {
-      width: 100%;
+    td.code-text {
       padding-left: 2px;
       border-left: solid 1px #aaa;
+      pre {
+        min-height: calc(1em + 3px);
+      }
     }
 
     tbody tr td span.add-or-del {
+      display: inline-block;
+      width: 1.75rem;
+      text-align: center;
       font-style: normal;
       padding: 0px 6px;
       border-radius: 6px;
@@ -232,31 +251,26 @@ div.patch-container {
     }
 
     tbody.diff-del tr {
-      td:nth-child(2) span,
-      td:nth-child(3) {
-        pre {
-          color: black;
-        }
+      pre {
+        color: black;
       }
-      td:nth-child(2) span {
+      td.linenum span {
         background-color: #ffaaaa;
       }
-      td:nth-child(3) {
+      td.code-text {
         background-color: #ffcaca;
       }
     }
 
     tbody.diff-add tr {
-      td:nth-child(1) span,
-      td:nth-child(3) {
-        pre {
-          color: black;
-        }
+      pre {
+        color: black;
       }
-      td:nth-child(1) span {
+      td.linenum span {
+        cursor: pointer;
         background-color: #8aef8a;
       }
-      td:nth-child(3) {
+      td.code-text {
         background-color: #caffca;
       }
     }

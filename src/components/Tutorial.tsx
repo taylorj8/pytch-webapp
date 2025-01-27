@@ -7,7 +7,12 @@ import React, {
 import { useStoreState, useStoreActions } from "../store";
 import RawElement from "./RawElement";
 import Button from "react-bootstrap/Button";
-import { assertNever, failIfNull, isDivOfClass } from "../utils";
+import {
+  assertNever,
+  copyTextToClipboard,
+  failIfNull,
+  isDivOfClass,
+} from "../utils";
 import { DiffHelpSamples } from "../model/user-interactions/code-diff-help";
 import { makeScratchSVG } from "../model/scratchblocks-render";
 
@@ -137,56 +142,6 @@ interface TutorialPatchElementProps {
 // well as avoiding this kind of hybrid React / direct DOM
 // manipulation.
 
-/* Modifies the passed-in element; returns array of tables found. */
-const addCopyButtons = (div: HTMLDivElement): Array<HTMLTableElement> => {
-  const tableElements = div.querySelectorAll("div.patch table");
-  tableElements.forEach((tableElement) => {
-    const table = tableElement as HTMLTableElement;
-
-    let tbodyAddElts = table.querySelectorAll("tbody.diff-add");
-
-    tbodyAddElts.forEach((tbodyElement) => {
-      const tbody = tbodyElement as HTMLTableSectionElement;
-      let copyButton = document.createElement("div");
-      copyButton.className = "copy-button";
-      copyButton.innerHTML =
-        '<p class="content">COPY</p><p class="feedback">✓&nbsp;Copied!</p>';
-      copyButton.onclick = async (evt: MouseEvent) => {
-        console.log(evt);
-        const pContent = evt.target as HTMLElement;
-        const parentElement = failIfNull(pContent.parentElement, "no parent");
-        parentElement.querySelectorAll("p").forEach((node) => {
-          const elt = node as HTMLParagraphElement;
-          elt.classList.add("active");
-          elt.addEventListener("animationend", () => {
-            elt.classList.remove("active");
-          });
-        });
-        try {
-          const text = tbody.dataset.addedText;
-          if (text != null) {
-            await navigator.clipboard.writeText(text);
-          }
-        } catch (err) {
-          console.log(
-            "Could not copy to clipboard",
-            "(an error is expected if running under Cypress):",
-            err
-          );
-        }
-      };
-
-      let topRightCell = failIfNull(
-        tbody.querySelector("tr > td:last-child"),
-        "top-right cell not found"
-      );
-      topRightCell.appendChild(copyButton);
-    });
-  });
-
-  return Array.from(tableElements) as Array<HTMLTableElement>;
-};
-
 const VerticalEllipsis = () => {
   return (
     <div className="patch-hunk-spacer">
@@ -217,21 +172,58 @@ const showLeadingSpaces = (table: HTMLTableElement) => {
 };
 
 const insertAddAndDelSymbols = (table: HTMLTableElement) => {
+  table.querySelectorAll("tbody tr").forEach((tr) => {
+    tr.removeChild(tr.childNodes[1]);
+    let lastTd = tr.lastChild as HTMLTableCellElement;
+    lastTd.classList.add("code-text");
+  });
+
   let addSpan = document.createElement("span");
   addSpan.classList.add("add-or-del");
   addSpan.innerText = "+";
+
   let delSpan = document.createElement("span");
   delSpan.classList.add("add-or-del");
   delSpan.innerText = "−";
 
-  console.log("add", addSpan);
-  table.querySelectorAll("tbody.diff-add tr td:first-child").forEach((td) => {
-    td.insertBefore(addSpan.cloneNode(true), td.firstChild);
+  table.querySelectorAll("tbody.diff-add").forEach((tbody_) => {
+    const tbody = tbody_ as HTMLTableSectionElement;
+    let firstRow = true;
+    tbody.querySelectorAll("tr").forEach((tr) => {
+      if (firstRow) {
+        let td0 = tr.firstChild as HTMLTableCellElement;
+        td0.setAttribute("rowspan", "0");
+        const addSpanClone = addSpan.cloneNode(true) as HTMLSpanElement;
+        td0.appendChild(addSpanClone);
+        addSpanClone.addEventListener("click", () => {
+          copyTextToClipboard(tbody.dataset.addedText ?? "UNKNOWN CODE SORRY");
+          addSpanClone.innerText = "✓";
+          setTimeout(() => {
+            addSpanClone.innerText = "+";
+          }, 800);
+        });
+        firstRow = false;
+      } else {
+        tr.removeChild(tr.firstChild!);
+      }
+    });
   });
-  console.log("add", addSpan);
-  table.querySelectorAll("tbody.diff-del tr td:nth-child(2)").forEach((td) => {
-    td.insertBefore(delSpan.cloneNode(true), td.firstChild);
+
+  table.querySelectorAll("tbody.diff-del").forEach((tbody) => {
+    let firstRow = true;
+    tbody.querySelectorAll("tr").forEach((tr) => {
+      if (firstRow) {
+        let td0 = tr.firstChild as HTMLTableCellElement;
+        td0.setAttribute("rowspan", "0");
+        td0.innerHTML = "";
+        td0.insertBefore(delSpan.cloneNode(true), null);
+        firstRow = false;
+      } else {
+        tr.removeChild(tr.firstChild!);
+      }
+    });
   });
+
   return table;
 };
 
@@ -245,13 +237,20 @@ const diffSampleOfClass = (
   let maybeSampleRow: HTMLTableRowElement | null = null;
 
   tables.forEach((table) => {
+    // This is fiddly.  We need to save the first row of the tbody
+    // because we only show one [-] or [+] sign spanning the full set of
+    // rows, so the row providing the content might only have one cell.
+    let firstRow: HTMLTableRowElement | null = null;
     table.querySelectorAll(`tbody.${cls} tr`).forEach((row) => {
-      const mCell = row.querySelector("td:nth-child(3) pre");
+      firstRow ??= row as HTMLTableRowElement;
+      const mCell = row.querySelector("td.code-text pre");
       if (mCell != null) {
         const text = mCell.textContent || "";
         if (text.length !== 0) {
           if (maybeSampleRow == null) {
-            maybeSampleRow = row.cloneNode(true) as HTMLTableRowElement;
+            maybeSampleRow = firstRow.cloneNode(true) as HTMLTableRowElement;
+            maybeSampleRow.removeChild(maybeSampleRow.lastChild!);
+            maybeSampleRow.appendChild(mCell.parentElement!.cloneNode(true));
           }
         }
       }
@@ -285,12 +284,20 @@ const diffSamples = (tables: Array<HTMLTableElement>): DiffHelpSamples => {
   };
 };
 
+const nAddHunks = (tables: Array<HTMLTableElement>): number => {
+  return tables
+    .map((table) => table.querySelectorAll("tbody.diff-add").length)
+    .reduce((a, x) => a + x, 0);
+};
+
 const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
   const runCodeDiffHelp = useRunFlow((f) => f.codeDiffHelpFlow);
 
   let divCopy = div.cloneNode(true) as HTMLDivElement;
 
-  const tableElts = addCopyButtons(divCopy);
+  const tableElts = Array.from(
+    divCopy.querySelectorAll("div.patch table")
+  ) as Array<HTMLTableElement>;
 
   if (tableElts.length === 0) {
     // Maybe this is a warning, e.g., for slug-not-found?  Don't crash,
@@ -335,6 +342,26 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
     }
   };
 
+  const nAdds = nAddHunks(tableElts);
+  const mHintDiv =
+    nAdds === 0 ? (
+      false
+    ) : nAdds === 1 ? (
+      <div className="copy-hint">
+        <p>
+          Hint: Click on the <span className="add-code-icon">+</span> button to
+          copy the new code.
+        </p>
+      </div>
+    ) : (
+      <div className="copy-hint">
+        <p>
+          Hint: Click on a <span className="add-code-icon">+</span> button to
+          copy that chunk of new code.
+        </p>
+      </div>
+    );
+
   return (
     <div className="patch-container" onCopy={convertDotsToSpaces}>
       <div className="header">
@@ -344,6 +371,7 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
         </Button>
       </div>
       <div className="patch-contents">{contentDivs}</div>
+      {mHintDiv}
     </div>
   );
 };
