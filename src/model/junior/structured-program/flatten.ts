@@ -1,7 +1,7 @@
 // Conversion of structured program into flat Python code.
 
 import { Actor, ActorKindOps } from "./actor";
-import { AssetMetaData, AssetMetaDataOps } from "./asset";
+import { AssetMetaData, AssetMetaDataOps, AssetNames } from "./asset";
 import { EventDescriptorOps } from "./event";
 import { StructuredProgram } from "./program";
 import { SourceMapEntry } from "./source-map";
@@ -24,11 +24,19 @@ const gensym = (() => {
   return () => `f${nextId++}`;
 })();
 
+/** Dependencies required for the flattening process, supplied in a
+ * context object rather than explicitly creating a dependency on Sk
+ * here. */
+type FlattenProgramContext = {
+  assetNamesTupleLiteral: (assetNames: AssetNames) => string;
+};
+
 const pushActorLines = (
   lines: Array<string>,
   mapEntries: Array<SourceMapEntry>,
   actor: Actor,
-  allAssets: Array<AssetMetaData>
+  allAssets: Array<AssetMetaData>,
+  context: FlattenProgramContext
 ): void => {
   const kindNames = ActorKindOps.names(actor.kind);
 
@@ -38,13 +46,13 @@ const pushActorLines = (
 
   lines.push(`    ${kindNames.appearancesAttribute} = [`);
   actorAssets.appearances.forEach((a) => {
-    lines.push(`        ("${a.basename}", "${a.fullPathname}"),`);
+    lines.push(`        ${context.assetNamesTupleLiteral(a)},`);
   });
   lines.push("    ]");
 
   lines.push("    Sounds = [");
   actorAssets.sounds.forEach((s) => {
-    lines.push(`        ("${s.basename}", "${s.fullPathname}"),`);
+    lines.push(`        ${context.assetNamesTupleLiteral(s)},`);
   });
   lines.push("    ]");
 
@@ -76,7 +84,8 @@ const pushActorLines = (
  * code). */
 export const flattenProgram = (
   program: StructuredProgram,
-  assets: Array<AssetMetaData>
+  assets: Array<AssetMetaData>,
+  context: FlattenProgramContext
 ): FlattenResults => {
   // TODO: What's the right way to handle "extensions"?  As another
   // property of a StructuredProgram?
@@ -84,7 +93,9 @@ export const flattenProgram = (
 
   let mapEntries: Array<SourceMapEntry> = [];
 
-  program.actors.forEach((a) => pushActorLines(lines, mapEntries, a, assets));
+  program.actors.forEach((a) =>
+    pushActorLines(lines, mapEntries, a, assets, context)
+  );
   const codeText = lines.join("\n");
 
   return { codeText, mapEntries };

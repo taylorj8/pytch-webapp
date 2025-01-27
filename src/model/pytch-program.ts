@@ -1,4 +1,5 @@
 import { AssetNameAndType } from "../database/indexed-db";
+import { assetNamesTupleLiteral } from "../skulpt-connection/utils";
 import { assertNever, hexSHA256 } from "../utils";
 import {
   AssetMetaData,
@@ -65,7 +66,8 @@ export class PytchProgramOps {
     return { kind: "per-method", program };
   }
 
-  /** Return a flat-text Python equivalent of the given `program`. */
+  /** Return a flat-text Python equivalent of the given `program` having
+   * the given `assets`. */
   static flatCodeText(
     program: PytchProgram,
     assets: Array<AssetMetaData>
@@ -74,7 +76,8 @@ export class PytchProgramOps {
       case "flat":
         return { codeText: program.text, mapEntries: [] };
       case "per-method": {
-        return flattenProgram(program.program, assets);
+        const context = { assetNamesTupleLiteral };
+        return flattenProgram(program.program, assets, context);
       }
       default:
         return assertNever(program);
