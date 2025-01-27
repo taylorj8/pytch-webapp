@@ -2,6 +2,7 @@
 
 import JSZip from "jszip";
 import { stageHalfHeight, stageHalfWidth } from "../../src/constants";
+import { assertCopiedText } from "./utils";
 
 context("Stage control actions", () => {
   before(() => {
@@ -31,26 +32,19 @@ context("Stage control actions", () => {
       stageHalfHeight - clientY,
     ];
 
-    cy.get(".CoordinateChooserOverlay").click(80, 60);
+    cy.get(".CoordinateChooserOverlay").click(clientX, clientY);
 
     const coordsRegExp = new RegExp("^\\(([-0-9]+), ([-0-9]+)\\)$");
 
-    // TODO: Pull out utility function for matching copied text?  Also
-    // used in "Tutorial share feature" test.
-    cy.waitUntil(() =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      cy.window().then((win: any) => {
-        const copiedText: string =
-          win["PYTCH_CYPRESS"]["latestTextCopied"] ?? "";
+    assertCopiedText((text) => {
+      const match = coordsRegExp.exec(text);
+      if (match == null) {
+        return false;
+      }
 
-        const match = coordsRegExp.exec(copiedText);
-        if (match == null)
-          throw new Error(`bad copied text "${copiedText}" for coords`);
-
-        const [gotX, gotY] = [parseInt(match[1]), parseInt(match[2])];
-        return Math.abs(gotX - stageX) < 2 && Math.abs(gotY - stageY) < 2;
-      })
-    );
+      const [gotX, gotY] = [parseInt(match[1]), parseInt(match[2])];
+      return Math.abs(gotX - stageX) < 2 && Math.abs(gotY - stageY) < 2;
+    });
 
     cy.get("button.close-button").click();
     cy.get(".CoordinateChooserBar").should("not.exist");

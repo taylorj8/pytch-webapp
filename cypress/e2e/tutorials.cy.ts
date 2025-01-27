@@ -1,6 +1,9 @@
 /// <reference types="cypress" />
 
-import { launchShareTutorialModal } from "./utils";
+import {
+  assertCopiedText,
+  launchShareTutorialModal,
+} from "./utils";
 
 context("Work with tutorials list", () => {
   it("shows list of tutorials", () => {
@@ -158,13 +161,6 @@ context("Tutorial share feature", () => {
     cy.visit("/tutorials");
     launchShareTutorialModal("Bunner");
     cy.get("button[title*='only']").click();
-    cy.waitUntil(() =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      cy.window().then((win: any) => {
-        const copiedText: string =
-          win["PYTCH_CYPRESS"]["latestTextCopied"] ?? "";
-        return copiedText.endsWith("suggested-tutorial/bunner");
-      })
-    );
+    assertCopiedText((text) => text.endsWith("suggested-tutorial/bunner"));
   });
 });

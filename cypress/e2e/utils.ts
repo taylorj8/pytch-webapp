@@ -127,3 +127,18 @@ export function launchCreateProjectModal(name?: string) {
 export function assertOnHomepage() {
   cy.get(".welcome-text .CodingJourney");
 }
+
+/** Assert that text satisfying the given predicate `textIsExpected()`
+ * has been copied to the clipboard.  (Note that this test cannot
+ * actually inspect the contents of the clipboard, so it relies on the
+ * code under test using the utility function `copyTextToClipboard()`.)
+ * */
+export function assertCopiedText(textIsExpected: (text: string) => boolean) {
+  cy.waitUntil(() =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    cy.window().then((win: any) => {
+      const copiedText: string = win["PYTCH_CYPRESS"]["latestTextCopied"] ?? "";
+      return textIsExpected(copiedText);
+    })
+  );
+}
