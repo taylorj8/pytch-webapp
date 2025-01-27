@@ -539,6 +539,7 @@
       color: $scratch-hat-block-text-colour;
     }
     &.add-sprite,
+    &.add-flat-asset,
     &.add-sprite-asset {
       @include background-color-as-button($sprite-card-background);
     }

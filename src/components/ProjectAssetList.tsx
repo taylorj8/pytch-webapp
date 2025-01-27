@@ -1,12 +1,15 @@
 import React from "react";
 import { useStoreState } from "../store";
 import { AssetPresentation } from "../model/asset";
-import Button from "react-bootstrap/Button";
 import { useRunFlow } from "../model";
 import { NoContentHelp } from "./Junior/NoContentHelp";
 import { SingleTab } from "./SingleTab";
 import { AssetCard as JrAssetCard } from "./Junior/AssetCard";
 import { AssetMetaDataOps } from "../model/junior/structured-program";
+import {
+  AddSomethingButton,
+  AddSomethingButtonStrip,
+} from "./Junior/AddSomethingButton";
 
 type AssetCardProps = {
   asset: AssetPresentation;
@@ -73,16 +76,21 @@ export const ProjectAssetList = () => {
                 <AssetCard key={asset.name} asset={asset} />
               ))}
             </div>
-            <div className="buttons">
-              <Button className="assets-button" onClick={launchUploadModal}>
-                Add an image or sound
-              </Button>
-              or
-              <Button className="assets-button" onClick={launchClipArtModal}>
-                Choose from library
-              </Button>
-            </div>
           </div>
+          <AddSomethingButtonStrip>
+            <AddSomethingButton
+              key="flat-lib"
+              what="flat-asset"
+              label="Add from media library"
+              onClick={launchClipArtModal}
+            />
+            <AddSomethingButton
+              key="flat-dev"
+              what="flat-asset"
+              label="Add from this device"
+              onClick={launchUploadModal}
+            />
+          </AddSomethingButtonStrip>
         </div>
       </SingleTab>
     </div>
