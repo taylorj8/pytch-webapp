@@ -6,9 +6,13 @@ import { ProgressTrail } from "./ProgressTrail";
 import { DivScroller } from "./DivScroller";
 import { useJrEditActions } from "../hooks";
 import { WidthMonitor } from "../WidthMonitor";
+import { useMappedLinkedJrTutorial } from "./hooks";
 
 export const Content: React.FC<EmptyProps> = () => {
   const contentRef = createRef<HTMLDivElement>();
+  const chapterIdx = useMappedLinkedJrTutorial(
+    (tutorial) => tutorial.interactionState.chapterIndex
+  );
   const setTutorialChapterScrollTop = useJrEditActions(
     (a) => a.setTutorialChapterScrollTop
   );
@@ -29,7 +33,7 @@ export const Content: React.FC<EmptyProps> = () => {
         <ProgressTrail.PerMethod />
       </div>
       <div className="Junior-LessonContent-inner-container">
-        <DivScroller containerDivRef={contentRef} />
+        <DivScroller pageKey={chapterIdx} containerDivRef={contentRef} />
         <div
           ref={contentRef}
           className="Junior-LessonContent abs-0000-oflow"
