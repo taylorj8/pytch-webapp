@@ -6,8 +6,6 @@ export type DivScrollerProps = {
   containerDivRef: React.RefObject<HTMLDivElement>;
 };
 
-// TODO: Compare this and the equivalent for "flat" tutorials and settle
-// on one approach.
 export const DivScroller: React.FC<DivScrollerProps> = (props) => {
   useEffect(() => {
     const containerDiv = props.containerDivRef.current;
