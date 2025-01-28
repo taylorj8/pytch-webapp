@@ -1,9 +1,4 @@
-import React, {
-  ClipboardEventHandler,
-  createRef,
-  useEffect,
-  useRef,
-} from "react";
+import React, { ClipboardEventHandler, createRef } from "react";
 import { useStoreState, useStoreActions } from "../store";
 import RawElement from "./RawElement";
 import Button from "react-bootstrap/Button";
@@ -21,6 +16,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRunFlow } from "../model";
 import { ProgressTrail } from "./Junior/lesson/ProgressTrail";
 import { WidthMonitor } from "./Junior/WidthMonitor";
+import { DivScroller } from "./Junior/lesson/DivScroller";
+import { useMappedTrackedTutorial } from "./hooks/tracked-tutorial";
 
 type NavigationDirection = "prev" | "next";
 
@@ -376,37 +373,10 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
   );
 };
 
-interface TutorialScrollerProps {
-  containerDivRef: React.RefObject<HTMLDivElement>;
-}
-
-// This is a bit of a fudge.  The seqnum is used to re-"render" this
-// component, whose only job is to scroll the chapter container to the
-// top.  The seqnum is incremented when an explicit navigation action
-// takes place.  The scroll position is maintained if the user just
-// switches to, say, the Output tab and back again.
-const TutorialScroller: React.FC<TutorialScrollerProps> = (props) => {
-  const seqnum = useStoreState(
-    (state) => state.activeProject.tutorialNavigationSeqnum
-  );
-  const lastActedSeqnumRef = useRef(0);
-
-  useEffect(() => {
-    const containerDiv = props.containerDivRef.current;
-    if (containerDiv != null && seqnum !== lastActedSeqnumRef.current) {
-      containerDiv.scrollTo(0, 0);
-      lastActedSeqnumRef.current = seqnum;
-    }
-  });
-
-  return <></>;
-};
-
 const TutorialChapter = () => {
   const maybeTrackedTutorial = useStoreState(
     (state) => state.activeProject.project?.trackedTutorial
   );
-  const chapterContainerRef: React.RefObject<HTMLDivElement> = createRef();
 
   const trackedTutorial = failIfNull(
     maybeTrackedTutorial,
@@ -431,7 +401,7 @@ const TutorialChapter = () => {
 
   return (
     <div className="TutorialChapter-scrollable">
-      <div className="TutorialChapter-container" ref={chapterContainerRef}>
+      <div className="TutorialChapter-container">
         <div className="TutorialChapter" tabIndex={-1}>
           {contentBodyElements.map((element, idx) => (
             <TutorialElement key={idx} element={element} />
@@ -453,7 +423,6 @@ const TutorialChapter = () => {
           </div>
         </div>
       </div>
-      <TutorialScroller containerDivRef={chapterContainerRef} />
     </div>
   );
 };
@@ -468,6 +437,11 @@ const ActiveTutorial = () => {
   // preserved within a chapter but reset when moving to another
   // chapter.
 
+  const chapterContainerRef: React.RefObject<HTMLDivElement> = createRef();
+  const chapterIndex = useMappedTrackedTutorial(
+    (tutorial) => tutorial.activeChapterIndex
+  );
+
   return (
     <div className="Junior-LessonContent-container">
       <WidthMonitor nonStageWd={1100} />
@@ -475,11 +449,18 @@ const ActiveTutorial = () => {
         <ProgressTrail.Flat />
       </div>
       <div className="Junior-LessonContent-inner-container">
-        <div className="Junior-LessonContent abs-0000-oflow">
+        <div
+          className="Junior-LessonContent abs-0000-oflow"
+          ref={chapterContainerRef}
+        >
           <div className="content">
             <TutorialChapter />
           </div>
         </div>
+        <DivScroller
+          pageKey={chapterIndex}
+          containerDivRef={chapterContainerRef}
+        />
       </div>
     </div>
   );

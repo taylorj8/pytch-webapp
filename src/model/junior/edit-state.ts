@@ -14,6 +14,7 @@ import {
   DeleteHandlerFlow,
   deleteHandlerFlow,
 } from "./user-flows/delete-handler";
+import { scrollTopFromPageKey } from "./jr-tutorial";
 
 export type ActorPropertiesTabKey = "code" | "appearances" | "sounds";
 export type InfoPanelTabKey = "output" | "errors";
@@ -77,9 +78,6 @@ export type EditState = {
     void,
     IPytchAppModel
   >;
-
-  tutorialChapterScrollTop: number;
-  setTutorialChapterScrollTop: Action<EditState, number>;
 
   focusedActor: Uuid;
   setFocusedActor: Action<EditState, Uuid>;
@@ -152,9 +150,6 @@ export const editState: EditState = {
     }
   }),
 
-  tutorialChapterScrollTop: 0,
-  setTutorialChapterScrollTop: propSetterAction("tutorialChapterScrollTop"),
-
   focusedActor: "",
   setFocusedActor: action((state, focusedActor) => {
     state.focusedActor = focusedActor;
@@ -199,6 +194,7 @@ export const editState: EditState = {
     (actions, { linkedContentKind, isTrackingTutorial }) => {
       actions.setInfoPanelActiveTab("output");
       actions.setInfoPanelState("expanded");
+      scrollTopFromPageKey.clear();
 
       const hasLinkedContent = linkedContentKind !== "none";
       if (isTrackingTutorial) {
@@ -241,7 +237,7 @@ export const editState: EditState = {
     actions.setInfoPanelActiveTab("output");
     actions.setInfoPanelState("expanded");
     actions.setMostRecentFocusedEditor("");
-    actions.setTutorialChapterScrollTop(0);
+    scrollTopFromPageKey.clear();
 
     switch (linkedContentKind) {
       case "none":
