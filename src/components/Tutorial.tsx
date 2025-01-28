@@ -406,7 +406,6 @@ const TutorialChapter = () => {
   const maybeTrackedTutorial = useStoreState(
     (state) => state.activeProject.project?.trackedTutorial
   );
-  const chapterContainerRef: React.RefObject<HTMLDivElement> = createRef();
 
   const trackedTutorial = failIfNull(
     maybeTrackedTutorial,
@@ -431,7 +430,7 @@ const TutorialChapter = () => {
 
   return (
     <div className="TutorialChapter-scrollable">
-      <div className="TutorialChapter-container" ref={chapterContainerRef}>
+      <div className="TutorialChapter-container">
         <div className="TutorialChapter" tabIndex={-1}>
           {contentBodyElements.map((element, idx) => (
             <TutorialElement key={idx} element={element} />
@@ -453,7 +452,6 @@ const TutorialChapter = () => {
           </div>
         </div>
       </div>
-      <TutorialScroller containerDivRef={chapterContainerRef} />
     </div>
   );
 };
