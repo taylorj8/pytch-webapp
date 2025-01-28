@@ -499,7 +499,7 @@ const Tutorial = () => {
       // Fall through to handle these cases.
       break;
     default:
-      throw new Error(`unknown loadState "${loadState}"`);
+      return assertNever(loadState);
   }
 
   return <ActiveTutorial />;
