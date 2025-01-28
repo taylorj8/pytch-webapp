@@ -1,9 +1,4 @@
-import React, {
-  ClipboardEventHandler,
-  createRef,
-  useEffect,
-  useRef,
-} from "react";
+import React, { ClipboardEventHandler, createRef } from "react";
 import { useStoreState, useStoreActions } from "../store";
 import RawElement from "./RawElement";
 import Button from "react-bootstrap/Button";
@@ -376,32 +371,6 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
       {mHintDiv}
     </div>
   );
-};
-
-interface TutorialScrollerProps {
-  containerDivRef: React.RefObject<HTMLDivElement>;
-}
-
-// This is a bit of a fudge.  The seqnum is used to re-"render" this
-// component, whose only job is to scroll the chapter container to the
-// top.  The seqnum is incremented when an explicit navigation action
-// takes place.  The scroll position is maintained if the user just
-// switches to, say, the Output tab and back again.
-const TutorialScroller: React.FC<TutorialScrollerProps> = (props) => {
-  const seqnum = useStoreState(
-    (state) => state.activeProject.tutorialNavigationSeqnum
-  );
-  const lastActedSeqnumRef = useRef(0);
-
-  useEffect(() => {
-    const containerDiv = props.containerDivRef.current;
-    if (containerDiv != null && seqnum !== lastActedSeqnumRef.current) {
-      containerDiv.scrollTo(0, 0);
-      lastActedSeqnumRef.current = seqnum;
-    }
-  });
-
-  return <></>;
 };
 
 const TutorialChapter = () => {
