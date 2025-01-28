@@ -21,6 +21,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRunFlow } from "../model";
 import { ProgressTrail } from "./Junior/lesson/ProgressTrail";
 import { WidthMonitor } from "./Junior/WidthMonitor";
+import { DivScroller } from "./Junior/lesson/DivScroller";
+import { useMappedTrackedTutorial } from "./hooks/tracked-tutorial";
 
 type NavigationDirection = "prev" | "next";
 
@@ -467,6 +469,9 @@ const ActiveTutorial = () => {
   // chapter.
 
   const chapterContainerRef: React.RefObject<HTMLDivElement> = createRef();
+  const chapterIndex = useMappedTrackedTutorial(
+    (tutorial) => tutorial.activeChapterIndex
+  );
 
   return (
     <div className="Junior-LessonContent-container">
@@ -483,6 +488,10 @@ const ActiveTutorial = () => {
             <TutorialChapter />
           </div>
         </div>
+        <DivScroller
+          pageKey={chapterIndex}
+          containerDivRef={chapterContainerRef}
+        />
       </div>
     </div>
   );
