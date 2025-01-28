@@ -2,14 +2,16 @@
 
 import { kExpNTutorials } from "./utils";
 
+const launchAddFromMediaLibrary = () => {
+  cy.get("div.AddSomethingButton").contains("Add from media library").click();
+};
+
 context("can filter media library by tags", () => {
   before(() => {
     cy.pytchExactlyOneProject();
   });
 
-  beforeEach(() => {
-    cy.get("button").contains("Choose from library").click();
-  });
+  beforeEach(launchAddFromMediaLibrary);
 
   afterEach(() => {
     cy.get("button").contains("Cancel").click();
@@ -87,7 +89,7 @@ context("Add clipart from library, handling errors", () => {
   };
 
   const launchChooseClipArt = () => {
-    cy.contains("Choose from library").click();
+    launchAddFromMediaLibrary();
     cy.contains("Add to project").should("be.disabled");
   };
 

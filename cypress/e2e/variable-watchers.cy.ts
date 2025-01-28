@@ -1,4 +1,3 @@
-import { stageWidth } from "../../src/constants";
 import { ArrayRGBA } from "../support/types";
 import { PixelStripSpecs, canvasOpsFromJQuery } from "./canvas-content-utils";
 
@@ -83,11 +82,8 @@ context("Watch variables", () => {
   [
     {
       label: "min-size",
-      setStageSize: () => cy.pytchDragStageDivider(-200),
-    },
-    {
-      label: "max-size",
-      setStageSize: () => cy.pytchDragStageDivider(200),
+      setStageSize: () => cy.viewport(960, 960),
+      expStageSize: [320, 240],
     },
   ].forEach((spec) => {
     it(`adjusts for stage scaling (${spec.label})`, () => {
@@ -113,16 +109,14 @@ context("Watch variables", () => {
       cy.get("@bubblesDiv").then(($div) => {
         const stageWd = $div.width();
         const stageHt = $div.height();
+        cy.wrap(stageWd).should("eq", spec.expStageSize[0]);
+        cy.wrap(stageHt).should("eq", spec.expStageSize[1]);
         if (stageWd == null || stageHt == null)
           throw new Error("missing wd/ht");
         cy.get(".attribute-watcher")
           .should("have.css", "left", `${stageWd / 2}px`)
           .should("have.css", "bottom", `${stageHt / 2}px`);
       });
-
-      // Reset size to default:
-      cy.get(".layout-icon.wide-info").click();
-      cy.get("@bubblesDiv").invoke("width").should("equal", stageWidth);
     });
   });
 
@@ -203,8 +197,8 @@ context("Watch variables", () => {
 
       const redColour = [255, 0, 0, 255] as ArrayRGBA;
 
-      cy.get(".LayoutChooser .full-screen").click();
-      cy.get(".LayoutChooser").should("not.exist");
+      cy.get(".StageControls button.full-screen").click();
+      cy.get(".FullScreenLayout");
       cy.wait(100);
       cy.pytchSendKeysToApp("m");
       cy.get("#pytch-canvas").then(($canvas) => {
@@ -217,7 +211,7 @@ context("Watch variables", () => {
         ];
         const cOps = canvasOpsFromJQuery($canvas);
         cy.waitUntil(() => cOps.allVStripsMatch(expPixelStrips)).then(() => {
-          cy.get(".leave-full-screen").click();
+          cy.get("button.leave-full-screen").click();
         });
       });
     });

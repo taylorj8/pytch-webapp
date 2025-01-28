@@ -23,8 +23,12 @@ context("Management of project assets", () => {
     cy.get('.form-control[type="file"]').attachFile(filenames);
   };
 
+  const launchAddFromThisDevice = () => {
+    cy.get("div.AddSomethingButton").contains("Add from this device").click();
+  };
+
   const addAsset = (fixtureBasename: string) => {
-    cy.contains("Add an image").click();
+    launchAddFromThisDevice();
     cy.contains("Add to project").should("be.disabled");
     attachSamples([fixtureBasename]);
     clickAdd();
@@ -57,7 +61,7 @@ context("Management of project assets", () => {
     });
 
     it("rejects adding same image twice", () => {
-      cy.contains("Add an image").click();
+      launchAddFromThisDevice();
       attachSamples(["green-circle-64.png"]);
       clickAdd();
       cy.contains("Sorry, there was a problem");
@@ -66,7 +70,7 @@ context("Management of project assets", () => {
     });
 
     it("rejects unhandled asset mime-type", () => {
-      cy.contains("Add an image").click();
+      launchAddFromThisDevice();
       attachSamples(["contains-an-empty-file.zip"]);
       clickAdd();
       cy.contains("Sorry, there was a problem");
@@ -75,7 +79,7 @@ context("Management of project assets", () => {
     });
 
     it("rejects corrupt PNG file", () => {
-      cy.contains("Add an image").click();
+      launchAddFromThisDevice();
       attachSamples(["not-really-a-png.png"]);
       clickAdd();
       cy.contains("Sorry, there was a problem");
@@ -84,7 +88,7 @@ context("Management of project assets", () => {
     });
 
     it("handles multiple errors", () => {
-      cy.contains("Add an image").click();
+      launchAddFromThisDevice();
       attachSamples(["contains-an-empty-file.zip", "green-circle-64.png"]);
       clickAdd();
       cy.contains("Sorry, there was a problem");
@@ -95,7 +99,7 @@ context("Management of project assets", () => {
   });
 
   it("Add two assets at once", () => {
-    cy.contains("Add an image").click();
+    launchAddFromThisDevice();
     attachSamples(["green-circle-64.png", "purple-circle-64.png"]);
     clickAdd();
     cy.get(".modal-content").should("not.exist");
@@ -107,7 +111,7 @@ context("Management of project assets", () => {
   });
 
   it("Handles mixed success / failure", () => {
-    cy.contains("Add an image").click();
+    launchAddFromThisDevice();
     attachSamples([
       "green-circle-64.png",
       "purple-circle-64.png",

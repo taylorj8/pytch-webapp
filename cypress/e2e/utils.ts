@@ -1,3 +1,6 @@
+import { PytchProgramKind } from "../../src/model/pytch-program";
+import { assertNever } from "../../src/utils";
+
 export const kExpNTutorials = 18;
 
 /** Set up request intercepts for a specimen for use in tests. */
@@ -141,4 +144,31 @@ export function assertCopiedText(textIsExpected: (text: string) => boolean) {
       return textIsExpected(copiedText);
     })
   );
+}
+
+/** Assert that the webapp is on the IDE for a program of the given
+ * `programKind`, and that the program has finished loading. */
+export function assertInIDE(programKind: PytchProgramKind) {
+  cy.get(".ReadOnlyOverlay").should("not.exist");
+
+  switch (programKind) {
+    case "flat":
+      cy.get(".EditorAndOutErr > .CodeEditor");
+      cy.get(".StageAndActorsOrAssets").contains("Images and sounds");
+      return;
+    case "per-method":
+      cy.get(".EditorAndOutErr > .Junior-ActorProperties-container");
+      cy.get(".StageAndActorsOrAssets").contains("Stage and sprites");
+      return;
+    default:
+      assertNever(programKind);
+  }
+}
+
+/** Assuming that the webapp is in the IDE for a project which is
+ * tracking (or linked to) a tutorial, use the progress trail to jump to
+ * the chapter at the given `chapterIndex`. */
+export function jumpToTutorialChapter(chapterIndex: number) {
+  const selector = `.progress-node-hover-target[data-chapter-index="${chapterIndex}"]`;
+  cy.get(selector).click();
 }

@@ -3,7 +3,7 @@
 import { AsyncFile } from "../../src/storage/google-drive";
 import { MockApiBehaviour } from "../../src/storage/google-drive/mock";
 import { valueCell } from "../../src/utils";
-import { assertOnHomepage } from "./utils";
+import { assertInIDE, assertOnHomepage } from "./utils";
 type MatchContent = Parameters<Cypress.Chainable["contains"]>[1];
 
 context("Google Drive import and export", () => {
@@ -420,8 +420,7 @@ context("Google Drive import and export", () => {
             []
           );
 
-          // Check have been sent to IDE:
-          cy.contains("images and sounds");
+          assertInIDE("flat");
         }
       );
     });

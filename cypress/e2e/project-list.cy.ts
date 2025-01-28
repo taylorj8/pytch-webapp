@@ -4,6 +4,7 @@ import { DexieStorage } from "../../src/database/indexed-db";
 import { WhetherExampleTag } from "../../src/model/project-templates";
 import { hexSHA256 } from "../../src/utils";
 import {
+  assertInIDE,
   launchCreateProjectModal,
   launchProjectInListDropdownAction,
 } from "./utils";
@@ -14,7 +15,7 @@ context("Default creation of project", () => {
     cy.contains("My projects").click();
     launchCreateProjectModal("Bananas");
     cy.get("button").contains("Create project").click();
-    cy.contains("Your project’s images and sounds");
+    assertInIDE("flat");
   });
 });
 

@@ -203,7 +203,7 @@ context("Create project from specimen", () => {
             // Create a new one and leave it unchanged.
             cy.get("button").contains("Start again").click();
             // Wait for creation process to complete:
-            cy.get(".ProjectIDE[data-project-id]");
+            cy.get(".IDELayout[data-project-id]");
 
             // Now the lesson URL should offer what seems to be the same
             // options, but in fact the "start again" option will open
@@ -280,18 +280,23 @@ context("Create project from specimen", () => {
       });
   });
 
-  it("shows linked-content top bar (flat)", () => {
+  it("shows linked-content activity content (flat)", () => {
     cy.pytchResetDatabase();
 
     // Create and open new project from specimen.
     cy.visit(lessonUrl);
-    cy.get(".LinkedContentBar.linked-content").contains("Hello World Specimen");
+    cy.get(".activity-bar-tabs > *").should("have.length", 2);
+    cy.get(".activity-content-expanded-specimen .specimen-name").contains(
+      "Hello World Specimen"
+    );
 
-    // The test seed project should not have a (non-empty) content bar.
+    // The test seed project should not have the option of linked
+    // content information.
     cy.pytchHomeFromIDE();
     cy.contains("My projects").click();
     cy.pytchOpenProject("Test seed project");
-    cy.get(".LinkedContentBar.no-linked-content");
+    cy.get(".activity-content-expanded-helpsidebar");
+    cy.get(".activity-bar-tabs > *").should("have.length", 1);
   });
 
   it("shows linked-content activity pane (per-method)", () => {
@@ -317,7 +322,9 @@ context("Create project from specimen", () => {
     cy.visit(lessonUrl);
 
     // Wait for linked content to load.
-    cy.get(".LinkedContentBar.linked-content").contains("Hello World");
+    cy.get(".activity-content-expanded-specimen .specimen-name").contains(
+      "Hello World"
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cy.window().then(async (window: any) => {
@@ -346,8 +353,7 @@ context("Compare user code to original", () => {
 
   it("can launch and dismiss modal", () => {
     cy.visit(lessonUrl);
-    cy.get(".LinkedContentBar.linked-content .dropdown button").click();
-    cy.contains("Compare to original").click();
+    cy.get("button").contains("Compare to original").click();
     cy.get(".ViewCodeDiffModal").find("button").contains("Close").click();
     cy.get(".ViewCodeDiffModal").should("not.exist");
   });

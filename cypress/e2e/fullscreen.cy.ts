@@ -1,58 +1,24 @@
 /// <reference types="cypress" />
 
-import {
-  stageWidth,
-  stageHeight,
-  stageFullScreenBorderPx,
-} from "../../src/constants";
+import { stageFullScreenBorderPx } from "../../src/constants";
 
 context("Full-screen layout", () => {
+  const goFullScreen = () => {
+    cy.get(".StageControls .full-screen").click();
+  };
+
   before(() => {
     cy.pytchExactlyOneProject();
   });
 
-  it("does not resize stage in IDE layout", () => {
-    cy.get(".LayoutChooser button.wide-info").click().click();
-    cy.viewport(800, 600);
-    cy.get("#pytch-canvas").its("0.width").should("eq", stageWidth);
-    cy.get("#pytch-canvas").its("0.height").should("eq", stageHeight);
-  });
-
   it("enters and leaves full-screen layout", () => {
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.get(".CodeEditor").should("not.exist");
-    cy.get(".InfoPanel").should("not.exist");
-    cy.get(".LayoutChooser").should("not.exist");
+    cy.get(".Junior-InfoPanel").should("not.exist");
 
     cy.get(".leave-full-screen").click();
     cy.get(".CodeEditor");
-    cy.get(".InfoPanel");
-    cy.get(".LayoutChooser");
-  });
-
-  it("remembers IDE-layout stage dimensions", () => {
-    // Click twice to ensure default stage size to start:
-    cy.get(".LayoutChooser button.wide-info").click().click();
-    cy.pytchDragStageDivider(50);
-    cy.get("#pytch-canvas")
-      .its("0.width")
-      .then((width) => {
-        cy.get("#pytch-canvas")
-          .its("0.height")
-          .then((height) => {
-            cy.get(".LayoutChooser .full-screen").click();
-            cy.get(".CodeEditor").should("not.exist");
-
-            cy.get("#pytch-canvas").its("0.width").should("be.gt", width);
-            cy.get("#pytch-canvas").its("0.height").should("be.gt", height);
-
-            cy.get(".leave-full-screen").click();
-            cy.get(".CodeEditor");
-
-            cy.get("#pytch-canvas").its("0.width").should("eq", width);
-            cy.get("#pytch-canvas").its("0.height").should("eq", height);
-          });
-      });
+    cy.get(".Junior-InfoPanel");
   });
 
   [
@@ -71,8 +37,7 @@ context("Full-screen layout", () => {
     },
   ].forEach((spec) => {
     it(`resizes stage in ${spec.label} full-screen layout`, () => {
-      cy.get(".LayoutChooser button.wide-info").click().click();
-      cy.get(".LayoutChooser button.full-screen").click();
+      goFullScreen();
       cy.get(".CodeEditor").should("not.exist");
       cy.viewport(spec.size[0], spec.size[1]);
       cy.get("#pytch-canvas").its(`0.${spec.attr}`).should("eq", spec.expValue);
@@ -81,11 +46,10 @@ context("Full-screen layout", () => {
     });
   });
 
-  const assertWideInfoWithError = (errorMatch: RegExp) => {
-    cy.get("button.wide-info.btn-primary");
+  const assertNonFullscreenWithError = (errorMatch: RegExp) => {
     cy.get(".CodeEditor");
-    cy.get(".InfoPanel");
-    cy.get(".LayoutChooser");
+    cy.get(".Junior-InfoPanel");
+    cy.get(".ActivityBar");
     cy.pytchShouldShowErrorCard(errorMatch, "user-space");
   };
 
@@ -97,10 +61,10 @@ context("Full-screen layout", () => {
           Costumes = []
           Sounds = [('splat', 'no-such-file.mp3')]
     `);
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.pytchBuild();
 
-    assertWideInfoWithError(/could not load Sound/);
+    assertNonFullscreenWithError(/could not load Sound/);
   });
 
   it("exits full-screen if runtime error", () => {
@@ -114,10 +78,10 @@ context("Full-screen layout", () => {
           def erk(self):
               print(1/0)
     `);
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.pytchBuild();
 
-    assertWideInfoWithError(/division by zero/);
+    assertNonFullscreenWithError(/division by zero/);
   });
 
   it("exits full-screen if rendering error", () => {
@@ -144,12 +108,12 @@ context("Full-screen layout", () => {
           self.give_error = True
       `);
 
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.pytchBuild();
 
     cy.pytchSendKeysToProject("x");
 
-    assertWideInfoWithError(/oh no/);
+    assertNonFullscreenWithError(/oh no/);
   });
 
   it("exits full-screen if variable-watcher error", () => {
@@ -168,21 +132,16 @@ context("Full-screen layout", () => {
           pytch.show_variable(self, "bad_property")
       `);
 
-    cy.get(".LayoutChooser .full-screen").click();
+    goFullScreen();
     cy.pytchBuild();
 
     cy.pytchSendKeysToProject("x");
 
-    assertWideInfoWithError(/oh no/);
+    assertNonFullscreenWithError(/oh no/);
   });
 
   it("navigating to project exits full-screen", () => {
-    cy.get(".LayoutChooser button.tall-code").click();
-    cy.get(".LayoutChooser button.tall-code").should(
-      "have.class",
-      "btn-primary"
-    );
-    cy.get(".LayoutChooser button.full-screen").click();
+    goFullScreen();
     cy.get(".AssetCardPane").should("not.exist");
     cy.go("back");
     cy.contains("Test seed project").click();

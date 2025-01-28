@@ -63,8 +63,7 @@ context("Interaction with the stage", () => {
 
   [
     { label: "default-size", setupFun: doNothing },
-    { label: "max-size", setupFun: () => cy.pytchDragStageDivider(200) },
-    { label: "min-size", setupFun: () => cy.pytchDragStageDivider(-200) },
+    { label: "min-size", setupFun: () => cy.viewport(960, 960) },
   ].forEach((spec) =>
     it(`computes click coords (${spec.label} stage)`, () => {
       spec.setupFun();
@@ -79,6 +78,7 @@ context("Interaction with the stage", () => {
             self.set_size(0.25)
             self.n_clicks = 0
             self.next_location_idx = 0
+            print("ready")
           @pytch.when_this_sprite_clicked
           def say_hello(self):
             self.n_clicks += 1
@@ -91,6 +91,7 @@ context("Interaction with the stage", () => {
     `);
 
       cy.pytchGreenFlag();
+      cy.pytchStdoutShouldContain("ready\n");
       cy.pytchClickStage(0, 0);
       cy.pytchStdoutShouldContain("hello 1 0 0\n");
 
