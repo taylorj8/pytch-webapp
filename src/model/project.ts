@@ -290,7 +290,6 @@ export interface IActiveProject {
   lastSyncFromStorageSeqNum: number;
   codeStateVsStorage: CodeStateVsStorage;
   buildSeqnum: number;
-  tutorialNavigationSeqnum: number;
 
   haveProject: Computed<IActiveProject, boolean>;
 
@@ -520,7 +519,6 @@ export const activeProject: IActiveProject = {
 
   codeStateVsStorage: "no-changes-since-last-save",
   buildSeqnum: 0,
-  tutorialNavigationSeqnum: 0,
 
   noteCodeChange: action((state) => {
     state.codeStateVsStorage = "unsaved-changes-exist";
@@ -1188,7 +1186,6 @@ export const activeProject: IActiveProject = {
     );
 
     trackedTutorial.activeChapterIndex = chapterIndex;
-    state.tutorialNavigationSeqnum += 1;
   }),
 
   incrementBuildSeqnum: action((state) => {
