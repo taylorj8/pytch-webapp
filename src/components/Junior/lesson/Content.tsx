@@ -1,10 +1,9 @@
-import React, { UIEventHandler, createRef } from "react";
+import React, { createRef } from "react";
 import { EmptyProps } from "../../../utils";
 import { ChapterNavigation } from "./ChapterNavigation";
 import { Chapter } from "./Chapter";
 import { ProgressTrail } from "./ProgressTrail";
 import { DivScroller } from "./DivScroller";
-import { useJrEditActions } from "../hooks";
 import { WidthMonitor } from "../WidthMonitor";
 import { useMappedLinkedJrTutorial } from "./hooks";
 
@@ -13,14 +12,6 @@ export const Content: React.FC<EmptyProps> = () => {
   const chapterIdx = useMappedLinkedJrTutorial(
     (tutorial) => tutorial.interactionState.chapterIndex
   );
-  const setTutorialChapterScrollTop = useJrEditActions(
-    (a) => a.setTutorialChapterScrollTop
-  );
-
-  const onContentScroll: UIEventHandler<HTMLDivElement> = (event) => {
-    const contentDiv = event.currentTarget;
-    setTutorialChapterScrollTop(contentDiv.scrollTop);
-  };
 
   // TODO: This "1100" for WidthMonitor is a bit of a magic number; it
   // came from the min width of the first two columns (512 each) then
@@ -34,11 +25,7 @@ export const Content: React.FC<EmptyProps> = () => {
       </div>
       <div className="Junior-LessonContent-inner-container">
         <DivScroller pageKey={chapterIdx} containerDivRef={contentRef} />
-        <div
-          ref={contentRef}
-          className="Junior-LessonContent abs-0000-oflow"
-          onScroll={onContentScroll}
-        >
+        <div ref={contentRef} className="Junior-LessonContent abs-0000-oflow">
           <div className="content">
             <Chapter />
             <ChapterNavigation />
