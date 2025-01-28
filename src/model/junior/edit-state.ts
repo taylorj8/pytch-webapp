@@ -14,6 +14,7 @@ import {
   DeleteHandlerFlow,
   deleteHandlerFlow,
 } from "./user-flows/delete-handler";
+import { scrollTopFromPageKey } from "./jr-tutorial";
 
 export type ActorPropertiesTabKey = "code" | "appearances" | "sounds";
 export type InfoPanelTabKey = "output" | "errors";
@@ -199,6 +200,7 @@ export const editState: EditState = {
     (actions, { linkedContentKind, isTrackingTutorial }) => {
       actions.setInfoPanelActiveTab("output");
       actions.setInfoPanelState("expanded");
+      scrollTopFromPageKey.clear();
 
       const hasLinkedContent = linkedContentKind !== "none";
       if (isTrackingTutorial) {
@@ -242,6 +244,7 @@ export const editState: EditState = {
     actions.setInfoPanelState("expanded");
     actions.setMostRecentFocusedEditor("");
     actions.setTutorialChapterScrollTop(0);
+    scrollTopFromPageKey.clear();
 
     switch (linkedContentKind) {
       case "none":
