@@ -496,13 +496,10 @@ const Tutorial = () => {
     case "pending":
       return <div>Loading...</div>;
     case "succeeded":
-      // Fall through to handle these cases.
-      break;
+      return <ActiveTutorial />;
     default:
-      throw new Error(`unknown loadState "${loadState}"`);
+      return assertNever(loadState);
   }
-
-  return <ActiveTutorial />;
 };
 
 export default Tutorial;
