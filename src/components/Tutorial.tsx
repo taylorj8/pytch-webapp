@@ -466,6 +466,8 @@ const ActiveTutorial = () => {
   // preserved within a chapter but reset when moving to another
   // chapter.
 
+  const chapterContainerRef: React.RefObject<HTMLDivElement> = createRef();
+
   return (
     <div className="Junior-LessonContent-container">
       <WidthMonitor nonStageWd={1100} />
@@ -473,7 +475,10 @@ const ActiveTutorial = () => {
         <ProgressTrail.Flat />
       </div>
       <div className="Junior-LessonContent-inner-container">
-        <div className="Junior-LessonContent abs-0000-oflow">
+        <div
+          className="Junior-LessonContent abs-0000-oflow"
+          ref={chapterContainerRef}
+        >
           <div className="content">
             <TutorialChapter />
           </div>
