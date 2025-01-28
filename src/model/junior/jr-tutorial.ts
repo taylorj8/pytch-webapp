@@ -326,3 +326,5 @@ export async function jrTutorialContentFromName(
   const html = await tutorialResourceText(relativeUrl);
   return jrTutorialContentFromHTML(name, html, relativeUrl);
 }
+
+export let scrollTopFromPageKey = new Map<number, number>();
