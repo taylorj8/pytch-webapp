@@ -873,23 +873,28 @@ export const activeProject: IActiveProject = {
         );
       }
 
-      // TODO: How should this be updated in unified IDE?
       storeActions.ideLayout.helpSidebar.hideAllContent();
 
-      if (content.program.kind === "per-method") {
-        const bootData = {
-          program: content.program.program,
-          linkedContentKind: content.linkedContentRef.kind,
-        };
-        storeActions.jrEditState.bootForProgram(bootData);
-      }
-
-      if (content.program.kind === "flat") {
-        const flatBootData = {
-          linkedContentKind: content.linkedContentRef.kind,
-          isTrackingTutorial: content.trackedTutorial != null,
-        };
-        storeActions.jrEditState.bootForFlatProgram(flatBootData);
+      const programKind = content.program.kind;
+      switch (programKind) {
+        case "per-method": {
+          const bootData = {
+            program: content.program.program,
+            linkedContentKind: content.linkedContentRef.kind,
+          };
+          storeActions.jrEditState.bootForProgram(bootData);
+          break;
+        }
+        case "flat": {
+          const flatBootData = {
+            linkedContentKind: content.linkedContentRef.kind,
+            isTrackingTutorial: content.trackedTutorial != null,
+          };
+          storeActions.jrEditState.bootForFlatProgram(flatBootData);
+          break;
+        }
+        default:
+          assertNever(programKind);
       }
 
       actions.noteLoadRequestOutcome("succeeded");
