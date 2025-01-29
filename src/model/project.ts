@@ -879,19 +879,19 @@ export const activeProject: IActiveProject = {
       const programKind = content.program.kind;
       switch (programKind) {
         case "per-method": {
-        const bootData = {
-          program: content.program.program,
-          linkedContentKind: content.linkedContentRef.kind,
-        };
-        storeActions.jrEditState.bootForProgram(bootData);
+          const bootData = {
+            program: content.program.program,
+            linkedContentKind: content.linkedContentRef.kind,
+          };
+          storeActions.jrEditState.bootForProgram(bootData);
           break;
         }
         case "flat": {
-        const flatBootData = {
-          linkedContentKind: content.linkedContentRef.kind,
-          isTrackingTutorial: content.trackedTutorial != null,
-        };
-        storeActions.jrEditState.bootForFlatProgram(flatBootData);
+          const flatBootData = {
+            linkedContentKind: content.linkedContentRef.kind,
+            isTrackingTutorial: content.trackedTutorial != null,
+          };
+          storeActions.jrEditState.bootForFlatProgram(flatBootData);
           break;
         }
         default:
