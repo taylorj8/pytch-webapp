@@ -873,7 +873,6 @@ export const activeProject: IActiveProject = {
         );
       }
 
-      // TODO: How should this be updated in unified IDE?
       storeActions.ideLayout.helpSidebar.hideAllContent();
 
       const programKind = content.program.kind;
