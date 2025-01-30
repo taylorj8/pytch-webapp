@@ -306,27 +306,6 @@ $speech-bubble-max-height: 180px;
   }
 }
 
-.LinkedContentBar {
-  background-color: $pytch-colour-main-blue;
-  border-radius: 6px 6px 0px 0px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  p {
-    margin: 0.25rem 0.5rem;
-    font-size: 0.9rem;
-    font-style: italic;
-    color: #fff792;
-  }
-  button {
-    padding: 0px 10px 0px 0px;
-    margin-right: 8px;
-    background-color: transparent;
-    border-color: transparent;
-    color: #fff792;
-  }
-}
-
 .CodeEditor {
   flex-grow: 1;
   flex-shrink: 1;
