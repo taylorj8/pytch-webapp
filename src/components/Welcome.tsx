@@ -13,6 +13,13 @@ import { useScrollToUrlFragment } from "./hooks/use-fragment-scroll";
 import "./Welcome.scss";
 
 const Welcome: React.FC<EmptyProps> = () => {
+  // I have NO IDEA why the following is needed.  I suspect a bug in
+  // Vite or the bundler.  Without the following line, the value
+  // "pytchAppModel" exported from model/index.ts is not defined before
+  // that value is used by store.ts.  It's possible there's a better fix
+  // but I am not inclined to go looking for it just now.
+  useStoreActions(() => void 0);
+
   useEffect(() => {
     document.title = "Pytch";
   });
