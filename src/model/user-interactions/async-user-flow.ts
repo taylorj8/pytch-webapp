@@ -349,7 +349,6 @@ export function flowFocusOrBlurFun<Elt extends HTMLElement, RunStateT>(
     }
 
     const element = elementRef.current;
-
     if (element == null) {
       // Shouldn't happen.
       return;
