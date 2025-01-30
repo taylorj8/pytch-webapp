@@ -39,8 +39,6 @@ const TutorialList: React.FC<EmptyProps> = () => {
     }
   });
 
-  const visibleTutorials = available;
-
   const paneRef: React.RefObject<HTMLDivElement> = React.createRef();
   useEffect(() => {
     paneRef.current?.focus();
@@ -53,7 +51,7 @@ const TutorialList: React.FC<EmptyProps> = () => {
         <h1>Tutorials</h1>
         <LoadingTutorialsPlaceholder />
         <ul className="tutorial-list">
-          {visibleTutorials.map((t) => (
+          {available.map((t) => (
             <TutorialSummaryDisplay
               key={t.slug}
               tutorial={t}
