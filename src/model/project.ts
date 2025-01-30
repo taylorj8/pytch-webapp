@@ -1099,19 +1099,17 @@ export const activeProject: IActiveProject = {
     }
   }),
 
-  handleLiveReloadMessage: thunk((actions, messageString, helpers) => {
-    const { appendTimestamped } = helpers.getStoreActions().editorWebSocketLog;
-
+  handleLiveReloadMessage: thunk((actions, messageString) => {
     const message = JSON.parse(messageString) as ILiveReloadMessage;
 
     switch (message.kind) {
       case "info": {
-        appendTimestamped(`server:info: ${message.message}`);
+        console.log(`server:info: ${message.message}`);
         break;
       }
       case "code": {
         const codeText: string = message.text;
-        appendTimestamped(`server:code: update of length ${codeText.length}`);
+        console.log(`server:code: update of length ${codeText.length}`);
 
         actions.setCodeTextAndBuild({
           codeText,
@@ -1134,7 +1132,7 @@ export const activeProject: IActiveProject = {
               message.text
             );
             const wipChapter = newContent.workInProgressChapter;
-            appendTimestamped(
+            console.log(
               `server:tutorial: update; ${newContent.chapters.length} chapter/s` +
                 (wipChapter != null
                   ? `; working on chapter ${wipChapter}` +
