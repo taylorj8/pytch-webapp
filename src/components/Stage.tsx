@@ -121,10 +121,6 @@ const Stage = () => {
           id="pytch-speech-bubbles"
           style={sizeStyle}
         />
-        <div
-          id="stage-resize-indicator"
-          style={sizeStyle}
-        />
         <CoordinateChooserOverlay />
       </div>
     </div>
