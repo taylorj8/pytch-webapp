@@ -11,7 +11,6 @@ import {
   AsyncUserFlowSlice,
   setRunStateProp,
 } from "./async-user-flow";
-import { VersionTag } from "../version-opt-in";
 
 type CreateProjectRunArgs = void;
 

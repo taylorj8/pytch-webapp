@@ -5,7 +5,6 @@ import { SyncState } from "../model/project";
 import { TutorialSummaryDisplay } from "./TutorialSummaryDisplay";
 import { EmptyProps, assertNever } from "../utils";
 import { PytchProgramKind } from "../model/pytch-program";
-import { useSetActiveUiVersionFun } from "./hooks/active-ui-version";
 
 const LoadingTutorialsPlaceholder = () => {
   const syncState = useStoreState(

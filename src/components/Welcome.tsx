@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import NavBanner from "./NavBanner";
 import { EmptyProps, assertNever } from "../utils";
 import { useStoreActions, useStoreState } from "../store";
-import { useSetActiveUiVersionFun } from "./hooks/active-ui-version";
 import { EditorKindThumbnail } from "./EditorKindThumbnail";
 import { Header } from "./front-page/Header";
 import { CodingJourney } from "./front-page/CodingJourney";
