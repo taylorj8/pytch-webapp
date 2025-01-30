@@ -13,15 +13,11 @@ import {
 } from "./async-user-flow";
 import { VersionTag } from "../version-opt-in";
 
-type CreateProjectRunArgs = {
-  activeUiVersion: VersionTag;
-  forceUiVersion?: VersionTag;
-};
+type CreateProjectRunArgs = void;
 
 type CreateProjectRunState = {
   name: string;
   whetherExample: WhetherExampleTag;
-  forceUiVersion: VersionTag | undefined;
   editorKind: PytchProgramKind;
 };
 
@@ -41,15 +37,11 @@ type CreateProjectActions = {
 
 export type CreateProjectFlow = CreateProjectBase & CreateProjectActions;
 
-async function prepare(
-  args: CreateProjectRunArgs
-): Promise<CreateProjectRunState> {
-  const effectiveUiVersion = args.forceUiVersion ?? args.activeUiVersion;
+async function prepare(_args: void): Promise<CreateProjectRunState> {
   return {
     name: "Untitled project",
     whetherExample: "with-example",
-    forceUiVersion: args.forceUiVersion,
-    editorKind: effectiveUiVersion === "v1" ? "flat" : "per-method",
+    editorKind: "per-method",
   };
 }
 
