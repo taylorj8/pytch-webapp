@@ -389,23 +389,6 @@ $speech-bubble-max-height: 180px;
   }
 }
 
-.CodeAndStage {
-  display: flex;
-  flex-direction: row;
-}
-
-.StageAndInfo {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-div.spacer-instead-of-resizer {
-  width: 100%;
-  height: $drag-resizer-height;
-  flex-shrink: 0;
-}
-
 .AssetCardPane,
 .StandardOutputPane,
 .ErrorsPane {
