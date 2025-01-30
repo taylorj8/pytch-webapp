@@ -6,6 +6,8 @@ import {
   thunk,
   Computed,
   computed,
+  Generic,
+  generic,
 } from "easy-peasy";
 import { delaySeconds } from "../../utils";
 import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
@@ -39,7 +41,7 @@ function assertInteracting<RunStateT>(
 }
 
 export type AsyncUserFlowState<RunStateT> = {
-  fsmState: AsyncUserFlowFsmState<RunStateT>;
+  fsmState: Generic<AsyncUserFlowFsmState<RunStateT>>;
   isSubmittable: Computed<AsyncUserFlowState<RunStateT>, boolean>;
 };
 
@@ -87,7 +89,7 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
   options: AsyncUserFlowOptions
 ): AsyncUserFlowSlice<AppModelT, RunArgsT, RunStateT> {
   return {
-    fsmState: { kind: "idle" },
+    fsmState: generic({ kind: "idle" }),
     isSubmittable: computed((state) => {
       const fsmState = state.fsmState as AsyncUserFlowFsmState<RunStateT>;
       return (
