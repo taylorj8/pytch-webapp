@@ -83,11 +83,6 @@ export const eqDisplaySize = (
   ds2: IStageDisplaySize
 ): boolean => ds1.width === ds2.width && ds1.height === ds2.height;
 
-export interface IStageVerticalResizeState {
-  dragStartY: number;
-  dragStartHeight: number;
-}
-
 const buttonTourProgressStages = ["green-flag"] as const;
 type ButtonTourStage = (typeof buttonTourProgressStages)[number];
 
@@ -116,7 +111,6 @@ export interface IIDELayout {
   pointerStagePosition: PointerStagePosition;
   coordsChooser: CoordsChooser;
   stageDisplaySize: IStageDisplaySize;
-  stageVerticalResizeState: IStageVerticalResizeState | null;
   buttonTourProgressIndex: number;
   buttonTourProgressStage: Computed<IIDELayout, ButtonTourStage | null>;
   helpSidebar: IHelpSidebar;
@@ -129,8 +123,6 @@ export interface IIDELayout {
   updatePointerStagePosition: Thunk<IIDELayout, UpdatePointerOverStageArgs>;
   setStageDisplayWidth: Action<IIDELayout, number>;
   setStageDisplayHeight: Action<IIDELayout, number>;
-  initiateVerticalResize: Action<IIDELayout, number>;
-  completeVerticalResize: Action<IIDELayout>;
   dismissButtonTour: Action<IIDELayout>;
   initiateButtonTour: Action<IIDELayout>;
   maybeAdvanceTour: Action<IIDELayout, ButtonTourStage>;
@@ -275,17 +267,6 @@ export const ideLayout: IIDELayout = {
   setStageDisplayHeight: action((state, height) => {
     const width = Math.round(stageWidth * (height / stageHeight));
     state.stageDisplaySize = { width, height };
-  }),
-
-  stageVerticalResizeState: null,
-  initiateVerticalResize: action((state, dragStartY) => {
-    state.stageVerticalResizeState = {
-      dragStartY,
-      dragStartHeight: state.stageDisplaySize.height,
-    };
-  }),
-  completeVerticalResize: action((state) => {
-    state.stageVerticalResizeState = null;
   }),
 
   buttonTourProgressIndex: -1,
