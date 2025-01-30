@@ -4,7 +4,6 @@ import { welcomeAssetUrl } from "./utils";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { useRunFlow } from "../../model";
-import { useStoreState } from "../../store";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./CodingJourney.scss";

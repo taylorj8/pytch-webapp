@@ -3,8 +3,7 @@ import NavBanner from "./NavBanner";
 import { useStoreActions, useStoreState } from "../store";
 import { SyncState } from "../model/project";
 import { TutorialSummaryDisplay } from "./TutorialSummaryDisplay";
-import { EmptyProps, assertNever } from "../utils";
-import { PytchProgramKind } from "../model/pytch-program";
+import { EmptyProps } from "../utils";
 
 const LoadingTutorialsPlaceholder = () => {
   const syncState = useStoreState(
