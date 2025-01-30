@@ -405,17 +405,6 @@ $speech-bubble-max-height: 180px;
   align-items: stretch;
 }
 
-.drag-resizer {
-  height: $drag-resizer-height;
-  flex-shrink: 0;
-
-  &:hover {
-    cursor: ns-resize;
-    background-color: black;
-    opacity: 0.2;
-  }
-}
-
 .InfoPanel-container {
   position: relative;
 
