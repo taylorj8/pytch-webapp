@@ -104,8 +104,6 @@ type UpdatePointerOverStageArgs = {
   mousePosition: { clientX: number; clientY: number } | null;
 };
 
-type EnsureNotFullScreenAction = "restore-layout" | "force-wide-info-pane";
-
 export interface IIDELayout {
   fullScreenState: FullScreenState;
   pointerStagePosition: PointerStagePosition;
@@ -116,7 +114,7 @@ export interface IIDELayout {
   helpSidebar: IHelpSidebar;
   _setIsFullScreen: Action<IIDELayout, boolean>;
   setIsFullScreen: Thunk<IIDELayout, boolean>;
-  ensureNotFullScreen: Thunk<IIDELayout, EnsureNotFullScreenAction>;
+  ensureNotFullScreen: Thunk<IIDELayout>;
   resizeFullScreen: Action<IIDELayout>;
   setPointerNotOverStage: Action<IIDELayout>;
   setPointerOverStage: Action<IIDELayout, StagePosition>;
@@ -193,18 +191,9 @@ export const ideLayout: IIDELayout = {
     // this case.
     actions.coordsChooser.setStateKind("idle");
   }),
-  ensureNotFullScreen: thunk((actions, layoutAction, helpers) => {
+  ensureNotFullScreen: thunk((actions, _voidPayload, helpers) => {
     if (helpers.getState().fullScreenState.isFullScreen) {
       actions.setIsFullScreen(false);
-      switch (layoutAction) {
-        case "restore-layout":
-          break;
-        case "force-wide-info-pane":
-          actions.setKind("wide-info-pane");
-          break;
-        default:
-          assertNever(layoutAction);
-      }
     }
   }),
   resizeFullScreen: action((state) => {
