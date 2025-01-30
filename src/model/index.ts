@@ -10,7 +10,6 @@ import {
   userConfirmations,
   IUserConfirmations,
   standardOutputPane,
-  editorWebSocketLog,
   IPlainTextPane,
   errorReportList,
   IErrorReportList,
@@ -59,7 +58,6 @@ export interface IPytchAppModel {
   standardOutputPane: IPlainTextPane;
   errorReportList: IErrorReportList;
   reloadServer: IReloadServer;
-  editorWebSocketLog: IPlainTextPane;
   userTextInput: IUserTextInput;
   variableWatchers: IVariableWatchers;
   demoFromZipfileURL: IDemoFromZipfileURL;
@@ -83,7 +81,6 @@ export const pytchAppModel: IPytchAppModel = {
   standardOutputPane,
   errorReportList,
   reloadServer,
-  editorWebSocketLog,
   userTextInput,
   variableWatchers,
   demoFromZipfileURL,

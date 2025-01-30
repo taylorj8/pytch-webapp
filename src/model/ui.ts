@@ -379,7 +379,6 @@ const makeTextPane = (): IPlainTextPane => ({
 });
 
 export const standardOutputPane = makeTextPane();
-export const editorWebSocketLog = makeTextPane();
 
 // TODO: Does this interface belong somewhere else?
 export interface IErrorReport {
