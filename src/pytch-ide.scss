@@ -2,7 +2,6 @@
 @import "./pytch-mixins.scss";
 @import "./pytch-variables.scss";
 
-$drag-resizer-height: 0.5rem;
 $tooltip-background-color: #151;
 
 // It's possible there's a cleaner way to achieve this.  The value comes
@@ -234,20 +233,6 @@ $stage-controls-height: 37.6px;
   }
 }
 
-#stage-resize-indicator {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  background-color: #888;
-  border: 1px solid #444;
-  box-sizing: content-box;
-  visibility: hidden;
-
-  &.resize-active {
-    visibility: visible;
-  }
-}
-
 $speech-bubble-background: #e8e8e8;
 $speech-bubble-arrow: #ccc;
 $speech-bubble-width: 210px;
@@ -303,27 +288,6 @@ $speech-bubble-max-height: 180px;
     .ace_completion-message {
       margin-left: 0.5rem;
     }
-  }
-}
-
-.LinkedContentBar {
-  background-color: $pytch-colour-main-blue;
-  border-radius: 6px 6px 0px 0px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  p {
-    margin: 0.25rem 0.5rem;
-    font-size: 0.9rem;
-    font-style: italic;
-    color: #fff792;
-  }
-  button {
-    padding: 0px 10px 0px 0px;
-    margin-right: 8px;
-    background-color: transparent;
-    border-color: transparent;
-    color: #fff792;
   }
 }
 
@@ -388,11 +352,6 @@ $speech-bubble-max-height: 180px;
     }
   }
 
-  #editor {
-    background-color: white;
-    flex-grow: 1;
-  }
-
   .ReadOnlyOverlay {
     z-index: 10;
     position: absolute;
@@ -415,92 +374,8 @@ $speech-bubble-max-height: 180px;
   }
 }
 
-.CodeAndStage {
-  display: flex;
-  flex-direction: row;
-}
-
-.StageAndInfo {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.drag-resizer {
-  height: $drag-resizer-height;
-  flex-shrink: 0;
-
-  &:hover {
-    cursor: ns-resize;
-    background-color: black;
-    opacity: 0.2;
-  }
-}
-
-.InfoPanel-container {
-  position: relative;
-
-  min-height: 0;
-  flex-grow: 1;
-  flex-shrink: 1;
-
-  display: flex;
-  flex-direction: column;
-
-  .LayoutChooser {
-    position: absolute;
-    height: 32px;
-    top: 0px;
-    right: 0px;
-    display: flex;
-    flex-direction: row;
-    button {
-      height: 32px;
-      margin-left: 0.5rem;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-    }
-    .layout-icon {
-      width: 24px;
-    }
-  }
-}
-
-div.spacer-instead-of-resizer {
-  width: 100%;
-  height: $drag-resizer-height;
-  flex-shrink: 0;
-}
-
-.InfoPanel {
-  min-height: 0;
-  flex-grow: 0;
-  flex-shrink: 0;
-  margin-top: 0px;
-  a {
-    background-color: #eef;
-  }
-}
-
-.InfoPanel + div {
-  min-height: 0;
-  flex-grow: 1;
-  flex-shrink: 1;
-  overflow-y: auto;
-  background-color: white;
-  position: relative;
-}
-
-.InfoPane {
-  min-height: 0;
-  flex-grow: 1;
-  flex-shrink: 1;
-}
-
 .AssetCardPane,
 .StandardOutputPane,
-.EditorWebSocketInfo,
 .ErrorsPane {
   flex-grow: 1;
   flex-shrink: 1;
@@ -512,8 +387,7 @@ div.spacer-instead-of-resizer {
   }
 }
 
-.StandardOutputPane,
-.EditorWebSocketInfo {
+.StandardOutputPane {
   pre {
     margin: 2rem 3rem;
   }

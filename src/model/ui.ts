@@ -1,5 +1,4 @@
 import { Action, action, computed, Computed, Thunk, thunk } from "easy-peasy";
-import { assertNever, propSetterAction } from "../utils";
 import {
   CreateProjectFlow,
   createProjectFlow,
@@ -73,12 +72,6 @@ import {
   deleteManyProjectsFlow,
 } from "./user-interactions/delete-many-projects";
 
-/** Choices the user has made about how the IDE should be laid out.
- * Currently this is just a choice between two layouts, but in due
- * course it might include a draggable splitter between panes. */
-
-export type IDELayoutKind = "wide-info-pane" | "tall-code-editor";
-
 export interface IStageDisplaySize {
   width: number;
   height: number;
@@ -88,11 +81,6 @@ export const eqDisplaySize = (
   ds1: IStageDisplaySize,
   ds2: IStageDisplaySize
 ): boolean => ds1.width === ds2.width && ds1.height === ds2.height;
-
-export interface IStageVerticalResizeState {
-  dragStartY: number;
-  dragStartHeight: number;
-}
 
 const buttonTourProgressStages = ["green-flag"] as const;
 type ButtonTourStage = (typeof buttonTourProgressStages)[number];
@@ -115,30 +103,23 @@ type UpdatePointerOverStageArgs = {
   mousePosition: { clientX: number; clientY: number } | null;
 };
 
-type EnsureNotFullScreenAction = "restore-layout" | "force-wide-info-pane";
-
 export interface IIDELayout {
-  kind: IDELayoutKind;
   fullScreenState: FullScreenState;
   pointerStagePosition: PointerStagePosition;
   coordsChooser: CoordsChooser;
   stageDisplaySize: IStageDisplaySize;
-  stageVerticalResizeState: IStageVerticalResizeState | null;
   buttonTourProgressIndex: number;
   buttonTourProgressStage: Computed<IIDELayout, ButtonTourStage | null>;
   helpSidebar: IHelpSidebar;
-  setKind: Action<IIDELayout, IDELayoutKind>;
   _setIsFullScreen: Action<IIDELayout, boolean>;
   setIsFullScreen: Thunk<IIDELayout, boolean>;
-  ensureNotFullScreen: Thunk<IIDELayout, EnsureNotFullScreenAction>;
+  ensureNotFullScreen: Thunk<IIDELayout>;
   resizeFullScreen: Action<IIDELayout>;
   setPointerNotOverStage: Action<IIDELayout>;
   setPointerOverStage: Action<IIDELayout, StagePosition>;
   updatePointerStagePosition: Thunk<IIDELayout, UpdatePointerOverStageArgs>;
   setStageDisplayWidth: Action<IIDELayout, number>;
   setStageDisplayHeight: Action<IIDELayout, number>;
-  initiateVerticalResize: Action<IIDELayout, number>;
-  completeVerticalResize: Action<IIDELayout>;
   dismissButtonTour: Action<IIDELayout>;
   initiateButtonTour: Action<IIDELayout>;
   maybeAdvanceTour: Action<IIDELayout, ButtonTourStage>;
@@ -173,16 +154,9 @@ export const fullScreenStageDisplaySize = (controlsHeight = 36) => {
 };
 
 export const ideLayout: IIDELayout = {
-  kind: "wide-info-pane",
   fullScreenState: { isFullScreen: false },
   pointerStagePosition: { kind: "not-over-stage" },
   coordsChooser,
-  setKind: action((state, kind) => {
-    if (state.kind === kind) {
-      state.stageDisplaySize = { width: stageWidth, height: stageHeight };
-    }
-    state.kind = kind;
-  }),
   _setIsFullScreen: action((state, isFullScreen) => {
     if (isFullScreen === state.fullScreenState.isFullScreen) {
       console.warn(`trying to set isFullScreen ${isFullScreen} but is already`);
@@ -216,18 +190,9 @@ export const ideLayout: IIDELayout = {
     // this case.
     actions.coordsChooser.setStateKind("idle");
   }),
-  ensureNotFullScreen: thunk((actions, layoutAction, helpers) => {
+  ensureNotFullScreen: thunk((actions, _voidPayload, helpers) => {
     if (helpers.getState().fullScreenState.isFullScreen) {
       actions.setIsFullScreen(false);
-      switch (layoutAction) {
-        case "restore-layout":
-          break;
-        case "force-wide-info-pane":
-          actions.setKind("wide-info-pane");
-          break;
-        default:
-          assertNever(layoutAction);
-      }
     }
   }),
   resizeFullScreen: action((state) => {
@@ -290,17 +255,6 @@ export const ideLayout: IIDELayout = {
   setStageDisplayHeight: action((state, height) => {
     const width = Math.round(stageWidth * (height / stageHeight));
     state.stageDisplaySize = { width, height };
-  }),
-
-  stageVerticalResizeState: null,
-  initiateVerticalResize: action((state, dragStartY) => {
-    state.stageVerticalResizeState = {
-      dragStartY,
-      dragStartHeight: state.stageDisplaySize.height,
-    };
-  }),
-  completeVerticalResize: action((state) => {
-    state.stageVerticalResizeState = null;
   }),
 
   buttonTourProgressIndex: -1,
@@ -394,7 +348,6 @@ const makeTextPane = (): IPlainTextPane => ({
 });
 
 export const standardOutputPane = makeTextPane();
-export const editorWebSocketLog = makeTextPane();
 
 // TODO: Does this interface belong somewhere else?
 export interface IErrorReport {
@@ -419,21 +372,4 @@ export const errorReportList: IErrorReportList = {
   clear: action((state) => {
     state.errors.splice(0);
   }),
-};
-
-export type InfoPanelTabKey =
-  | "tutorial"
-  | "assets"
-  | "output"
-  | "errors"
-  | "websocket-log";
-
-export interface IInfoPanel {
-  activeTabKey: InfoPanelTabKey;
-  setActiveTabKey: Action<IInfoPanel, InfoPanelTabKey>;
-}
-
-export const infoPanel: IInfoPanel = {
-  activeTabKey: "assets",
-  setActiveTabKey: propSetterAction("activeTabKey"),
 };

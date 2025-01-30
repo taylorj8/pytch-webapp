@@ -13,8 +13,8 @@ export const liveReloadURL = "ws://127.0.0.1:4111/";
 // watch server.
 
 type ReloadCallbacks = {
-  onerror(ev: Event): null;
-  onmessage(ev: MessageEvent): null;
+  onerror(ev: Event): void;
+  onmessage(ev: MessageEvent): void;
 };
 
 export interface IReloadServer {
@@ -42,11 +42,15 @@ export const reloadServer: IReloadServer = {
       return;
     }
 
-    const { handleLiveReloadMessage, handleLiveReloadError } =
-      helpers.getStoreActions().activeProject;
+    const handleLiveReloadMessage =
+      helpers.getStoreActions().activeProject.handleLiveReloadMessage;
+
+    const handleError = (errorEvent: Event) => {
+      console.log("live-reload error:", errorEvent);
+    };
 
     const callbacks: ReloadCallbacks = {
-      onerror: () => handleLiveReloadError(),
+      onerror: () => handleError,
       onmessage: (ev) => handleLiveReloadMessage(ev.data),
     };
 
