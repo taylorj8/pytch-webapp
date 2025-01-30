@@ -112,8 +112,9 @@ export const usePytchScriptDrop = (actorId: Uuid, handlerId: Uuid) => {
 type AssetCardDragItem = { fullPathname: string };
 
 type AssetCardDragProps = { isDragging: boolean };
-export const useAssetCardDrag = (fullPathname: string) => {
+export const useAssetCardDrag = (fullPathname: string, allowed: boolean) => {
   return useDrag<AssetCardDragItem, void, AssetCardDragProps>(() => ({
+    canDrag: allowed,
     type: "jr-asset-card",
     item: { fullPathname },
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
