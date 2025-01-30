@@ -73,12 +73,6 @@ import {
   deleteManyProjectsFlow,
 } from "./user-interactions/delete-many-projects";
 
-/** Choices the user has made about how the IDE should be laid out.
- * Currently this is just a choice between two layouts, but in due
- * course it might include a draggable splitter between panes. */
-
-export type IDELayoutKind = "wide-info-pane" | "tall-code-editor";
-
 export interface IStageDisplaySize {
   width: number;
   height: number;
@@ -118,7 +112,6 @@ type UpdatePointerOverStageArgs = {
 type EnsureNotFullScreenAction = "restore-layout" | "force-wide-info-pane";
 
 export interface IIDELayout {
-  kind: IDELayoutKind;
   fullScreenState: FullScreenState;
   pointerStagePosition: PointerStagePosition;
   coordsChooser: CoordsChooser;
@@ -127,7 +120,6 @@ export interface IIDELayout {
   buttonTourProgressIndex: number;
   buttonTourProgressStage: Computed<IIDELayout, ButtonTourStage | null>;
   helpSidebar: IHelpSidebar;
-  setKind: Action<IIDELayout, IDELayoutKind>;
   _setIsFullScreen: Action<IIDELayout, boolean>;
   setIsFullScreen: Thunk<IIDELayout, boolean>;
   ensureNotFullScreen: Thunk<IIDELayout, EnsureNotFullScreenAction>;
@@ -173,16 +165,9 @@ export const fullScreenStageDisplaySize = (controlsHeight = 36) => {
 };
 
 export const ideLayout: IIDELayout = {
-  kind: "wide-info-pane",
   fullScreenState: { isFullScreen: false },
   pointerStagePosition: { kind: "not-over-stage" },
   coordsChooser,
-  setKind: action((state, kind) => {
-    if (state.kind === kind) {
-      state.stageDisplaySize = { width: stageWidth, height: stageHeight };
-    }
-    state.kind = kind;
-  }),
   _setIsFullScreen: action((state, isFullScreen) => {
     if (isFullScreen === state.fullScreenState.isFullScreen) {
       console.warn(`trying to set isFullScreen ${isFullScreen} but is already`);
