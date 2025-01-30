@@ -9,7 +9,7 @@ import {
   Generic,
   generic,
 } from "easy-peasy";
-import { delaySeconds } from "../../utils";
+import { delaySeconds, propSetterAction } from "../../utils";
 import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
 
 type UserSettleResult = "cancel" | "submit";
@@ -97,11 +97,7 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
       );
     }),
 
-    // Did not get to the bottom of what's going on with the typing
-    // such that I can't use propSetterAction() here.
-    setFsmState: action((s, val) => {
-      s.fsmState = val;
-    }),
+    setFsmState: propSetterAction("fsmState"),
 
     run: thunk(async (actions, args, helpers) => {
       const fsmStateKind = helpers.getState().fsmState.kind;
