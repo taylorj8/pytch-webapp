@@ -71,10 +71,6 @@ function App() {
   const basepath = envVarOrFail("BASE_URL");
   console.log(`basepath: "${basepath}"`);
 
-  const bootUiVersion = useStoreActions(
-    (actions) => actions.versionOptIn.bootFromQuery
-  );
-
   const bootRandomChapterAccessInTutorials = useStoreActions(
     (actions) =>
       actions.tutorialCollection.bootAllowRandomChapterAccessFromQuery
@@ -134,7 +130,6 @@ function App() {
   ]);
 
   useEffect(() => {
-    bootUiVersion();
     bootRandomChapterAccessInTutorials();
     fireAndForgetEvent("render", "");
   });
