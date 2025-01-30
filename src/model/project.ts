@@ -400,7 +400,6 @@ export interface IActiveProject {
   replaceTutorialAndSyncCode: Action<IActiveProject, ITrackedTutorial>;
 
   handleLiveReloadMessage: Thunk<IActiveProject, string, void, IPytchAppModel>;
-  handleLiveReloadError: Thunk<IActiveProject, void, void, IPytchAppModel>;
 
   setActiveTutorialChapter: Action<IActiveProject, number>;
 
@@ -1166,14 +1165,6 @@ export const activeProject: IActiveProject = {
         // might inadvertently break that promise one day.
         assertNever(message);
     }
-  }),
-
-  handleLiveReloadError: thunk((_actions, _voidPayload, helpers) => {
-    const { appendTimestamped } = helpers.getStoreActions().editorWebSocketLog;
-    appendTimestamped(
-      `error with websocket connection;` +
-        ` ensure server is running at ${liveReloadURL}`
-    );
   }),
 
   setActiveTutorialChapter: action((state, chapterIndex) => {

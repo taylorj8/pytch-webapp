@@ -42,8 +42,8 @@ export const reloadServer: IReloadServer = {
       return;
     }
 
-    const { handleLiveReloadMessage, handleLiveReloadError } =
-      helpers.getStoreActions().activeProject;
+    const handleLiveReloadMessage =
+      helpers.getStoreActions().activeProject.handleLiveReloadMessage;
 
     const handleError = (errorEvent: Event) => {
       console.log("live-reload error:", errorEvent);
