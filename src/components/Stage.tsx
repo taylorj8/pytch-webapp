@@ -20,9 +20,6 @@ const Stage = () => {
     (state) => state.ideLayout.stageDisplaySize,
     eqDisplaySize
   );
-  const resizeIsActive = useStoreState(
-    (state) => state.ideLayout.stageVerticalResizeState != null
-  );
   const updatePointerStagePosition = useStoreActions(
     (actions) => actions.ideLayout.updatePointerStagePosition
   );
@@ -93,14 +90,6 @@ const Stage = () => {
     height: `${displaySize.height}px`,
   };
 
-  // When resizing, the stage rendering flickers with what seems to be a
-  // first render before the transformation has been set.  Hide the
-  // stage while a drag-resize is in progress.
-  //
-  // TODO: Work out why flickering happens in the first place, and see
-  // if there's a tidier way to do this.
-  const resizeClass = resizeIsActive ? "resize-active" : undefined;
-
   return (
     <div id="pytch-stage-container">
       <div
@@ -123,7 +112,6 @@ const Stage = () => {
         <canvas
           ref={canvasRef}
           id="pytch-canvas"
-          className={resizeClass}
           width={displaySize.width}
           height={displaySize.height}
         />
@@ -131,12 +119,10 @@ const Stage = () => {
         <div
           ref={bubblesRef}
           id="pytch-speech-bubbles"
-          className={resizeClass}
           style={sizeStyle}
         />
         <div
           id="stage-resize-indicator"
-          className={resizeClass}
           style={sizeStyle}
         />
         <CoordinateChooserOverlay />
