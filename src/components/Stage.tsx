@@ -116,11 +116,7 @@ const Stage = () => {
           height={displaySize.height}
         />
         <VariableWatchers />
-        <div
-          ref={bubblesRef}
-          id="pytch-speech-bubbles"
-          style={sizeStyle}
-        />
+        <div ref={bubblesRef} id="pytch-speech-bubbles" style={sizeStyle} />
         <CoordinateChooserOverlay />
       </div>
     </div>
