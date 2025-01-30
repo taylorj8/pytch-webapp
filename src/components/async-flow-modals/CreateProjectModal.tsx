@@ -3,7 +3,6 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 
-import { useStoreActions, useStoreState } from "../../store";
 import { submitOnEnterKeyFun } from "../../utils";
 import { MaybeErrorOrSuccessReport } from "../MaybeErrorOrSuccessReport";
 import { RadioButtonOption } from "../RadioButtonOption";
@@ -29,27 +28,17 @@ const EditorKindOption = RadioButtonOption<PytchProgramKind>;
 
 export const CreateProjectModal = () => {
   const { fsmState, isSubmittable } = useFlowState((f) => f.createProjectFlow);
-  const activeUiVersion = useStoreState(
-    (state) => state.versionOptIn.activeUiVersion
-  );
 
   const { setEditorKind, setWhetherExample, setName } = useFlowActions(
     (f) => f.createProjectFlow
-  );
-  const setActiveUiVersion = useStoreActions(
-    (actions) => actions.versionOptIn.setActiveUiVersion
   );
 
   const inputRef: React.RefObject<HTMLInputElement> = React.createRef();
   useEffect(flowFocusOrBlurFun(inputRef, fsmState));
 
   return asyncFlowModal(fsmState, (activeFsmState) => {
-    const { name, editorKind, forceUiVersion, whetherExample } =
-      activeFsmState.runState;
+    const { name, editorKind, whetherExample } = activeFsmState.runState;
     const settle = settleFunctions(isSubmittable, activeFsmState);
-
-    const uiVersionIsForced = forceUiVersion != undefined;
-    const effectiveUiVersion = forceUiVersion ?? activeUiVersion;
 
     const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
       setName(evt.target.value);
@@ -60,7 +49,7 @@ export const CreateProjectModal = () => {
     const editorKindThumbnail =
       editorKind === "flat" ? FlatEditorThumbnail : PerMethodEditorThumbnail;
 
-    const mEditingModeContent = effectiveUiVersion === "v2" && (
+    const editingModeContent = (
       <>
         <hr />
         <Form.Group className="editor-kind">
@@ -84,30 +73,6 @@ export const CreateProjectModal = () => {
         </Form.Group>
       </>
     );
-
-    const wrapUiStyleText = (text: string, onClick: () => void) => (
-      <p className="change-ui-style">
-        <span onClick={onClick}>{text}</span>
-      </p>
-    );
-
-    // Ensure that "back to classic Pytch" forces "flat" project:
-    const setUiV1 = () => {
-      setActiveUiVersion("v1");
-      setEditorKind("flat");
-    };
-
-    // And that "try new Pytch" defaults to "per-method" project:
-    const setUiV2 = () => {
-      setActiveUiVersion("v2");
-      setEditorKind("per-method");
-    };
-
-    const changeUiStyleLink =
-      !uiVersionIsForced &&
-      (activeUiVersion === "v1"
-        ? wrapUiStyleText("Try our new script-by-script editor!", setUiV2)
-        : wrapUiStyleText("Go back to classic Pytch", setUiV1));
 
     return (
       <Modal
@@ -151,7 +116,7 @@ export const CreateProjectModal = () => {
                 />
               </div>
             </Form.Group>
-            {mEditingModeContent}
+            {editingModeContent}
           </Form>
           <MaybeErrorOrSuccessReport
             messageWhenSuccess="Project created!"
@@ -160,7 +125,6 @@ export const CreateProjectModal = () => {
           />
         </Modal.Body>
         <Modal.Footer>
-          {changeUiStyleLink}
           <Button
             variant="secondary"
             onClick={settle.cancel}

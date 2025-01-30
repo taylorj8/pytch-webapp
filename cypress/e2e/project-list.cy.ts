@@ -4,20 +4,9 @@ import { DexieStorage } from "../../src/database/indexed-db";
 import { WhetherExampleTag } from "../../src/model/project-templates";
 import { hexSHA256 } from "../../src/utils";
 import {
-  assertInIDE,
   launchCreateProjectModal,
   launchProjectInListDropdownAction,
 } from "./utils";
-
-context("Default creation of project", () => {
-  it('creates "flat" by default', () => {
-    cy.pytchResetDatabase({ uiVersion: "v1" });
-    cy.contains("My projects").click();
-    launchCreateProjectModal("Bananas");
-    cy.get("button").contains("Create project").click();
-    assertInIDE("flat");
-  });
-});
 
 context("Management of project list", () => {
   beforeEach(() => {

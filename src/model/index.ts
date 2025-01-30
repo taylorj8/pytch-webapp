@@ -39,7 +39,6 @@ import {
   GoogleDriveIntegration,
   googleDriveIntegration,
 } from "./google-drive-import-export";
-import { VersionOptIn, versionOptIn } from "./version-opt-in";
 import {
   StandalonePlayDemoState,
   standalonePlayDemoState,
@@ -47,7 +46,6 @@ import {
 import { useStoreActions, useStoreState } from "../store";
 
 export interface IPytchAppModel {
-  versionOptIn: VersionOptIn;
   navigationRequestQueue: NavigationRequestQueue;
   projectCollection: IProjectCollection;
   activeProject: IActiveProject;
@@ -70,7 +68,6 @@ export interface IPytchAppModel {
 export type PytchAppModelActions = Actions<IPytchAppModel>;
 
 export const pytchAppModel: IPytchAppModel = {
-  versionOptIn,
   navigationRequestQueue,
   projectCollection,
   activeProject,

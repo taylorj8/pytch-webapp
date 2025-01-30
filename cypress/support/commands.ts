@@ -51,7 +51,6 @@ const addAssetFromFixture = (
 
 const resetDatabaseDefaults: Required<ResetDatabaseOptions> = {
   initialUrl: "/",
-  uiVersion: "v2",
   extraAssets: [],
   extraProjectNames: [],
   extraWindowActions: [],
@@ -88,14 +87,6 @@ Cypress.Commands.add("pytchResetDatabase", (options?: ResetDatabaseOptions) => {
       addAssetFromFixture(db, projectSummary.id, name, mimeType);
     }
   });
-
-  if (
-    effectiveOptions.initialUrl === "/" &&
-    effectiveOptions.uiVersion === "v1"
-  ) {
-    cy.get(".ToggleUiStylePanel").contains("back to classic Pytch").click();
-    cy.get(".ToggleUiStylePanel").contains("Try it");
-  }
 });
 
 Cypress.Commands.add(

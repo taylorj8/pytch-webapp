@@ -4,7 +4,6 @@ import { welcomeAssetUrl } from "./utils";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { useRunFlow } from "../../model";
-import { useStoreState } from "../../store";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./CodingJourney.scss";
@@ -18,10 +17,8 @@ const CodingJourneysModal: React.FC<CodingJourneysModalProps> = ({
   dismiss,
 }) => {
   const navigate = useNavigate();
-  const activeUiVersion = useStoreState((s) => s.versionOptIn.activeUiVersion);
   const runCreateProjectFlow = useRunFlow((f) => f.createProjectFlow);
-  const runCreateProject = () =>
-    runCreateProjectFlow({ activeUiVersion, forceUiVersion: "v2" });
+  const runCreateProject = () => runCreateProjectFlow();
 
   return (
     <Modal
