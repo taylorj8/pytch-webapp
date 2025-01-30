@@ -17,7 +17,6 @@ import {
 } from "./GoogleOperationModals";
 import { ShareTutorialModal } from "./async-flow-modals/ShareTutorialModal";
 import { ViewCodeDiffModal } from "./async-flow-modals/ViewCodeDiffModal";
-import { VersionOptInOperationModal } from "./VersionOptInOperationModal";
 
 import { DeleteAssetModal } from "./async-flow-modals/DeleteAssetModal";
 import { DeleteProjectModal } from "./async-flow-modals/DeleteProjectModal";
@@ -26,7 +25,6 @@ import { DeleteManyProjectsModal } from "./async-flow-modals/DeleteManyProjectsM
 export const AllModals = () => {
   return (
     <>
-      <VersionOptInOperationModal />
       <CreateProjectModal />
       <AddAssetsModal />
       <RenameAssetModal />
