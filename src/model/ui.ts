@@ -405,20 +405,3 @@ export const errorReportList: IErrorReportList = {
     state.errors.splice(0);
   }),
 };
-
-export type InfoPanelTabKey =
-  | "tutorial"
-  | "assets"
-  | "output"
-  | "errors"
-  | "websocket-log";
-
-export interface IInfoPanel {
-  activeTabKey: InfoPanelTabKey;
-  setActiveTabKey: Action<IInfoPanel, InfoPanelTabKey>;
-}
-
-export const infoPanel: IInfoPanel = {
-  activeTabKey: "assets",
-  setActiveTabKey: propSetterAction("activeTabKey"),
-};

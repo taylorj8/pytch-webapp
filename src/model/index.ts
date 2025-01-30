@@ -9,8 +9,6 @@ import {
   IIDELayout,
   userConfirmations,
   IUserConfirmations,
-  infoPanel,
-  IInfoPanel,
   standardOutputPane,
   editorWebSocketLog,
   IPlainTextPane,
@@ -58,7 +56,6 @@ export interface IPytchAppModel {
   ideLayout: IIDELayout;
   jrEditState: JrEditState;
   userConfirmations: IUserConfirmations;
-  infoPanel: IInfoPanel;
   standardOutputPane: IPlainTextPane;
   errorReportList: IErrorReportList;
   reloadServer: IReloadServer;
@@ -83,7 +80,6 @@ export const pytchAppModel: IPytchAppModel = {
   ideLayout,
   jrEditState,
   userConfirmations,
-  infoPanel,
   standardOutputPane,
   errorReportList,
   reloadServer,

@@ -833,8 +833,6 @@ export const activeProject: IActiveProject = {
       });
 
       const descriptor = await projectDescriptor(projectId);
-      const initialTabKey =
-        descriptor.trackedTutorial != null ? "tutorial" : "assets";
 
       // TODO: Should the asset-server be local to the project?  Might
       // save all the to/fro with prepare/clear and knowing when to revoke
@@ -899,7 +897,6 @@ export const activeProject: IActiveProject = {
 
       actions.noteLoadRequestOutcome("succeeded");
       fireAndForgetEvent("project-loaded", `${projectId}`);
-      storeActions.infoPanel.setActiveTabKey(initialTabKey);
     } catch (err) {
       // TODO: Is there anything more intelligent we can do as
       // far as reporting to the user is concerned?
@@ -1212,10 +1209,7 @@ export const activeProject: IActiveProject = {
       const appendOutput = storeActions.standardOutputPane.append;
       const appendError = storeActions.errorReportList.append;
 
-      // Switch both UIs to the "errors" pane; the one we're not using
-      // won't mind.
       const switchToErrorPane = () => {
-        storeActions.infoPanel.setActiveTabKey("errors");
         storeActions.jrEditState.expandAndSetActive("errors");
       };
 
