@@ -31,9 +31,6 @@ const TutorialList: React.FC<EmptyProps> = () => {
   const available = useStoreState(
     (state) => state.tutorialCollection.available
   );
-  const activeUiVersion = useStoreState(
-    (state) => state.versionOptIn.activeUiVersion
-  );
 
   useEffect(() => {
     document.title = "Pytch: Tutorials";
@@ -42,11 +39,7 @@ const TutorialList: React.FC<EmptyProps> = () => {
     }
   });
 
-  const visibleTutorials = available.filter((tutorial) => {
-    const programKind: PytchProgramKind =
-      tutorial.metadata.programKind ?? "flat";
-    return activeUiVersion === "v2" || programKind === "flat";
-  });
+  const visibleTutorials = available;
 
   const paneRef: React.RefObject<HTMLDivElement> = React.createRef();
   useEffect(() => {
