@@ -31,6 +31,7 @@ const SoundsContent = ({ actorKind, sounds }: SoundsContentProps) => {
     <>
       {sounds.map((a, idx) => (
         <AssetCard
+          dragDropAllowed={true}
           key={a.name}
           assetKind="audio"
           operationScope={actorKind}

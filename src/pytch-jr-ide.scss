@@ -329,7 +329,6 @@
     }
   }
 
-  cursor: pointer;
   user-select: none;
   position: relative;
 
@@ -465,6 +464,10 @@
       font-size: 0.75rem;
     }
   }
+}
+
+.ActorCard {
+  cursor: pointer;
 }
 
 // TMP: Will fold this into above once drag/drop working for Sprites

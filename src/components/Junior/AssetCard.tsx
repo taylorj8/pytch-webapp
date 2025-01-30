@@ -174,6 +174,7 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 };
 
 type AssetCardProps = {
+  dragDropAllowed: boolean;
   assetKind: AssetMimeType;
   operationScope: AssetOperationScope;
   displayIndex: number | null;
@@ -181,6 +182,7 @@ type AssetCardProps = {
   canBeDeleted: boolean;
 };
 export const AssetCard: React.FC<AssetCardProps> = ({
+  dragDropAllowed,
   assetKind,
   operationScope,
   displayIndex,
@@ -189,8 +191,11 @@ export const AssetCard: React.FC<AssetCardProps> = ({
 }) => {
   const fullPathname = assetPresentation.name;
 
-  const [dragProps, dragRef, preview] = useAssetCardDrag(fullPathname);
-  const [dropProps, dropRef] = useAssetCardDrop(fullPathname);
+  const [dragProps, dragRef, preview] = useAssetCardDrag(
+    fullPathname,
+    dragDropAllowed
+  );
+  const [dropProps, dropRef] = useAssetCardDrop(fullPathname, dragDropAllowed);
 
   const presentation = assetPresentation.presentation;
   if (presentation.kind !== assetKind) {
