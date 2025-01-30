@@ -55,7 +55,6 @@ import {
   valueCell,
 } from "../utils";
 import { codeJustBeforeWipChapter, tutorialContentFromHTML } from "./tutorial";
-import { liveReloadURL } from "./live-reload";
 
 import { fireAndForgetEvent } from "./anonymous-instrumentation";
 
