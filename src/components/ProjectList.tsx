@@ -146,9 +146,6 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
   const selectedIds = useStoreState(
     (state) => state.projectCollection.availableSelectedIds
   );
-  const activeUiVersion = useStoreState(
-    (state) => state.versionOptIn.activeUiVersion
-  );
   const runCreateProject = useRunFlow((f) => f.createProjectFlow);
   const runUploadZipfiles = useRunFlow((f) => f.uploadZipfilesFlow);
   const runDeleteManyProjects = useRunFlow((f) => f.deleteManyProjectsFlow);
@@ -178,7 +175,7 @@ const ProjectListButtons: React.FC<EmptyProps> = () => {
       </div>
     );
   } else {
-    const showCreateModal = () => runCreateProject({ activeUiVersion });
+    const showCreateModal = () => runCreateProject();
     const showUploadModal = () => runUploadZipfiles();
     return (
       <div className="buttons">
