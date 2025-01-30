@@ -47,6 +47,7 @@ const AppearancesContent: React.FC<AppearancesContentProps> = ({
     <>
       {appearances.map((a, idx) => (
         <AssetCard
+          dragDropAllowed={true}
           key={a.name}
           assetKind="image"
           operationScope={actorKind}
