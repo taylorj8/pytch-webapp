@@ -50,7 +50,7 @@ export const CreateProjectModal = () => {
     const editorKindThumbnail =
       editorKind === "flat" ? FlatEditorThumbnail : PerMethodEditorThumbnail;
 
-    const mEditingModeContent = (
+    const editingModeContent = (
       <>
         <hr />
         <Form.Group className="editor-kind">
@@ -117,7 +117,7 @@ export const CreateProjectModal = () => {
                 />
               </div>
             </Form.Group>
-            {mEditingModeContent}
+            {editingModeContent}
           </Form>
           <MaybeErrorOrSuccessReport
             messageWhenSuccess="Project created!"
