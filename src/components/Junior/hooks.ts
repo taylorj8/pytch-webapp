@@ -122,7 +122,7 @@ export const useAssetCardDrag = (fullPathname: string, allowed: boolean) => {
 };
 
 type AssetCardDropProps = { hasDragItemOver: boolean };
-export const useAssetCardDrop = (fullPathname: string) => {
+export const useAssetCardDrop = (fullPathname: string, allowed: boolean) => {
   const projectId = useStoreState((state) => state.activeProject.project.id);
   const reorderAssets = useStoreActions(
     (actions) => actions.activeProject.reorderAssetsAndSync
@@ -130,7 +130,7 @@ export const useAssetCardDrop = (fullPathname: string) => {
 
   return useDrop<AssetCardDragItem, void, AssetCardDropProps>(() => ({
     accept: "jr-asset-card",
-    canDrop: (item) => item.fullPathname !== fullPathname,
+    canDrop: (item) => allowed && item.fullPathname !== fullPathname,
     drop: (item) => {
       console.log("Dropping!", item);
       reorderAssets({
