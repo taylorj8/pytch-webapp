@@ -13,8 +13,8 @@ export const liveReloadURL = "ws://127.0.0.1:4111/";
 // watch server.
 
 type ReloadCallbacks = {
-  onerror(ev: Event): null;
-  onmessage(ev: MessageEvent): null;
+  onerror(ev: Event): void;
+  onmessage(ev: MessageEvent): void;
 };
 
 export interface IReloadServer {
