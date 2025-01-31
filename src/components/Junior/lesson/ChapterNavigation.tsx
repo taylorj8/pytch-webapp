@@ -8,6 +8,10 @@ import {
   allTasksDoneInCurrentChapter,
 } from "../../../model/junior/jr-tutorial";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  ChapterNavigationButtons,
+  ChapterNavigationButtonsProps,
+} from "./ChapterNavigationButtons";
 
 type ChapterNavigationState = {
   allChapterTasksDone: boolean;
@@ -50,19 +54,13 @@ export const ChapterNavigation: React.FC<EmptyProps> = () => {
 
   if (!state.allChapterTasksDone && !allowRandomChapterAccess) return null;
 
-  const nextChapterTitle = state.mNextChapterTitle;
-  if (nextChapterTitle == null) return null;
+  let props: ChapterNavigationButtonsProps = {};
+  if (state.mNextChapterTitle != null) {
+    props.next = {
+      displayTitle: state.mNextChapterTitle,
+      navigate: () => setChapterIndex(state.chapterIdx + 1),
+    };
+  }
 
-  const nextChapter = () => {
-    setChapterIndex(state.chapterIdx + 1);
-  };
-
-  return (
-    <div className="Junior-ChapterNavigation">
-      <Button className="next" onClick={nextChapter}>
-        Next: {nextChapterTitle}{" "}
-        <FontAwesomeIcon className="next-arrow" icon="arrow-right-long" />
-      </Button>
-    </div>
-  );
+  return <ChapterNavigationButtons {...props} />;
 };
