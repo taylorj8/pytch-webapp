@@ -253,7 +253,7 @@ $task-checkbox-not-done-colour: #999;
   height: $chapter-final-content-height;
   display: flex;
   flex-direction: row;
-  justify-content: end;
+  justify-content: space-between;
   align-items: center;
 }
 
