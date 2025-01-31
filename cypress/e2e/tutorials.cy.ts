@@ -38,19 +38,19 @@ context("Interact with a tutorial", () => {
   };
 
   it("can navigate through tutorial", () => {
-    cy.contains("Get started:").click();
+    cy.contains("Next: Make the playing area").click();
     assertActiveChapterIndex(1);
-    cy.contains("Back:").click();
+    cy.contains("Back: Boing").click();
     assertActiveChapterIndex(0);
-    cy.contains("Get started:").click();
+    cy.contains("Next: Make the playing area").click();
     cy.contains("Next:").click();
     cy.contains("Next:").click();
     assertActiveChapterIndex(3);
   });
 
   it("copies text when [+] label clicked", () => {
-    cy.contains("Get started:").click();
-    cy.contains("Next:").click();
+    cy.contains("Next: Make the playing area").click();
+    cy.contains("Next: Add the player's bat").click();
     cy.get("tbody.diff-add span.add-or-del").eq(0).click();
     assertCopiedText(
       (text) =>
