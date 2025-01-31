@@ -93,6 +93,9 @@ const TutorialElement = ({ element }: TutorialElementProps) => {
   return <RawElement element={element} />;
 };
 
+// TODO: Remove this feature?  The preferred method for a user to try
+// the finished version of a tutorial is to use the "demo" button in the
+// tutorial's card.
 const TutorialTryWholeProjectElement = () => {
   const maybeTutorial = useStoreState(
     (state) => state.activeProject.project?.trackedTutorial?.content
