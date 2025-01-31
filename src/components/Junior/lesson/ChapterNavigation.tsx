@@ -1,13 +1,11 @@
 import React from "react";
 import { EmptyProps } from "../../../utils";
-import { Button } from "react-bootstrap";
 import { useMappedLinkedJrTutorial } from "./hooks";
 import { useStoreActions, useStoreState } from "../../../store";
 import {
   LinkedJrTutorial,
   allTasksDoneInCurrentChapter,
 } from "../../../model/junior/jr-tutorial";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ChapterNavigationButtons,
   ChapterNavigationButtonsProps,
