@@ -18,6 +18,10 @@ import { ProgressTrail } from "./Junior/lesson/ProgressTrail";
 import { WidthMonitor } from "./Junior/WidthMonitor";
 import { DivScroller } from "./Junior/lesson/DivScroller";
 import { useMappedTrackedTutorial } from "./hooks/tracked-tutorial";
+import {
+  ChapterNavigationButtons,
+  ChapterNavigationButtonsProps,
+} from "./Junior/lesson/ChapterNavigationButtons";
 
 type NavigationDirection = "prev" | "next";
 
@@ -377,6 +381,9 @@ const TutorialChapter = () => {
   const maybeTrackedTutorial = useStoreState(
     (state) => state.activeProject.project?.trackedTutorial
   );
+  const navigateToChapter = useStoreActions(
+    (actions) => actions.activeProject.setActiveTutorialChapter
+  );
 
   const trackedTutorial = failIfNull(
     maybeTrackedTutorial,
@@ -394,6 +401,21 @@ const TutorialChapter = () => {
   const chapterIndex = Math.min(rawChapterIndex, maxValidIndex);
   const activeChapter = allChapters[chapterIndex];
 
+  const navigateToChapterFun = (chapterIndex: number) => () =>
+    navigateToChapter(chapterIndex);
+
+  let navigationButtonsProps: ChapterNavigationButtonsProps = {};
+  if (activeChapter.maybePrevTitle != null)
+    navigationButtonsProps.prev = {
+      displayTitle: activeChapter.maybePrevTitle,
+      navigate: navigateToChapterFun(chapterIndex - 1),
+    };
+  if (activeChapter.maybeNextTitle != null)
+    navigationButtonsProps.next = {
+      displayTitle: activeChapter.maybeNextTitle,
+      navigate: navigateToChapterFun(chapterIndex + 1),
+    };
+
   // Discard the first item in contentElements, which is the heading
   // element.  The chapter title is already shown in the header bar
   // (progress trail).
@@ -406,21 +428,7 @@ const TutorialChapter = () => {
           {contentBodyElements.map((element, idx) => (
             <TutorialElement key={idx} element={element} />
           ))}
-          <div className="navigation-buttons">
-            {activeChapter.maybePrevTitle && (
-              <TutorialNavigation
-                kind="prev"
-                toChapterIndex={chapterIndex - 1}
-              />
-            )}
-            {activeChapter.maybeNextTitle &&
-              !activeChapter.hasRunProjectMarker && (
-                <TutorialNavigation
-                  kind="next"
-                  toChapterIndex={chapterIndex + 1}
-                />
-              )}
-          </div>
+          <ChapterNavigationButtons {...navigationButtonsProps} />
         </div>
       </div>
     </div>
