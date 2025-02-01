@@ -4,11 +4,12 @@ import { assetServer } from "./asset-server";
 import { ensureSoundManager } from "./sound-manager";
 import { ProjectContent } from "../model/project-core";
 import { AssetPresentation } from "../model/asset";
-import { useStoreActions } from "../store";
-import { set } from "date-fns";
+
+// import Debugger from "./debugger";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
+// declare let Debugger: any;
 
 const builtinRead = (fileName: string) => {
   if (
@@ -58,14 +59,32 @@ export const build = async (
   handleError: (pytchError: any, errorContext: any) => void,
   inDebugMode: boolean
 ): Promise<BuildOutcome> => {
-  // This also resets the current_live_project slot.
-  Sk.configure({
-    __future__: Sk.python3,
-    read: builtinRead,
-    output: addOutputChunk,
-    pytch: { on_exception: handleError },
-    debugging: inDebugMode,
-  });
+  if (inDebugMode) {
+    console.log("build: in debug mode");
+    const debuggerInstance: any = new Sk.Debugger("<stdin>", () => {
+      console.log("Debugger: on_exception");
+    });
+    debuggerInstance.add_breakpoint("<stdin>.py", 17, '0', false);
+    console.log(debuggerInstance)
+    
+    Sk.configure({
+      __future__: Sk.python3,
+      read: builtinRead,
+      output: addOutputChunk,
+      pytch: { on_exception: handleError },
+      debugging: true,
+      // breakpoints: debuggerInstance.check_breakpoints.bind(debuggerInstance),
+    });
+  } else {
+    // This also resets the current_live_project slot.
+    Sk.configure({
+      __future__: Sk.python3,
+      read: builtinRead,
+      output: addOutputChunk,
+      pytch: { on_exception: handleError },
+    });
+  }
+
   try {
     ensureSoundManager();
     Sk.pytch.async_load_image = (name: string) => assetServer.loadImage(name);
