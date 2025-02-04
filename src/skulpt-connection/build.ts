@@ -62,9 +62,10 @@ export const build = async (
   if (inDebugMode) {
     console.log("build: in debug mode");
     const debuggerInstance: any = new Sk.Debugger("<stdin>", () => {
-      console.log("Debugger: on_exception");
+      console.log("Debugger: output_callback");
     });
-    debuggerInstance.add_breakpoint("<stdin>.py", 17, '0', false);
+    debuggerInstance.add_breakpoint("<stdin>.py", 67, 0, false);
+    // debuggerInstance.add_breakpoint("<stdin>.py", 24, 0, false);
     console.log(debuggerInstance)
     
     Sk.configure({
@@ -73,7 +74,7 @@ export const build = async (
       output: addOutputChunk,
       pytch: { on_exception: handleError },
       debugging: true,
-      // breakpoints: debuggerInstance.check_breakpoints.bind(debuggerInstance),
+      breakpoints: debuggerInstance.check_breakpoints.bind(debuggerInstance),
     });
   } else {
     // This also resets the current_live_project slot.

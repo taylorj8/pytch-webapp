@@ -54,7 +54,7 @@ const InfoPanel = () => {
   );
   const layoutKind = useStoreState((state) => state.ideLayout.kind);
 
-  const setDebugMode = useStoreActions(actions => actions.ideLayout.setDebugMode);
+  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState)
 
   if (isSyncingFromBackEnd) {
     return null;
@@ -70,7 +70,7 @@ const InfoPanel = () => {
         activeKey={activeKey}
         onSelect={(k) => {
           setActiveKey(k as InfoPanelTabKey)
-          setDebugMode(k === "debug" ? "debug" : "normal")
+          // setDebugState(k === "debug" ? "debug" : "normal")
         }}
       >
         {isTrackingTutorial && (

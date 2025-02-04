@@ -89,43 +89,15 @@ export const DebugPane: React.FC<EmptyProps> = () => {
           </Card>
         ))}
         <div>
-            <Button className="PlayPauseButton" variant="warning" onClick={
-            () => {
-              const project = Sk.pytch.current_live_project;
-              if (project === Sk.default_pytch_environment.current_live_project) {
-                console.log("no real live project; bailing");
-                return;
-              }
-
-              if (buttonName === "Pause") {
-                console.log("pausing")
-                setDebugState("paused")
-                setButtonName("Play")
-                setShowVars(true)
-              } else {
-                console.log("running")
-                setDebugState("running")
-                setButtonName("Pause")
-                setShowVars(false)
-              }
-            }
-            } style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>{buttonName}</Button>
-            {buttonName === "Play" && (
-            <Button className="StepButton" variant="warning" onClick={
+        <Button className="StepButton" variant="warning" onClick={
               () => {
-                const project = Sk.pytch.current_live_project;
-                if (project === Sk.default_pytch_environment.current_live_project) {
-                  console.log("no real live project; bailing");
-                  return;
-                }
-                // Sk.pytch.sound_manager.one_frame();
-                // const projectState = project.one_frame();
-                window.requestAnimationFrame(project.one_frame);
-                console.log("!!!!! " + debugState)
+                console.log("stepping")
+
+
+
                 setDebugState("stepping")
               }
             } style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Step</Button>
-            )}
         </div>
         {/* {showVars && realActors && realActors.map((realActor) => (
           <Card key={realActor.class_name}>

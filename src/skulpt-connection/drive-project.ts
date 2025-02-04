@@ -356,7 +356,7 @@ export class ProjectEngine {
     const renderResult = this.render(project);
     renderResult.webApiCalls.forEach((f) => f());
 
-    if (this.debugState !== "paused") {
+    if (!projectState.braked) {
       if (renderResult.succeeded) {
         window.requestAnimationFrame(this.oneFrame);
       } else {
