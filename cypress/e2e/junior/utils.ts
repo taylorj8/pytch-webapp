@@ -430,7 +430,11 @@ export const launchAddSprite = () =>
  * something" buttons.  The arg `match` should be contained in the label
  * of the button to click. */
 export const clickAddSomething = (match: string) =>
-  cy.get("div.tab-pane.active .AddSomethingButton").contains(match).click();
+  cy
+    .get(".IDELayout div.tab-pane.active .AddSomethingButton")
+    .contains(match)
+    .should("have.length", 1)
+    .click();
 
 /** Assuming that we are in the per-method IDE, launch the "add from
  * media library" modal dialog, and for each of the given `matches`,
