@@ -17,6 +17,8 @@ import { LinkedContentBar } from "./LinkedContentBar";
 import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
 
+// var Range = ace.require('ace/range').Range;
+
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
     (state) => state.activeProject.syncState,
@@ -28,8 +30,8 @@ const ReadOnlyOverlay = () => {
     syncState.loadState === "pending"
       ? "Loading..."
       : syncState.saveState === "pending"
-      ? "Saving..."
-      : null;
+        ? "Saving..."
+        : null;
 
   if (maybeMessage != null) {
     return (
@@ -51,10 +53,16 @@ const CodeAceEditor = () => {
   const inDebugMode = useStoreState(
     (state) => state.activeProject.inDebugMode
   )
+  const debugLine = useStoreState(
+    (state) => state.activeProject.debugLine
+  )
   const editSeqNum = useStoreState((state) => state.activeProject.editSeqNum);
   const lastSyncFromStorageSeqNum = useStoreState(
     (state) => state.activeProject.lastSyncFromStorageSeqNum
   );
+
+  const { addBreakpoint, removeBreakpoint }
+    = useStoreActions((actions) => actions.activeProject);
 
   // We don't care about the actual value of the stage display size, but
   // we do need to know when it changes, so we can resize the editor in
@@ -69,12 +77,12 @@ const CodeAceEditor = () => {
     ace.editor.commands.addCommand({
       name: "buildAndGreenFlag",
       bindKey: { mac: "Ctrl-Enter", win: "Ctrl-Enter" },
-      exec: () => build({focusDestination: "running-project", inDebugMode: false}),
+      exec: () => build({ focusDestination: "running-project", inDebugMode: false, breakpoints: new Set() }),
     });
     ace.editor.commands.addCommand({
       name: "buildAndGreenFlagKeepFocus",
       bindKey: { mac: "Ctrl-Shift-Enter", win: "Ctrl-Shift-Enter" },
-      exec: () => build({focusDestination: "editor", inDebugMode: false}),
+      exec: () => build({ focusDestination: "editor", inDebugMode: false, breakpoints: new Set() }),
     });
     ace.editor.commands.addCommand({
       name: "copySelectionAsHtml",
@@ -84,17 +92,28 @@ const CodeAceEditor = () => {
       },
     });
 
-    ace.editor.session.addMarker(
-      new Range(10, 0, 11, 1),
-      "line-11-marker",
-      "fullLine"
-    );
+    // toggleable breakpoints
+    ace.editor.on("guttermousedown", (e: any) => {
+      if (e.domEvent.target.className.indexOf("ace_gutter-cell") == -1) {
+        return;
+      }
 
-    ace.editor.session.addMarker(
-      new Range(0, 0, 1, 1),
-      "error-marker",
-      "text"
-    );
+      var breakpoints = e.editor.session.getBreakpoints(row, 0);
+      var row = e.getDocumentPosition().row;
+
+      // If there's a breakpoint already defined, it should be removed, offering the toggle feature
+      if (typeof breakpoints[row] === typeof undefined) {
+        e.editor.session.setBreakpoint(row);
+        addBreakpoint(row)
+      } else {
+        e.editor.session.clearBreakpoint(row);
+        removeBreakpoint(row)
+      }
+
+      e.stop();
+    });
+
+    ace.editor.session.addMarker(new Range(debugLine, 0, debugLine, 1), "debugLine", "fullLine");
 
     // It seems common to have not ever heard of "overwrite" mode.  If
     // it gets turned on by mistake, people often get confused.  Ensure
@@ -123,15 +142,6 @@ const CodeAceEditor = () => {
   //
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const completers = [new PytchAceAutoCompleter() as any];
-
-  const markers = [{
-    startRow: 0,
-    startCol: 0,
-    endRow: 1,
-    endCol: 1,
-    className: 'error-marker',
-    type: 'text'
-  }];
 
   return (
     <>

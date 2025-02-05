@@ -14,6 +14,8 @@ import {
   MaybeUserAnswerSubmissionToVM,
 } from "../model/user-text-input";
 import { DebugState } from "../model/project";
+import { useStoreActions, useStoreState } from "../store";
+import { set } from "date-fns";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -328,8 +330,15 @@ export class ProjectEngine {
       return;
     }
     
+    // todo fix this (hook not allowed here)
+    const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine);
+
     // only run the one_frame methods if the program isn't at a breakpoint
-    if (!project.is_braked()) {
+    if (project.is_braked()) {
+      const susp = project.get_debug_suspension();
+      setDebugLine(susp.line_number);
+      console.log("suspended at line", susp.line_number);
+    } else {
       const maybeQuestionAnswer =
         this.webAppAPI.maybeAcquireUserInputSubmission();
       if (maybeQuestionAnswer != null) {

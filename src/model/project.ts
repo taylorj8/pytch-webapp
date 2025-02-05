@@ -89,7 +89,9 @@ import {
   NotableChangesManager,
   NotableChangesManagerOps,
 } from "./notable-changes";
+import { enableMapSet } from "immer";
 
+enableMapSet();
 const ensureKind = PytchProgramOps.ensureKind;
 
 type FocusDestination = "editor" | "running-project";
@@ -243,7 +245,7 @@ function assertLinkedContentSucceededOfKind<KindT extends LinkedContentKind>(
   if (contentKind !== requiredContentKind) {
     throw new Error(
       `required linked-content-kind "${requiredContentKind}"` +
-        ` but have kind "${contentKind}"`
+      ` but have kind "${contentKind}"`
     );
   }
 }
@@ -407,7 +409,7 @@ export interface IActiveProject {
   setActiveTutorialChapter: Action<IActiveProject, number>;
 
   incrementBuildSeqnum: Action<IActiveProject>;
-  build: Thunk<IActiveProject, { focusDestination: FocusDestination; inDebugMode: boolean }, void, IPytchAppModel>;
+  build: Thunk<IActiveProject, { focusDestination: FocusDestination; inDebugMode: boolean; breakpoints: Set<number> }, void, IPytchAppModel>;
 
   ////////////////////////////////////////////////////////////////////////
   // Background sync
@@ -420,6 +422,13 @@ export interface IActiveProject {
   debugState: DebugState;
   inDebugMode: boolean;
   setDebugState: Action<IActiveProject, DebugState>;
+
+  breakpoints: Set<number>;
+  addBreakpoint: Action<IActiveProject, number>;
+  removeBreakpoint: Action<IActiveProject, number>;
+
+  debugLine: number;	
+  setDebugLine: Action<IActiveProject, number>;
 }
 
 const dummyPytchProgram = PytchProgramOps.fromPythonCode(
@@ -772,7 +781,7 @@ export const activeProject: IActiveProject = {
 
   setCodeTextAndBuild: thunk(async (actions, payload) => {
     actions.setCodeText(payload.codeText);
-    await actions.build({ focusDestination: payload.focusDestination, inDebugMode: false });
+    await actions.build({ focusDestination: payload.focusDestination, inDebugMode: false, breakpoints: new Set() });
   }),
 
   syncDummyProject: action((state) => {
@@ -868,8 +877,8 @@ export const activeProject: IActiveProject = {
       if (liveLoadRequest.seqnum !== ourSeqnum) {
         console.log(
           "ensureSyncFromStorage():" +
-            ` live seqnum is ${liveLoadRequest.seqnum}` +
-            ` but we are working on ${ourSeqnum}; abandoning`
+          ` live seqnum is ${liveLoadRequest.seqnum}` +
+          ` but we are working on ${ourSeqnum}; abandoning`
         );
         return;
       }
@@ -984,7 +993,7 @@ export const activeProject: IActiveProject = {
   addAssetAndSync: thunk(async (actions, descriptor, helpers) => {
     console.log(
       `adding asset ${descriptor.name}: ${descriptor.mimeType}` +
-        ` (${descriptor.data.byteLength} bytes)`
+      ` (${descriptor.data.byteLength} bytes)`
     );
 
     const project = helpers.getState().project;
@@ -1021,17 +1030,17 @@ export const activeProject: IActiveProject = {
     try {
       await renameAssetInProject(project.id, oldName, newName);
     } catch (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      err: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    err: any
     ) {
       if (err.name === "PytchDuplicateAssetNameError") {
         const opContext = descriptor.operationContext;
         throw new Error(
           `Cannot rename "${descriptor.oldNameSuffix}"` +
-            ` to "${descriptor.newNameSuffix}" because` +
-            ` ${opContext.scope} already contains` +
-            ` ${opContext.assetIndefinite} called` +
-            ` "${descriptor.newNameSuffix}".`
+          ` to "${descriptor.newNameSuffix}" because` +
+          ` ${opContext.scope} already contains` +
+          ` ${opContext.assetIndefinite} called` +
+          ` "${descriptor.newNameSuffix}".`
         );
       } else {
         throw err;
@@ -1133,10 +1142,10 @@ export const activeProject: IActiveProject = {
             const wipChapter = newContent.workInProgressChapter;
             appendTimestamped(
               `server:tutorial: update; ${newContent.chapters.length} chapter/s` +
-                (wipChapter != null
-                  ? `; working on chapter ${wipChapter}` +
-                    ` "${newContent.chapters[wipChapter].title}"`
-                  : "")
+              (wipChapter != null
+                ? `; working on chapter ${wipChapter}` +
+                ` "${newContent.chapters[wipChapter].title}"`
+                : "")
             );
             const newTrackedTutorial = {
               content: newContent,
@@ -1171,7 +1180,7 @@ export const activeProject: IActiveProject = {
     const { appendTimestamped } = helpers.getStoreActions().editorWebSocketLog;
     appendTimestamped(
       `error with websocket connection;` +
-        ` ensure server is running at ${liveReloadURL}`
+      ` ensure server is running at ${liveReloadURL}`
     );
   }),
 
@@ -1193,7 +1202,7 @@ export const activeProject: IActiveProject = {
   }),
 
   build: thunk(
-    async (actions, {focusDestination, inDebugMode}, helpers): Promise<BuildOutcome> => {
+    async (actions, { focusDestination, inDebugMode, breakpoints }, helpers): Promise<BuildOutcome> => {
       const project = helpers.getState().project;
       failIfDummy(project, "build");
 
@@ -1235,7 +1244,7 @@ export const activeProject: IActiveProject = {
       // which does mean we need to do this bit ourselves too, ugh:
       helpers.getStoreActions().projectCollection.noteDatabaseChange();
 
-      const buildOutcome = await build(project, appendOutput, recordError, inDebugMode);
+      const buildOutcome = await build(project, appendOutput, recordError, inDebugMode, breakpoints);
 
       const programKind = project.program.kind;
       const outcomeKind = BuildOutcomeKindOps.displayName(buildOutcome.kind);
@@ -1301,7 +1310,7 @@ export const activeProject: IActiveProject = {
     if (state.nPendingSyncActions < 0) {
       console.warn(
         `nPendingSyncActions = ${state.nPendingSyncActions} < 0;` +
-          " clamping to zero"
+        " clamping to zero"
       );
       state.nPendingSyncActions = 0;
     }
@@ -1314,5 +1323,20 @@ export const activeProject: IActiveProject = {
     console.log("setDebugState(): ", newDebugState);
     state.debugState = newDebugState;
     state.inDebugMode = newDebugState !== "running" && newDebugState !== "stopped";
+  }),
+
+  breakpoints: new Set<number>(),
+  addBreakpoint: action((state, line) => {
+    console.log("addBreakpoint():", line);
+    state.breakpoints.add(line);
+  }),
+  removeBreakpoint: action((state, line) => {
+    state.breakpoints.delete(line);
+    console.log("removeBreakpoint():", line);
+  }),
+
+  debugLine: -1,
+  setDebugLine: action((state, line) => {
+    state.debugLine = line;
   }),
 };

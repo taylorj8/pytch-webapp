@@ -28,17 +28,11 @@ const getActors = () => {
 };
 
 export const DebugPane: React.FC<EmptyProps> = () => {
-
-  const code = useStoreState(
-    (state) => PytchProgramOps.ensureKind("DebugPane", state.activeProject.project.program, "flat")
-  );
-
-  const debugState = useStoreState((state) => state.activeProject.debugState)
+  // const debugState = useStoreState((state) => state.activeProject.debugState)
   const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState)
+  const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine)
 
   const project = Sk.pytch.current_live_project
-  // console.log("actors:")
-  // console.log(realActors)
 
   return (
     <div className="DebugPane">
@@ -48,6 +42,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
         <Button className="ContinueButton" variant="warning" onClick={
               () => {
                 console.log("continue")
+                setDebugLine(-1)
                 project.continue_on_breakpoint()
               }
             }style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Continue</Button>

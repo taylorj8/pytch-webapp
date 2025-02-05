@@ -364,6 +364,18 @@ $speech-bubble-max-height: 180px;
     font-family: $monospace-fonts;
   }
 
+  .ace_gutter-cell.ace_breakpoint{ 
+    border-radius: 20px 0px 0px 20px;
+    /* Change the color of the breakpoint if you want */
+    box-shadow: 0px 0px 1px 1px #d41818 inset; 
+  }
+
+  .debugLine {
+   position: absolute;
+   background: rgba(204, 35, 35, 0.5);
+   z-index: 20
+  }
+
   .help-sidebar {
     display: flex;
     flex-direction: row;
