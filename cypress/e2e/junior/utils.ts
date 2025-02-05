@@ -436,6 +436,17 @@ export const clickAddSomething = (match: string) =>
     .should("have.length", 1)
     .click();
 
+const launchAddFun = (match: string) => () => clickAddSomething(match);
+
+/** Assuming that we are in the IDE, click, an "add something" button,
+ * according to the function-valued property. */
+export const launchAdd = {
+  sprite: launchAddFun("Add sprite"),
+  assetFromThisDevice: launchAddFun("Add from this device"),
+  assetFromMediaLibrary: launchAddFun("Add from media library"),
+  script: launchAddFun("Add script"),
+};
+
 /** Assuming that we are in the per-method IDE, launch the "add from
  * media library" modal dialog, and for each of the given `matches`,
  * select the matching card. */
