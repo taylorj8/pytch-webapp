@@ -345,7 +345,7 @@ export class ScriptOps {
   static launchAddHandler() {
     selectSprite("Snake");
     selectActorAspect("Code");
-    cy.get(".Junior-CodeEditor .AddSomethingButton").click();
+    launchAdd.script();
   }
 
   /** Add a script to the focused actor.  The given
@@ -451,7 +451,7 @@ export const launchAdd = {
  * media library" modal dialog, and for each of the given `matches`,
  * select the matching card. */
 export const initiateAddFromMediaLib = (matches: Array<string>) => {
-  clickAddSomething("from media library");
+  launchAdd.assetFromMediaLibrary();
 
   for (const match of matches) {
     // Sometimes the media library is scrolled such that the chosen

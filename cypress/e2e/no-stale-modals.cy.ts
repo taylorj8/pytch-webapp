@@ -16,6 +16,7 @@ import {
   clickAddSomething,
   clickUniqueButton,
   launchAddSprite,
+  launchAdd,
   launchDeleteActorByIndex,
   launchDeleteAssetByIndex,
   launchDeleteHandlerByIndex,
@@ -300,17 +301,14 @@ context("Modals are cancelled when navigating away", () => {
 
   itCanAbandon("add assets (flat)", {
     page: { kind: "ide", projectIdx: kFlatProjectIdx },
-    runModal: () =>
-      cy.get("div.AddSomethingButton").contains("Add from this device").click(),
+    runModal: launchAdd.assetFromThisDevice,
     afterwardsExpect: assertFlatAssetsUnchanged,
   });
 
   itCanAbandon("add clip art (flat)", {
     page: { kind: "ide", projectIdx: kFlatProjectIdx },
     runModal: () => {
-      cy.get("div.AddSomethingButton")
-        .contains("Add from media library")
-        .click();
+      launchAdd.assetFromMediaLibrary();
       cy.get(".clipart-card").contains("blocks").click();
     },
     afterwardsExpect: assertFlatAssetsUnchanged,
@@ -336,7 +334,7 @@ context("Modals are cancelled when navigating away", () => {
 
   itCanAbandon("add sprite", {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
-    runModal: launchAddSprite,
+    runModal: launchAdd.sprite,
     afterwardsExpect: assertActorNamesUnchanged,
   });
 
@@ -359,7 +357,7 @@ context("Modals are cancelled when navigating away", () => {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
     runModal: () => {
       selectSnakeCode();
-      clickAddSomething("Add script");
+      launchAdd.script();
     },
     afterwardsExpect: assertSnakeHatBlocksUnchanged,
   });
@@ -387,7 +385,7 @@ context("Modals are cancelled when navigating away", () => {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
     runModal: () => {
       selectSnakeCostumes();
-      clickAddSomething("from this device");
+      launchAdd.assetFromThisDevice();
     },
   });
 
@@ -426,7 +424,7 @@ context("Modals are cancelled when navigating away", () => {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
     runModal: () => {
       selectSnakeCostumes();
-      clickAddSomething("Add from media library");
+      launchAdd.assetFromMediaLibrary();
       cy.get(".clipart-card").contains("blocks").click();
     },
     afterwardsExpect: assertSnakeCostumesUnchanged,

@@ -4,6 +4,7 @@ import {
   assertCostumeNames,
   elementIsVisible,
   launchAddSprite,
+  launchAdd,
   launchDeleteActorByIndex,
   launchRenameActorByIndex,
   selectActorAspect,
@@ -19,14 +20,14 @@ context("Work with list of actors", () => {
   it("can add sprites", () => {
     assertActorNames(["Stage", "Snake"]);
 
-    launchAddSprite();
+    launchAdd.sprite();
     settleModalDialog("OK");
     assertActorNames(["Stage", "Snake", "Sprite1"]);
 
     selectSprite("Snake");
     assertActorFocusedByIndex(1);
 
-    launchAddSprite();
+    launchAdd.sprite();
     cy.get(".modal-dialog input").type("{selectAll}{del}Banana");
     settleModalDialog("OK");
     assertActorNames(["Stage", "Snake", "Sprite1", "Banana"]);
@@ -64,9 +65,9 @@ context("Work with list of actors", () => {
 
     selectActorAspect("Backdrops");
 
-    launchAddSprite();
+    launchAdd.sprite();
     settleModalDialog("OK");
-    launchAddSprite();
+    launchAdd.sprite();
     settleModalDialog("OK");
     assertActorNames(["Stage", "Snake", "Sprite1", "Sprite2"]);
 
@@ -88,7 +89,7 @@ context("Work with list of actors", () => {
     { actionName: "delete", launchFun: launchDeleteActorByIndex },
   ].forEach((spec) =>
     it(`can cancel ${spec.actionName} of Sprite`, () => {
-      launchAddSprite();
+      launchAdd.sprite();
       settleModalDialog("OK");
 
       const assertUnchanged = () =>
@@ -109,7 +110,7 @@ context("Work with list of actors", () => {
   );
 
   it("can rename a sprite", () => {
-    launchAddSprite();
+    launchAdd.sprite();
     settleModalDialog("OK");
 
     const inputNewName = (name: string) =>
@@ -158,9 +159,9 @@ context("Work with list of actors", () => {
   };
 
   it("can delete all sprites", () => {
-    launchAddSprite();
+    launchAdd.sprite();
     settleModalDialog("OK");
-    launchAddSprite();
+    launchAdd.sprite();
     settleModalDialog("OK");
 
     assertActorNames(["Stage", "Snake", "Sprite1", "Sprite2"]);
