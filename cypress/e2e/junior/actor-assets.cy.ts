@@ -4,10 +4,10 @@ import {
   assertBackdropNames,
   assertCostumeNames,
   assertSoundNames,
-  clickAddSomething,
   clickHeaderCloseButton,
   clickUniqueButton,
   initiateAddFromMediaLib,
+  launchAdd,
   launchDeleteAssetByIndex,
   launchRenameAssetByIndex,
   selectActorAspect,
@@ -28,7 +28,7 @@ context("Working with assets of an actor", () => {
   };
 
   const initiateAddFromFixture = (fixtureBasename: string) => {
-    clickAddSomething("from this device");
+    launchAdd.assetFromThisDevice();
 
     // TODO: Remove dup with attachSamples() in project-asset-list.cy.ts
     const fixtureFilename = `sample-project-assets/${fixtureBasename}`;
@@ -163,7 +163,7 @@ context("Working with assets of an actor", () => {
 
   it("has useful UI text for uploading", () => {
     const assertContentCorrect = (headerMatch: string, bodyMatch: string) => {
-      clickAddSomething("from this device");
+      launchAdd.assetFromThisDevice();
       cy.get(".modal-header").contains(headerMatch);
       cy.get(".modal-body").contains(bodyMatch);
       settleModalDialog("Cancel");
