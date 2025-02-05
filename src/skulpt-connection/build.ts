@@ -5,8 +5,6 @@ import { ensureSoundManager } from "./sound-manager";
 import { ProjectContent } from "../model/project-core";
 import { AssetPresentation } from "../model/asset";
 
-// import Debugger from "./debugger";
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
 // declare let Debugger: any;

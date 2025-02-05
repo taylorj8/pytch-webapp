@@ -27,32 +27,6 @@ const getActors = () => {
   // return actorNames;
 };
 
-
-const extractNames = (text: string) => {
-  const separatorRegex = /(class\s)[\s\S]*?(?=class|$)/g;
-  const classRegex = /class (\w+)/;
-  const actors: { actor: string; scripts: string[] }[] = [];
-  const scriptRegex = /@pytch\..*\n\s*def\s+(\w+)/g
-
-  let wholeClass;
-  while ((wholeClass = separatorRegex.exec(text)) !== null) {
-    const className = classRegex.exec(wholeClass[0])
-    const scripts: string[] = [];
-    let scriptMatch;
-
-    scriptRegex.lastIndex = 0;
-    while ((scriptMatch = scriptRegex.exec(wholeClass[0])) !== null) {
-      scripts.push(scriptMatch[1]);
-    }
-
-    if (className && scripts.length > 0) {
-      actors.push({ actor: className[1], scripts: scripts });
-    }
-  }
-
-  return actors;
-}
-
 export const DebugPane: React.FC<EmptyProps> = () => {
 
   const code = useStoreState(
@@ -62,62 +36,29 @@ export const DebugPane: React.FC<EmptyProps> = () => {
   const debugState = useStoreState((state) => state.activeProject.debugState)
   const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState)
 
-  const actors = extractNames(code.text)
-  if (!actors) {
-    return <div></div>
-  }
-
-  const [buttonName, setButtonName] = React.useState<"Pause" | "Play">("Pause");
-  const [showVars, setShowVars] = React.useState<boolean>(false);
-
-  const realActors: any[] = Sk.pytch.current_live_project.actors
-  console.log("actors:")
-  console.log(realActors)
+  const project = Sk.pytch.current_live_project
+  // console.log("actors:")
+  // console.log(realActors)
 
   return (
     <div className="DebugPane">
-      <h1>Choose a script to debug</h1>
+      <h1>Debug</h1>
       <div className="card-container">
-        {actors.map(({ actor, scripts }) => (
-          <Card>
-            <Card.Body>
-              <Card.Title>{actor}</Card.Title>
-              {scripts.map((script, i) => (
-                <Button key={`${actor}Button${i}`} className="DebugScriptButton">{script}</Button>
-              ))}
-            </Card.Body>
-          </Card>
-        ))}
         <div>
+        <Button className="ContinueButton" variant="warning" onClick={
+              () => {
+                console.log("continue")
+                project.continue_on_breakpoint()
+              }
+            }style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Continue</Button>
         <Button className="StepButton" variant="warning" onClick={
               () => {
                 console.log("stepping")
-
-
-
                 setDebugState("stepping")
               }
-            } style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Step</Button>
+            }style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Step</Button>
         </div>
         {/* {showVars && realActors && realActors.map((realActor) => (
-          <Card key={realActor.class_name}>
-            <Card.Body>
-              <Card.Title>{realActor.class_name}</Card.Title>
-              <Button className="DebugScriptButton">
-                {(() => {
-                  try {
-                    console.log(realActor)
-                    return realActor.instances[0].js_attr("y_position");
-                  } catch (e) {
-                    console.error(e);
-                    return "Error";
-                  }
-                })()}
-              </Button>
-            </Card.Body>
-          </Card>
-        ))} */}
-        {showVars && realActors && realActors.map((realActor) => (
           <Card key={realActor.class_name}>
             <Card.Body>
               <Card.Title>{realActor.class_name}</Card.Title>
@@ -135,7 +76,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
               ))}
             </Card.Body>
           </Card>
-        ))}
+        ))} */}
 
       </div>
     </div>

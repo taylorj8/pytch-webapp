@@ -327,50 +327,54 @@ export class ProjectEngine {
       console.log(`${logIntro}: no real live project; bailing`);
       return;
     }
+    
+    // only run the one_frame methods if the program isn't at a breakpoint
+    if (!project.is_braked()) {
+      const maybeQuestionAnswer =
+        this.webAppAPI.maybeAcquireUserInputSubmission();
+      if (maybeQuestionAnswer != null) {
+        project.accept_question_answer(
+          maybeQuestionAnswer.questionId,
+          maybeQuestionAnswer.answer
+        );
+      }
+        
+      Sk.pytch.sound_manager.one_frame();
+      const projectState = project.one_frame();
 
-    const maybeQuestionAnswer =
-      this.webAppAPI.maybeAcquireUserInputSubmission();
-    if (maybeQuestionAnswer != null)
-      project.accept_question_answer(
-        maybeQuestionAnswer.questionId,
-        maybeQuestionAnswer.answer
-      );
-
-    Sk.pytch.sound_manager.one_frame();
-    const projectState = project.one_frame();
-
-    if (projectState.exception_was_raised) {
-      this.webAppAPI.ensureNotFullScreen();
-    }
-
-    const question = projectState.maybe_live_question;
-    if (question == null) {
-      this.webAppAPI.clearUserQuestion();
-    } else {
-      this.webAppAPI.askUserQuestion({
-        id: question.id,
-        prompt: question.prompt,
-      });
+      if (projectState.exception_was_raised) {
+        this.webAppAPI.ensureNotFullScreen();
+      }
+  
+      const question = projectState.maybe_live_question;
+      if (question == null) {
+        this.webAppAPI.clearUserQuestion();
+      } else {
+        this.webAppAPI.askUserQuestion({
+          id: question.id,
+          prompt: question.prompt,
+        });
+      }
     }
 
     const renderResult = this.render(project);
     renderResult.webApiCalls.forEach((f) => f());
 
-    if (!projectState.braked) {
-      if (renderResult.succeeded) {
-        window.requestAnimationFrame(this.oneFrame);
-      } else {
-        console.log(`${logIntro}: error while rendering; bailing`);
-        this.webAppAPI.clearUserQuestion();
-        this.webAppAPI.setVariableWatchers([]);
-        this.webAppAPI.ensureNotFullScreen();
-      }
+    if (renderResult.succeeded) {
+      window.requestAnimationFrame(this.oneFrame);
+    } else {
+      console.log(`${logIntro}: error while rendering; bailing`);
+      this.webAppAPI.clearUserQuestion();
+      this.webAppAPI.setVariableWatchers([]);
+      this.webAppAPI.ensureNotFullScreen();
     }
 
     if (this.debugState === "stepping") {
       this.debugState = "paused";
     }
   }
+
+
 
   requestHalt() {
     console.log(`ProjectEngine[${this.id}]: requestHalt()`);
