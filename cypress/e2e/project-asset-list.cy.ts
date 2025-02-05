@@ -25,10 +25,6 @@ context("Management of project assets", () => {
     cy.get('.form-control[type="file"]').attachFile(filenames);
   };
 
-  const launchAddFromThisDevice = () => {
-    cy.get("div.AddSomethingButton").contains("Add from this device").click();
-  };
-
   const addAsset = (fixtureBasename: string) => {
     launchAdd.assetFromThisDevice();
     cy.contains("Add to project").should("be.disabled");

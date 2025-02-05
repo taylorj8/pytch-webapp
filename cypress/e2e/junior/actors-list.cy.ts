@@ -3,7 +3,6 @@ import {
   assertBackdropNames,
   assertCostumeNames,
   elementIsVisible,
-  launchAddSprite,
   launchAdd,
   launchDeleteActorByIndex,
   launchRenameActorByIndex,

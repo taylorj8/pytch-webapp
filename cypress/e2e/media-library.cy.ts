@@ -3,10 +3,6 @@
 import { launchAdd } from "./junior/utils";
 import { kExpNTutorials } from "./utils";
 
-const launchAddFromMediaLibrary = () => {
-  cy.get("div.AddSomethingButton").contains("Add from media library").click();
-};
-
 context("can filter media library by tags", () => {
   before(() => {
     cy.pytchExactlyOneProject();

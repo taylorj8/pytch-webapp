@@ -4,7 +4,6 @@ import {
   assertBackdropNames,
   assertCostumeNames,
   assertSoundNames,
-  clickAddSomething,
   clickHeaderCloseButton,
   clickUniqueButton,
   initiateAddFromMediaLib,
