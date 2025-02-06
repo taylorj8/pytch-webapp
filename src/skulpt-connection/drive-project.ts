@@ -333,6 +333,7 @@ export class ProjectEngine {
 
     // only run the one_frame methods if the program isn't at a breakpoint
     if ((debugState === "debugging" || debugState == "stepping") && project.is_braked()) {
+      project.stop_others_listening();
       const debugLine = project.get_debug_line();
       setDebugLine(debugLine);
       setDebugState("paused");
