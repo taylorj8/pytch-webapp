@@ -1328,15 +1328,16 @@ export const activeProject: IActiveProject = {
   breakpoints: new Set<number>(),
   addBreakpoint: action((state, line) => {
     console.log("addBreakpoint():", line);
-    state.breakpoints.add(line);
+    state.breakpoints.add(line + 1);
   }),
   removeBreakpoint: action((state, line) => {
-    state.breakpoints.delete(line);
+    state.breakpoints.delete(line - 1);
     console.log("removeBreakpoint():", line);
   }),
 
   debugLine: -1,
   setDebugLine: action((state, line) => {
+    console.log("!!! 2")
     state.debugLine = line;
   }),
 };

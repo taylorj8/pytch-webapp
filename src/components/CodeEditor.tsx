@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AceEditor from "react-ace";
 import { Range } from "ace-builds";
 import "ace-builds/src-noconflict/mode-python";
@@ -17,7 +17,7 @@ import { LinkedContentBar } from "./LinkedContentBar";
 import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
 
-// var Range = ace.require('ace/range').Range;
+declare let Sk: any;
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -69,6 +69,8 @@ const CodeAceEditor = () => {
   // our useEffect() call below.
   useStoreState((state) => state.ideLayout.stageDisplaySize, eqDisplaySize);
 
+  const [prevMarker, setPrevMarker] = useState<number | null>(null);
+
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
 
@@ -113,8 +115,6 @@ const CodeAceEditor = () => {
       e.stop();
     });
 
-    ace.editor.session.addMarker(new Range(debugLine, 0, debugLine, 1), "debugLine", "fullLine");
-
     // It seems common to have not ever heard of "overwrite" mode.  If
     // it gets turned on by mistake, people often get confused.  Ensure
     // we are in "insert" mode, and also remove any bindings for the
@@ -126,6 +126,24 @@ const CodeAceEditor = () => {
       ace.editor.session.getUndoManager().reset();
     }
   });
+
+  // const project = Sk.pytch.current_live_project;
+  // if (project !== Sk.default_pytch_environment.current_live_project) {
+  //   const newDebugLine = project.get_debug_line();
+  //   setDebugLine(newDebugLine);
+  // }
+
+  useEffect(() => {
+    console.log("!!!!! CodeAceEditor effect: debugLine", debugLine);
+    const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
+    if (prevMarker !== null)
+      ace.editor.session.removeMarker(prevMarker);
+
+    if (debugLine !== null) {
+      const marker = ace.editor.session.addMarker(new Range(debugLine-1, 0, debugLine-1, 1), "debugLine", "fullLine");
+      setPrevMarker(marker);
+    }
+  }, [debugLine]);
 
   const { build, setCodeText } = useStoreActions(
     (actions) => actions.activeProject

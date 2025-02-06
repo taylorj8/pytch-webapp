@@ -14,7 +14,7 @@ import {
   MaybeUserAnswerSubmissionToVM,
 } from "../model/user-text-input";
 import { DebugState } from "../model/project";
-import { useStoreActions, useStoreState } from "../store";
+import store from "../store";
 import { set } from "date-fns";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,7 +67,6 @@ export class ProjectEngine {
   shouldRun: boolean;
   liveSpeechBubbles: Map<SpeakerId, LiveSpeechBubble>;
   webAppAPI: IWebAppAPI;
-  debugState: DebugState;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -114,7 +113,6 @@ export class ProjectEngine {
     this.liveSpeechBubbles = newSpeechBubblesMap();
 
     this.shouldRun = true;
-    this.debugState = "running"
 
     this.oneFrame = this.oneFrame.bind(this);
     console.log(
@@ -312,10 +310,6 @@ export class ProjectEngine {
     };
   }
 
-  setDebugState(debugState: DebugState) {
-    this.debugState = debugState;
-  }
-
   oneFrame() {
     const logIntro = `ProjectEngine[${this.id}].oneFrame()`;
     
@@ -329,16 +323,19 @@ export class ProjectEngine {
       console.log(`${logIntro}: no real live project; bailing`);
       return;
     }
-    
-    // todo fix this (hook not allowed here)
-    const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine);
+
+    const debugState = store.getState().activeProject.debugState;
+    const setDebugState = store.getActions().activeProject.setDebugState;
+    const setDebugLine = store.getActions().activeProject.setDebugLine;
 
     // only run the one_frame methods if the program isn't at a breakpoint
-    if (project.is_braked()) {
-      const susp = project.get_debug_suspension();
-      setDebugLine(susp.line_number);
-      console.log("suspended at line", susp.line_number);
-    } else {
+    if (debugState === "debugging" && project.is_braked()) {
+      console.log("!!! 1")
+      const debugLine = project.get_debug_line();
+      setDebugLine(debugLine);
+      setDebugState("paused");
+    } 
+    else if (debugState === "running" || debugState === "debugging") {
       const maybeQuestionAnswer =
         this.webAppAPI.maybeAcquireUserInputSubmission();
       if (maybeQuestionAnswer != null) {
@@ -377,13 +374,7 @@ export class ProjectEngine {
       this.webAppAPI.setVariableWatchers([]);
       this.webAppAPI.ensureNotFullScreen();
     }
-
-    if (this.debugState === "stepping") {
-      this.debugState = "paused";
-    }
   }
-
-
 
   requestHalt() {
     console.log(`ProjectEngine[${this.id}]: requestHalt()`);

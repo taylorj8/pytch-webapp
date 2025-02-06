@@ -42,6 +42,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
         <Button className="ContinueButton" variant="warning" onClick={
               () => {
                 console.log("continue")
+                setDebugState("debugging")
                 setDebugLine(-1)
                 project.continue_on_breakpoint()
               }
