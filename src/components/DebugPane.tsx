@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// import { IAceEditorProps } from "react-ace";
 import { EmptyProps } from "../utils";
 import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import { useStoreActions, useStoreState } from "../store";
-import { PytchProgramOps } from "../model/pytch-program";
+import { useStoreActions } from "../store";
 import React from "react";
+import { Debugger } from "../skulpt-connection/drive-project";
 
 declare let Sk: any;
 
@@ -42,16 +40,20 @@ export const DebugPane: React.FC<EmptyProps> = () => {
         <Button className="ContinueButton" variant="warning" onClick={
               () => {
                 console.log("continue")
+                Debugger.disable_step_mode()
                 setDebugState("debugging")
                 setDebugLine(-1)
                 project.continue_on_breakpoint()
               }
             }style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Continue</Button>
         <Button className="StepButton" variant="warning" onClick={
-              () => {
-                console.log("stepping")
-                setDebugState("stepping")
-              }
+          () => {
+            console.log("stepping")
+            Debugger.enable_step_mode()
+            setDebugState("stepping")
+            project.continue_on_breakpoint()
+            console.log(Debugger)
+          }
             }style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Step</Button>
         </div>
         {/* {showVars && realActors && realActors.map((realActor) => (
@@ -73,7 +75,6 @@ export const DebugPane: React.FC<EmptyProps> = () => {
             </Card.Body>
           </Card>
         ))} */}
-
       </div>
     </div>
   );

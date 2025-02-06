@@ -16,6 +16,7 @@ import {
 import { DebugState } from "../model/project";
 import store from "../store";
 import { set } from "date-fns";
+// import { Debugger } from "../components/CodeEditor";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -25,6 +26,8 @@ declare let Sk: any;
 //
 // TODO: Is this the best place to put this?
 Sk.configure({});
+export let Debugger = new Sk.Debugger("<stdin>.py", null);
+console.log("Debugger", Debugger);
 
 let peId = 1000;
 
@@ -329,13 +332,12 @@ export class ProjectEngine {
     const setDebugLine = store.getActions().activeProject.setDebugLine;
 
     // only run the one_frame methods if the program isn't at a breakpoint
-    if (debugState === "debugging" && project.is_braked()) {
-      console.log("!!! 1")
+    if ((debugState === "debugging" || debugState == "stepping") && project.is_braked()) {
       const debugLine = project.get_debug_line();
       setDebugLine(debugLine);
       setDebugState("paused");
     } 
-    else if (debugState === "running" || debugState === "debugging") {
+    else if (debugState === "running" || debugState === "debugging" || debugState === "stepping") {
       const maybeQuestionAnswer =
         this.webAppAPI.maybeAcquireUserInputSubmission();
       if (maybeQuestionAnswer != null) {

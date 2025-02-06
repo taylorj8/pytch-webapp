@@ -16,10 +16,7 @@ import { equalILoadSaveStatus } from "../model/project";
 import { LinkedContentBar } from "./LinkedContentBar";
 import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
-
-
-declare let Sk: any
-export let Debugger: any
+import { Debugger } from "../skulpt-connection/drive-project";
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -70,6 +67,10 @@ const CodeAceEditor = () => {
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
 
+  // // todo: is this the best way to do this?
+  // Debugger = new Sk.Debugger("<stdin>.py", null);
+  // console.log("Debugger", Debugger);
+
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
 
@@ -92,9 +93,6 @@ const CodeAceEditor = () => {
         await getFlatAceController()?.copySelectionAsHtml();
       },
     });
-
-    // todo: is this the best way to do this?
-    Debugger = new Sk.Debugger("<stdin>", null);
 
     // toggleable breakpoints
     ace.editor.on("guttermousedown", (e: any) => {

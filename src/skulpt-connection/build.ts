@@ -4,7 +4,7 @@ import { assetServer } from "./asset-server";
 import { ensureSoundManager } from "./sound-manager";
 import { ProjectContent } from "../model/project-core";
 import { AssetPresentation } from "../model/asset";
-import { Debugger } from "../components/CodeEditor"
+import { Debugger } from "../skulpt-connection/drive-project";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
