@@ -17,7 +17,9 @@ import { LinkedContentBar } from "./LinkedContentBar";
 import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
 
-declare let Sk: any;
+
+declare let Sk: any
+export let Debugger: any
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -61,9 +63,6 @@ const CodeAceEditor = () => {
     (state) => state.activeProject.lastSyncFromStorageSeqNum
   );
 
-  const { addBreakpoint, removeBreakpoint }
-    = useStoreActions((actions) => actions.activeProject);
-
   // We don't care about the actual value of the stage display size, but
   // we do need to know when it changes, so we can resize the editor in
   // our useEffect() call below.
@@ -79,12 +78,12 @@ const CodeAceEditor = () => {
     ace.editor.commands.addCommand({
       name: "buildAndGreenFlag",
       bindKey: { mac: "Ctrl-Enter", win: "Ctrl-Enter" },
-      exec: () => build({ focusDestination: "running-project", inDebugMode: false, breakpoints: new Set() }),
+      exec: () => build({ focusDestination: "running-project", inDebugMode: false }),
     });
     ace.editor.commands.addCommand({
       name: "buildAndGreenFlagKeepFocus",
       bindKey: { mac: "Ctrl-Shift-Enter", win: "Ctrl-Shift-Enter" },
-      exec: () => build({ focusDestination: "editor", inDebugMode: false, breakpoints: new Set() }),
+      exec: () => build({ focusDestination: "editor", inDebugMode: false }),
     });
     ace.editor.commands.addCommand({
       name: "copySelectionAsHtml",
@@ -93,6 +92,9 @@ const CodeAceEditor = () => {
         await getFlatAceController()?.copySelectionAsHtml();
       },
     });
+
+    // todo: is this the best way to do this?
+    Debugger = new Sk.Debugger("<stdin>", null);
 
     // toggleable breakpoints
     ace.editor.on("guttermousedown", (e: any) => {
@@ -106,10 +108,10 @@ const CodeAceEditor = () => {
       // If there's a breakpoint already defined, it should be removed, offering the toggle feature
       if (typeof breakpoints[row] === typeof undefined) {
         e.editor.session.setBreakpoint(row);
-        addBreakpoint(row)
+        Debugger.add_breakpoint("<stdin>.py", row+1, 0, false);
       } else {
         e.editor.session.clearBreakpoint(row);
-        removeBreakpoint(row)
+        Debugger.clear_breakpoint("<stdin>.py", row+1, 0, false);
       }
 
       e.stop();

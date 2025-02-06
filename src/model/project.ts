@@ -91,7 +91,6 @@ import {
 } from "./notable-changes";
 import { enableMapSet } from "immer";
 
-enableMapSet();
 const ensureKind = PytchProgramOps.ensureKind;
 
 type FocusDestination = "editor" | "running-project";
@@ -409,7 +408,7 @@ export interface IActiveProject {
   setActiveTutorialChapter: Action<IActiveProject, number>;
 
   incrementBuildSeqnum: Action<IActiveProject>;
-  build: Thunk<IActiveProject, { focusDestination: FocusDestination; inDebugMode: boolean; breakpoints: Set<number> }, void, IPytchAppModel>;
+  build: Thunk<IActiveProject, { focusDestination: FocusDestination; inDebugMode: boolean; }, void, IPytchAppModel>;
 
   ////////////////////////////////////////////////////////////////////////
   // Background sync
@@ -422,10 +421,6 @@ export interface IActiveProject {
   debugState: DebugState;
   inDebugMode: boolean;
   setDebugState: Action<IActiveProject, DebugState>;
-
-  breakpoints: Set<number>;
-  addBreakpoint: Action<IActiveProject, number>;
-  removeBreakpoint: Action<IActiveProject, number>;
 
   debugLine: number;	
   setDebugLine: Action<IActiveProject, number>;
@@ -781,7 +776,7 @@ export const activeProject: IActiveProject = {
 
   setCodeTextAndBuild: thunk(async (actions, payload) => {
     actions.setCodeText(payload.codeText);
-    await actions.build({ focusDestination: payload.focusDestination, inDebugMode: false, breakpoints: new Set() });
+    await actions.build({ focusDestination: payload.focusDestination, inDebugMode: false });
   }),
 
   syncDummyProject: action((state) => {
@@ -1202,7 +1197,7 @@ export const activeProject: IActiveProject = {
   }),
 
   build: thunk(
-    async (actions, { focusDestination, inDebugMode, breakpoints }, helpers): Promise<BuildOutcome> => {
+    async (actions, { focusDestination, inDebugMode }, helpers): Promise<BuildOutcome> => {
       const project = helpers.getState().project;
       failIfDummy(project, "build");
 
@@ -1244,7 +1239,7 @@ export const activeProject: IActiveProject = {
       // which does mean we need to do this bit ourselves too, ugh:
       helpers.getStoreActions().projectCollection.noteDatabaseChange();
 
-      const buildOutcome = await build(project, appendOutput, recordError, inDebugMode, breakpoints);
+      const buildOutcome = await build(project, appendOutput, recordError, inDebugMode);
 
       const programKind = project.program.kind;
       const outcomeKind = BuildOutcomeKindOps.displayName(buildOutcome.kind);
@@ -1325,19 +1320,8 @@ export const activeProject: IActiveProject = {
     state.inDebugMode = newDebugState !== "running" && newDebugState !== "stopped";
   }),
 
-  breakpoints: new Set<number>(),
-  addBreakpoint: action((state, line) => {
-    console.log("addBreakpoint():", line);
-    state.breakpoints.add(line + 1);
-  }),
-  removeBreakpoint: action((state, line) => {
-    state.breakpoints.delete(line - 1);
-    console.log("removeBreakpoint():", line);
-  }),
-
   debugLine: -1,
   setDebugLine: action((state, line) => {
-    console.log("!!! 2")
     state.debugLine = line;
   }),
 };

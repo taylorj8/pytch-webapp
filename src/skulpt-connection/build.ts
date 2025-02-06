@@ -4,10 +4,10 @@ import { assetServer } from "./asset-server";
 import { ensureSoundManager } from "./sound-manager";
 import { ProjectContent } from "../model/project-core";
 import { AssetPresentation } from "../model/asset";
+import { Debugger } from "../components/CodeEditor"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
-// declare let Debugger: any;
 
 const builtinRead = (fileName: string) => {
   if (
@@ -55,30 +55,17 @@ export const build = async (
   addOutputChunk: (chunk: string) => void,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleError: (pytchError: any, errorContext: any) => void,
-  inDebugMode: boolean,
-  breakpoints: Set<number>,
+  inDebugMode: boolean
 ): Promise<BuildOutcome> => {
   if (inDebugMode) {
     console.log("build: in debug mode");
-    // todo make global to allow for dynamic updates
-    const debuggerInstance: any = new Sk.Debugger("<stdin>", () => {
-      console.log("Debugger: output_callback");
-    });
-    console.log("breakpoints")
-    console.log(breakpoints)
-    breakpoints.forEach((line) => {
-      debuggerInstance.add_breakpoint("<stdin>.py", line, 0, false);
-    });
-    // debuggerInstance.add_breakpoint("<stdin>.py", 24, 0, false);
-    console.log(debuggerInstance)
-    
     Sk.configure({
       __future__: Sk.python3,
       read: builtinRead,
       output: addOutputChunk,
       pytch: { on_exception: handleError },
       debugging: true,
-      breakpoints: debuggerInstance.check_breakpoints.bind(debuggerInstance),
+      breakpoints: Debugger.check_breakpoints.bind(Debugger),
     });
   } else {
     // This also resets the current_live_project slot.

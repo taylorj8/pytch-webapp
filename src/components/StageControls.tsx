@@ -44,7 +44,7 @@ const GreenFlag = () => {
   const build = useStoreActions((actions) => actions.activeProject.build);
   const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
   const handleClick = () => {
-    build({ focusDestination: "running-project", inDebugMode: false, breakpoints: new Set() });
+    build({ focusDestination: "running-project", inDebugMode: false });
     setDebugState("running");
   };
 
@@ -68,9 +68,8 @@ const GreenFlag = () => {
 const YellowDebug = () => {
   const build = useStoreActions((actions) => actions.activeProject.build);
   const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
-  const breakpoints = useStoreState((state) => state.activeProject.breakpoints);
   const handleClick = () => {
-    build({ focusDestination: "running-project", inDebugMode: true, breakpoints: breakpoints });
+    build({ focusDestination: "running-project", inDebugMode: true });
     setDebugState("debugging");
   };
   return (
