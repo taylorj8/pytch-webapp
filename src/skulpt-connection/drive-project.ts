@@ -70,6 +70,7 @@ export class ProjectEngine {
   shouldRun: boolean;
   liveSpeechBubbles: Map<SpeakerId, LiveSpeechBubble>;
   webAppAPI: IWebAppAPI;
+  stepCount: number;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -116,6 +117,7 @@ export class ProjectEngine {
     this.liveSpeechBubbles = newSpeechBubblesMap();
 
     this.shouldRun = true;
+    this.stepCount = 0;
 
     this.oneFrame = this.oneFrame.bind(this);
     console.log(
@@ -328,16 +330,29 @@ export class ProjectEngine {
     }
 
     const debugState = store.getState().activeProject.debugState;
-    const setDebugState = store.getActions().activeProject.setDebugState;
-    const setDebugLine = store.getActions().activeProject.setDebugLine;
 
+    console.log(`debugState: ${debugState} | has_braked_thread: ${project.has_braked_thread()} | stepCount: ${this.stepCount}`)
     // only run the one_frame methods if the program isn't at a breakpoint
-    if ((debugState === "debugging" || debugState == "stepping") && project.is_braked()) {
+    if ((debugState === "debugging" || debugState === "stepping") && project.has_braked_thread()) {
+      const setDebugState = store.getActions().activeProject.setDebugState;
+      const setDebugLine = store.getActions().activeProject.setDebugLine;
       project.stop_others_listening();
-      const debugLine = project.get_debug_line();
-      setDebugLine(debugLine);
+      setDebugLine(project.get_debug_line());
       setDebugState("paused");
+      this.stepCount = 0;
     } 
+    // todo: step counter is a really hacky approach to solving the stepping issue
+    // need to find a better way to handle this
+    else if (debugState === "stepping" && this.stepCount > 10) { 
+      console.log("HI")
+      const setDebugState = store.getActions().activeProject.setDebugState;
+      const setDebugLine = store.getActions().activeProject.setDebugLine;
+      project.allow_all_listening();
+      setDebugLine(-1);
+      setDebugState("debugging");
+      Debugger.disable_step_mode();
+      this.stepCount = 0;
+    }
     else if (debugState === "running" || debugState === "debugging" || debugState === "stepping") {
       const maybeQuestionAnswer =
         this.webAppAPI.maybeAcquireUserInputSubmission();
@@ -364,6 +379,7 @@ export class ProjectEngine {
           prompt: question.prompt,
         });
       }
+      this.stepCount += 1;
     }
 
     const renderResult = this.render(project);
