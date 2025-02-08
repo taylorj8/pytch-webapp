@@ -36,27 +36,6 @@ export const DebugPane: React.FC<EmptyProps> = () => {
     <div className="DebugPane">
       <h1>Debug</h1>
       <div className="card-container">
-        <div>
-        <Button className="ContinueButton" variant="warning" onClick={
-              () => {
-                console.log("continue")
-                Debugger.disable_step_mode()
-                setDebugState("debugging")
-                setDebugLine(-1)
-                project.allow_all_threads_listening()
-                project.continue_on_breakpoint()
-              }
-            }style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Continue</Button>
-        <Button className="StepButton" variant="warning" onClick={
-          () => {
-            console.log("stepping")
-            Debugger.enable_step_mode()
-            setDebugState("debugging")
-            project.continue_on_breakpoint()
-            console.log(Debugger)
-          }
-            }style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Step</Button>
-        </div>
         {/* {showVars && realActors && realActors.map((realActor) => (
           <Card key={realActor.class_name}>
             <Card.Body>

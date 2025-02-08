@@ -9,6 +9,7 @@ import { LayoutChooser } from "./LayoutChooser";
 import { isEnabled as liveReloadEnabled } from "../model/live-reload";
 import { InfoPanelTabKey } from "../model/ui";
 import { DebugPane } from "./DebugPane";
+import { DebugButtons } from "./DebugButtons";
 
 const StandardOutput = () => {
   const text = useStoreState((state) => state.standardOutputPane.text);
@@ -53,8 +54,7 @@ const InfoPanel = () => {
     (state) => state.infoPanel.setActiveTabKey
   );
   const layoutKind = useStoreState((state) => state.ideLayout.kind);
-
-  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState)
+  const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode);
 
   if (isSyncingFromBackEnd) {
     return null;
@@ -63,6 +63,7 @@ const InfoPanel = () => {
   const Tab = TabWithTypedKey<InfoPanelTabKey>;
   return (
     <div className="InfoPanel-container">
+      {inDebugMode && <DebugButtons />}
       <LayoutChooser />
       <Tabs
         className={`InfoPanel ${layoutKind}`}

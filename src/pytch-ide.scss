@@ -498,6 +498,25 @@ $speech-bubble-max-height: 180px;
       width: 24px;
     }
   }
+
+  .DebugButtons {
+    position: absolute;
+    height: 32px;
+    top: 0px;
+    right: 300px;
+    display: flex;
+    flex-direction: row;
+    button {
+      height: 32px;
+      margin-left: 0.5rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    .layout-icon {
+      width: 24px;
+    }
+  }
 }
 
 div.spacer-instead-of-resizer {
