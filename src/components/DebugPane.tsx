@@ -2,59 +2,60 @@
 
 import { EmptyProps } from "../utils";
 import Button from 'react-bootstrap/Button';
-import { useStoreActions } from "../store";
-import React from "react";
+import Card from 'react-bootstrap/Card';
+import { useStoreActions, useStoreState } from "../store";
+import React, { useEffect, useState } from "react";
 import { Debugger } from "../skulpt-connection/drive-project";
 
 declare let Sk: any;
 
-const getActors = () => {
-
-  console.log("TEST")
-
-  const project = Sk.pytch.current_live_project
-
-  if (!project) {
-    console.error("!!! No current live project found !!!");
-    return [];
-  }
-
-  console.log(project.actors)
-
-  // const actorNames = project.actors.map((actor: any) => actor.class_name());
-  // return actorNames;
-};
-
 export const DebugPane: React.FC<EmptyProps> = () => {
-  // const debugState = useStoreState((state) => state.activeProject.debugState)
-  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState)
-  const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine)
+  const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode)
+  const [actors, setActors] = useState<any[]>([]);
 
-  const project = Sk.pytch.current_live_project
+  useEffect(() => {
+    const updateActors = () => {
+      const project = Sk.pytch.current_live_project;
+      if (project && project.actors) {
+        setActors(project.actors[1].instances);
+      }
+    };
 
-  return (
+    const intervalId = setInterval(updateActors, 100); // Update every 0.1s
+    return () => clearInterval(intervalId);
+  });
+
+  if (!inDebugMode) {
+    return <div>Debug mode is off. Please enable debug mode to see the details.</div>;
+  }
+  // const stage = project.actors[0].instances[0]
+  // const actors = project.actors[1].instances
+
+  // console.log(actors[0].info_label)
+
+  return (  
     <div className="DebugPane">
       <h1>Debug</h1>
       <div className="card-container">
-        {/* {showVars && realActors && realActors.map((realActor) => (
-          <Card key={realActor.class_name}>
+        <Card>
+          <Card.Body>
+            <Card.Title>Stage</Card.Title>
+            <Card.Text>
+              <div>Costume: </div>
+            </Card.Text>
+          </Card.Body>
+        </Card>
+        {actors.map((actor: any) => (
+          <Card key={actor.info_label}>
             <Card.Body>
-              <Card.Title>{realActor.class_name}</Card.Title>
-              {realActor.instances.map((instance: any, index: number) => (
-                <Card key={index}>
-                  <Card.Body>
-                    <Card.Title>Instance {index + 1}</Card.Title>
-                    {Object.keys(instance.py_object.$d.entries)
-                      .filter((key) => !key.startsWith("!"))
-                      .map((key) => (
-                      <Button>{key}: {instance.js_attr(key)}</Button>
-                      ))}
-                  </Card.Body>
-                </Card>
-              ))}
+              <Card.Title>{actor.info_label}</Card.Title>
+              <Card.Text>
+                <div>Position: {parseFloat(actor.render_x.toFixed(3))}, {parseFloat(actor.render_y.toFixed(3))}</div>
+                <div>Costume: </div>
+              </Card.Text>
             </Card.Body>
           </Card>
-        ))} */}
+        ))}
       </div>
     </div>
   );

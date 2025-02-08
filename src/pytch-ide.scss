@@ -499,6 +499,26 @@ $speech-bubble-max-height: 180px;
     }
   }
 
+  .DebugPane {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: auto; // Enable horizontal scrolling if needed
+
+    .card-container {
+      display: flex;
+      flex-wrap: nowrap; // Prevent wrapping of cards
+      gap: 1rem; // Adjust the gap between cards as needed
+      flex-grow: 1; // Allow the container to grow vertically
+    }
+
+    .card {
+      flex: 0 0 250px; // Set a constant width for the cards
+      min-width: 250px; // Ensure the minimum width is the same as the constant width
+      margin-bottom: auto;
+    }
+  }
+
   .DebugButtons {
     position: absolute;
     height: 32px;
