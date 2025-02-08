@@ -43,7 +43,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
                 Debugger.disable_step_mode()
                 setDebugState("debugging")
                 setDebugLine(-1)
-                project.allow_all_listening()
+                project.allow_all_threads_listening()
                 project.continue_on_breakpoint()
               }
             }style={{ display: 'block', marginBottom: '10px', minWidth: '70px' }}>Continue</Button>
@@ -51,7 +51,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
           () => {
             console.log("stepping")
             Debugger.enable_step_mode()
-            setDebugState("stepping")
+            setDebugState("debugging")
             project.continue_on_breakpoint()
             console.log(Debugger)
           }

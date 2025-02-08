@@ -260,7 +260,7 @@ type NoteChangeAugArgs = {
 };
 
 type LoadPhase = "booting" | "booted";
-export type DebugState = "stopped" | "running" | "debugging" | "paused" | "stepping"
+export type DebugState = "stopped" | "running" | "debugging" | "paused"
 
 export interface IActiveProject {
   changesManager: NotableChangesManager;
