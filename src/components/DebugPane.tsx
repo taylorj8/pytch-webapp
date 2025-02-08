@@ -36,6 +36,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
   const [stage, setStage] = useState<any>();
   const [actors, setActors] = useState<any[]>([]);
   const [liveProject, setProject] = useState<any>();
+  const [highlightedActor, setHighlightedActor] = useState<string>("");
 
   useEffect(() => {
     const updateActors = () => {
@@ -46,7 +47,14 @@ export const DebugPane: React.FC<EmptyProps> = () => {
       }
       if (project !== Sk.default_pytch_environment.current_live_project) {
         setProject(project);
+        if (project.get_debug_suspension() === null) {
+          setHighlightedActor("");
+        }
+        else {
+          setHighlightedActor(project.get_debug_suspension().$tmps.self.$pytchActorInstance.info_label);
+        }
       }
+      console.log(highlightedActor);
     };
 
     const intervalId = setInterval(updateActors, 100); // Update every 0.1s
@@ -78,7 +86,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
             </Card.Text>
           </Card.Body>
         </Card>}
-        {stage && <Card>
+        {stage && <Card className={highlightedActor === stage.info_label ? "highlighted-card" : ""}>
           <Card.Body>
             <Card.Title>
               <img src={getImageSrc(stage)} className="card-title-img" />
@@ -90,7 +98,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
           </Card.Body>
         </Card>}
         {actors.map((actor: any) => (
-          <Card key={actor.info_label}>
+          <Card key={actor.info_label} className={highlightedActor === actor.info_label ? "highlighted-card" : ""}>
             <Card.Body>
               <Card.Title>
                 <img src={getImageSrc(actor)} className="card-title-img" />
@@ -104,6 +112,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
           </Card>
         ))}
       </div>
+      {/* <div className="spacer"/> */}
     </div>
   );
 };
