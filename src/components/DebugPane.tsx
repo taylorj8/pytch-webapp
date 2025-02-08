@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { EmptyProps } from "../utils";
-import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import { useStoreActions, useStoreState } from "../store";
+import { useStoreState } from "../store";
 import React, { useEffect, useState } from "react";
-import { Debugger } from "../skulpt-connection/drive-project";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEarthEurope } from '@fortawesome/free-solid-svg-icons';
 
 declare let Sk: any;
 
@@ -35,13 +35,17 @@ export const DebugPane: React.FC<EmptyProps> = () => {
   const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode)
   const [stage, setStage] = useState<any>();
   const [actors, setActors] = useState<any[]>([]);
+  const [liveProject, setProject] = useState<any>();
 
   useEffect(() => {
     const updateActors = () => {
       const project = Sk.pytch.current_live_project;
       if (project && project.actors) {
-        setStage(project.actors[0].instances[0]);
+        setStage(project.actors[0].instances[0]); // todo: check if there is always only one stage
         setActors(project.actors[1].instances);
+      }
+      if (project !== Sk.default_pytch_environment.current_live_project) {
+        setProject(project);
       }
     };
 
@@ -52,19 +56,32 @@ export const DebugPane: React.FC<EmptyProps> = () => {
   if (!inDebugMode) {
     return <div>Debug mode is off. Please enable debug mode to see the details.</div>;
   }
-  // const stage = project.actors[0].instances[0]
-  // const actors = project.actors[1].instances
-
-  // console.log(actors[0].info_label)
 
   return (  
     <div className="DebugPane">
       <h2>Debug</h2>
       <div className="card-container">
+        {liveProject && <Card>
+          <Card.Body>
+            <Card.Title>
+              <FontAwesomeIcon icon={faEarthEurope} className="card-title-icon"/>
+              Global Variables
+            </Card.Title>
+            <Card.Text>
+                {Object.entries(liveProject.$containingModule.$d)
+                .filter(([key, value]) => !key.startsWith("_") && !key.startsWith("$") && typeof value !== "function" && !String(value).startsWith("<module"))
+                .map(([key, value]) => (
+                  <div key={key}>
+                  {key}: {String(value)}
+                  </div>
+                ))}
+            </Card.Text>
+          </Card.Body>
+        </Card>}
         {stage && <Card>
           <Card.Body>
             <Card.Title>
-              <img src={getImageSrc(stage)} className="card-title-icon" />
+              <img src={getImageSrc(stage)} className="card-title-img" />
               {stage.info_label}
             </Card.Title>
             <Card.Text>
@@ -76,7 +93,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
           <Card key={actor.info_label}>
             <Card.Body>
               <Card.Title>
-                <img src={getImageSrc(actor)} className="card-title-icon" />
+                <img src={getImageSrc(actor)} className="card-title-img" />
                 {actor.info_label}
               </Card.Title>
               <Card.Text>
