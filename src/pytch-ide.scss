@@ -499,6 +499,15 @@ $speech-bubble-max-height: 180px;
     }
   }
 
+  .card-title-icon {
+    max-width: 32px;
+    max-height: 32px;
+    width: auto;
+    height: auto;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
   .DebugPane {
     display: flex;
     flex-direction: column;

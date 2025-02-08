@@ -9,14 +9,38 @@ import { Debugger } from "../skulpt-connection/drive-project";
 
 declare let Sk: any;
 
+function getImageSrc(actor: any) {
+  if (!actor) {
+    return "";
+  }
+  return actor.actor._appearances[actor.render_appearance_index].image.currentSrc;
+}
+
+function getActorVars(actor: any) {
+  if (!actor) {
+    return <div/>;
+  }
+  return <div>
+    {Object.entries(Object.getPrototypeOf(actor.py_object))
+    .filter(([key, value]) => !key.startsWith("_") && !String(value).startsWith("<function"))
+    .map(([key, value]) => (
+      <div key={key}>
+      {key}: {String(value)}
+      </div>
+    ))}
+  </div>
+}
+
 export const DebugPane: React.FC<EmptyProps> = () => {
   const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode)
+  const [stage, setStage] = useState<any>();
   const [actors, setActors] = useState<any[]>([]);
 
   useEffect(() => {
     const updateActors = () => {
       const project = Sk.pytch.current_live_project;
       if (project && project.actors) {
+        setStage(project.actors[0].instances[0]);
         setActors(project.actors[1].instances);
       }
     };
@@ -35,23 +59,29 @@ export const DebugPane: React.FC<EmptyProps> = () => {
 
   return (  
     <div className="DebugPane">
-      <h1>Debug</h1>
+      <h2>Debug</h2>
       <div className="card-container">
-        <Card>
+        {stage && <Card>
           <Card.Body>
-            <Card.Title>Stage</Card.Title>
+            <Card.Title>
+              <img src={getImageSrc(stage)} className="card-title-icon" />
+              {stage.info_label}
+            </Card.Title>
             <Card.Text>
-              <div>Costume: </div>
+              {getActorVars(stage)}
             </Card.Text>
           </Card.Body>
-        </Card>
+        </Card>}
         {actors.map((actor: any) => (
           <Card key={actor.info_label}>
             <Card.Body>
-              <Card.Title>{actor.info_label}</Card.Title>
+              <Card.Title>
+                <img src={getImageSrc(actor)} className="card-title-icon" />
+                {actor.info_label}
+              </Card.Title>
               <Card.Text>
                 <div>Position: {parseFloat(actor.render_x.toFixed(3))}, {parseFloat(actor.render_y.toFixed(3))}</div>
-                <div>Costume: </div>
+                {getActorVars(actor)}
               </Card.Text>
             </Card.Body>
           </Card>
