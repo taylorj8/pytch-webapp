@@ -1,18 +1,18 @@
-import React from "react";
 import Button from "react-bootstrap/Button";
-import { useStoreActions, useStoreState } from "../store";
+import { useStoreActions } from "../store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Debugger } from "../skulpt-connection/drive-project";
 import { faEject, faShoePrints } from '@fortawesome/free-solid-svg-icons';
 
+
 declare let Sk: any;
 
 export const DebugButtons = () => {
-  const project = Sk.pytch.current_live_project
   const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState)
   const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine)
 
   const continueCallback = () => {
+    const project = Sk.pytch.current_live_project
     setDebugLine(-1)
     project.allow_all_threads_listening()
     Debugger.disable_step_mode()
@@ -21,6 +21,7 @@ export const DebugButtons = () => {
   }
 
   const stepCallback = () => {
+    const project = Sk.pytch.current_live_project
     Debugger.enable_step_mode()
     setDebugState("debugging")
     project.continue_on_breakpoint()

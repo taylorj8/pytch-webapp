@@ -31,15 +31,33 @@ function getActorVars(actor: any) {
   </div>
 }
 
+import { saveAs } from 'file-saver';
+
+function saveObjectToFile(obj: any, filename: string) {
+  const seen = new WeakSet();
+  const blob = new Blob([JSON.stringify(obj, (key, value) => {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  }, 2)], { type: 'application/json' });
+  saveAs(blob, filename);
+}
+
 export const DebugPane: React.FC<EmptyProps> = () => {
   const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode)
   const [stage, setStage] = useState<any>();
   const [actors, setActors] = useState<any[]>([]);
   const [liveProject, setProject] = useState<any>();
-  const [highlightedActor, setHighlightedActor] = useState<string>("");
+  const [highlightedCard, setHighlightedCard] = useState<string>("");
+  const [localVars, setLocalVars] = useState<any>();
+  const [globalVars, setGlobalVars] = useState<any>();
 
   useEffect(() => {
-    const updateActors = () => {
+    const updateCards = () => {
       const project = Sk.pytch.current_live_project;
       if (project && project.actors) {
         setStage(project.actors[0].instances[0]); // todo: check if there is always only one stage
@@ -47,17 +65,21 @@ export const DebugPane: React.FC<EmptyProps> = () => {
       }
       if (project !== Sk.default_pytch_environment.current_live_project) {
         setProject(project);
-        if (project.get_debug_suspension() === null) {
-          setHighlightedActor("");
-        }
+        setLocalVars(project.get_all_local_variables());
+        setGlobalVars(project.get_global_variables());
+        const suspension = project.get_debug_suspension();
+        if (suspension === null) {
+          setHighlightedCard("");
+        } 
         else {
-          setHighlightedActor(project.get_debug_suspension().$tmps.self.$pytchActorInstance.info_label);
+          // saveObjectToFile(project, "project.json");
+          setHighlightedCard(suspension.$tmps.self.$pytchActorInstance.info_label);
         }
       }
-      console.log(highlightedActor);
     };
 
-    const intervalId = setInterval(updateActors, 100); // Update every 0.1s
+
+    const intervalId = setInterval(updateCards, 100); // Update every 0.1s
     return () => clearInterval(intervalId);
   });
 
@@ -69,44 +91,38 @@ export const DebugPane: React.FC<EmptyProps> = () => {
     <div className="DebugPane">
       <h2>Debug</h2>
       <div className="card-container">
-        {liveProject && <Card>
+        {globalVars && <Card>
           <Card.Body>
             <Card.Title>
               <FontAwesomeIcon icon={faEarthEurope} className="card-title-icon"/>
               Global Variables
             </Card.Title>
-            <Card.Text>
-                {Object.entries(liveProject.$containingModule.$d)
-                .filter(([key, value]) => !key.startsWith("_") && !key.startsWith("$") && typeof value !== "function" && !String(value).startsWith("<module"))
-                .map(([key, value]) => (
+            <Card.Text className="monospace-font">
+              {
+                Object.entries(globalVars).map(([key, value]) => (
                   <div key={key}>
-                  {key}: {String(value)}
+                    {key}: {String(value)}
                   </div>
-                ))}
+                ))
+              }
             </Card.Text>
           </Card.Body>
         </Card>}
-        {stage && <Card className={highlightedActor === stage.info_label ? "highlighted-card" : ""}>
-          <Card.Body>
-            <Card.Title>
-              <img src={getImageSrc(stage)} className="card-title-img" />
-              {stage.info_label}
-            </Card.Title>
-            <Card.Text>
-              {getActorVars(stage)}
-            </Card.Text>
-          </Card.Body>
-        </Card>}
-        {actors.map((actor: any) => (
-          <Card key={actor.info_label} className={highlightedActor === actor.info_label ? "highlighted-card" : ""}>
+        {localVars && Object.entries(localVars).map(([name, vars]: [string, any]) => (
+          <Card key={name} className={highlightedCard === name ? "highlighted-card" : ""}>
             <Card.Body>
               <Card.Title>
-                <img src={getImageSrc(actor)} className="card-title-img" />
-                {actor.info_label}
+                <img src={vars.img_src} className="card-title-img" />
+                {name}
               </Card.Title>
-              <Card.Text>
-                <div>Position: {parseFloat(actor.render_x.toFixed(3))}, {parseFloat(actor.render_y.toFixed(3))}</div>
-                {getActorVars(actor)}
+              <Card.Text className="monospace-font">
+                {vars.position.toString()}
+                  {vars.show_variables("static").map((variable: any, index: number) => (
+                    <div key={index} style={{ color: 'blue' }}>{variable}</div>
+                  ))}
+                {vars.show_variables("local").map((variable: any, index: number) => (
+                    <div key={index}>{variable}</div>
+                  ))}
               </Card.Text>
             </Card.Body>
           </Card>

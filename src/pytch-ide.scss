@@ -521,8 +521,8 @@ $speech-bubble-max-height: 180px;
       margin-right: 0.5rem;
   
       .card {
-        flex: 0 0 250px;
-        min-width: 250px;
+        flex: 0 0 300px;
+        min-width: 300px;
         margin-bottom: 20px;
       }
   
@@ -547,6 +547,11 @@ $speech-bubble-max-height: 180px;
         height: auto;
         margin-right: 0.5rem;
         vertical-align: middle;
+      }
+
+      .monospace-font {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.95rem;
       }
     }
   }
