@@ -83,14 +83,6 @@ $tutorial-display-side-margin: 3rem;
   flex-shrink: 1;
   flex-grow: 1;
 
-  .Tutorials-ToggleUiStyleLink p {
-    text-align: center;
-    font-size: 0.875rem;
-    > span {
-      @include pytch-colours-hover();
-    }
-  }
-
   h1 {
     margin: 1.5rem 0px;
     text-align: center;
@@ -252,13 +244,6 @@ button.awaiting-action {
 }
 
 .modal.CreateProjectModal {
-  .change-ui-style {
-    flex-grow: 1;
-    > span {
-      @include pytch-colours-hover();
-    }
-  }
-
   .whether-include-example,
   .editor-kind {
     .option-buttons {
