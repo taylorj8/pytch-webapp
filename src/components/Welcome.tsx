@@ -11,6 +11,24 @@ import { Footer } from "./front-page/Footer";
 import { useScrollToUrlFragment } from "./hooks/use-fragment-scroll";
 import "./Welcome.scss";
 
+const NewsLink: React.FC<EmptyProps> = () => {
+  return (
+    <div className="Welcome-NewsLink">
+      <p>
+        We’re excited to release the redesign of the IDE for working with “one
+        big program” Pytch projects!
+      </p>
+      <p>
+        You can{" "}
+        <a href="https://pytch.scss.tcd.ie/?p=974">
+          read the announcement about it
+        </a>
+        .
+      </p>
+    </div>
+  );
+};
+
 const Welcome: React.FC<EmptyProps> = () => {
   // I have NO IDEA why the following is needed.  I suspect a bug in
   // Vite or the bundler.  Without the following line, the value
@@ -37,6 +55,7 @@ const Welcome: React.FC<EmptyProps> = () => {
           developed in Scratch
         </h3>
 
+        <NewsLink />
         <CardCarousel />
         <LearnPython />
         <ContactInvitation />
