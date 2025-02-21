@@ -42,3 +42,15 @@
     margin: -1rem auto 2rem;
   }
 }
+
+.Welcome-NewsLink {
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: $pytch-colour-main-yellow;
+  max-width: min(calc(100vw - 2rem), 28rem, 90vw);
+  margin: auto;
+  text-align: center;
+  p {
+    margin: 0.5rem 0px;
+  }
+}
