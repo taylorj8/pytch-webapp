@@ -55,6 +55,7 @@ const Welcome: React.FC<EmptyProps> = () => {
           developed in Scratch
         </h3>
 
+        <NewsLink />
         <CardCarousel />
         <LearnPython />
         <ContactInvitation />
