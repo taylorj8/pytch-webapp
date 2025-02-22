@@ -8,11 +8,6 @@
           font-size: 1.625rem;
         }
 
-        code {
-          margin: 0px 2px;
-          color: #a00;
-        }
-
         /* Zeroth-order approximation to italic correction: */
         em {
           padding-right: 0.1rem;
@@ -48,18 +43,6 @@
 
         blockquote {
           margin: 0rem 6rem;
-        }
-
-        .asset-credits {
-          .credit-intro {
-            margin-bottom: 0.25rem;
-          }
-          .asset-filename {
-            color: #a00;
-          }
-          .credits {
-            margin: 0rem 3rem;
-          }
         }
       }
     }
