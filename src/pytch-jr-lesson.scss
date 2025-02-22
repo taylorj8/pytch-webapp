@@ -495,10 +495,25 @@ $progress-node-backgrounds-strip-x-margin: calc(
         margin-bottom: 0px;
       }
     }
+
     code {
       margin: 0px 2px;
-      color: #a00;
     }
+    p > code,
+    strong > code,
+    li > code {
+      color: $pytch-colour-main-blue-darkened;
+      font-style: italic;
+    }
+    em > code {
+      padding-left: 1px;
+      color: $pytch-colour-main-blue-darkened;
+      font-style: normal;
+    }
+    pre code {
+      font-style: normal;
+    }
+
     p.img-center {
       text-align: center;
     }
@@ -509,13 +524,12 @@ $progress-node-backgrounds-strip-x-margin: calc(
       font-style: italic;
     }
 
-    // TODO: Eliminate duplication with pytch-tutorial.scss
     .asset-credits {
       .credit-intro {
         margin-bottom: 0.25rem;
       }
       .asset-filename {
-        color: #a00;
+        color: $pytch-colour-main-blue-darkened;
       }
       .credits {
         margin: 0rem 3rem;
