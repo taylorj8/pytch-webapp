@@ -117,9 +117,10 @@ export const DebugPane: React.FC<EmptyProps> = () => {
               </Card.Title>
               <Card.Text className="monospace-font">
                 {vars.position.toString()}
-                  {vars.show_variables("static").map((variable: any, index: number) => (
-                    <div key={index} style={{ color: 'blue' }}>{variable}</div>
-                  ))}
+                {"\nCostume Index: " + vars.appearance_index}
+                {vars.show_variables("static").map((variable: any, index: number) => (
+                  <div key={index} style={{ color: 'blue' }}>{variable}</div>
+                ))}
                 {vars.show_variables("local").map((variable: any, index: number) => (
                     <div key={index}>{variable}</div>
                   ))}
