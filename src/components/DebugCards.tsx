@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "react-bootstrap";
+import Collapse from "react-bootstrap/Collapse";
 
 interface ActorInstanceProps {
   actorId: string;
@@ -46,7 +48,6 @@ export const ActorInstance: React.FC<ActorInstanceProps> = ({
       </Card.Body>
     </Card>
   );
-  
   
 
 export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars }) => (
@@ -122,6 +123,7 @@ export const ActorClassCard: React.FC<{
   highlighted: boolean;
   highlightedInstance: string;
 }> = ({ name, classVars, highlighted, highlightedInstance: highlightedClone }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
   const actorEntries = Object.entries(classVars.actors);
 
   if (!classVars.has_clones()) {
@@ -140,12 +142,22 @@ export const ActorClassCard: React.FC<{
   return (
     <Card className={highlighted ? "highlighted-card" : ""}>
       <Card.Body>
-        <Card.Title className="d-flex justify-content-between align-items-center">
-            {name}
-            <span className="badge bg-secondary" style={{ fontSize: "0.7em" }}>
-                {actorEntries.length} instances
-            </span>
-        </Card.Title>
+      <Card.Title className="d-flex justify-content-between align-items-center">
+        <div style={{ cursor: "pointer" }} onClick={() => setIsExpanded(!isExpanded)}>
+          {name}
+          <span className="badge bg-secondary ms-2" style={{ fontSize: "0.7em" }}>
+            {actorEntries.length} instances
+          </span>
+        </div>
+        <Button
+          size="sm"
+          variant="light"
+          onClick={() => setIsExpanded(!isExpanded)}
+          aria-label={isExpanded ? "Collapse" : "Expand"}
+        >
+          {isExpanded ? "▲" : "▼"}
+        </Button>
+      </Card.Title>
 
         {/* Static variables */}
         <Card.Text className="monospace-font">
@@ -159,17 +171,19 @@ export const ActorClassCard: React.FC<{
         </Card.Text>
 
         {/* Cloned actor instances */}
-        <div className="clone-container">
-          {actorEntries.map(([actorId, actorVars]: [string, any]) => (
-            <ActorInstance
-              key={actorId}
-              actorId={actorId}
-              actorVars={actorVars}
-              highlighted={highlightedClone === actorId}
-              isStage={classVars.is_stage}
-            />
-          ))}
-        </div>
+        <Collapse in={isExpanded}>
+          <div className="clone-container">
+            {actorEntries.map(([actorId, actorVars]: [string, any]) => (
+              <ActorInstance
+                key={actorId}
+                actorId={actorId}
+                actorVars={actorVars}
+                highlighted={highlightedClone === actorId}
+                isStage={classVars.is_stage}
+              />
+            ))}
+          </div>
+        </Collapse>
       </Card.Body>
     </Card>
   );
