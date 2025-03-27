@@ -81,9 +81,24 @@ export const DebugPane: React.FC<EmptyProps> = () => {
     <div className="DebugPane">
       <h2>Debug</h2>
       <div className="card-container">
-        {globalVars && <GlobalVariablesCard globalVars={globalVars} />}
+        <div>
+          {globalVars && <GlobalVariablesCard globalVars={globalVars} />}
+          {localVars && Object.entries(localVars)
+        .filter(([_, classVars]) => classVars.is_stage)
+        .map(([name, classVars]) => (
+          <ActorClassCard
+            key={name}
+            name={name}
+            classVars={classVars}
+            highlighted={highlightedCard === name}
+            highlightedInstance={highlightedCard}
+          />
+        ))}
+        </div>
         {localVars &&
-          Object.entries(localVars).map(([name, classVars]: [string, any]) => (
+          Object.entries(localVars)
+          .filter(([_, classVars]) => !classVars.is_stage)
+          .map(([name, classVars]: [string, any]) => (
             <ActorClassCard
               key={name}
               name={name}

@@ -63,7 +63,7 @@ const InfoPanel = () => {
   const Tab = TabWithTypedKey<InfoPanelTabKey>;
   return (
     <div className="InfoPanel-container">
-      {inDebugMode && <DebugButtons />}
+      {inDebugMode && <DebugButtons/>}
       <LayoutChooser />
       <Tabs
         className={`InfoPanel ${layoutKind}`}

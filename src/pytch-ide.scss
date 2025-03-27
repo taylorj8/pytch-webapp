@@ -532,7 +532,7 @@ $speech-bubble-max-height: 180px;
   
       .card {
         flex: 0 0 300px;
-        min-width: 300px;
+        min-width: 330px;
         margin-bottom: 20px;
       }
 
@@ -623,7 +623,6 @@ $speech-bubble-max-height: 180px;
     position: absolute;
     height: 32px;
     top: 0px;
-    right: 300px;
     display: flex;
     flex-direction: row;
     button {

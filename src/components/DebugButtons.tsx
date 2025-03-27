@@ -1,5 +1,5 @@
 import Button from "react-bootstrap/Button";
-import { useStoreActions } from "../store";
+import { useStoreState, useStoreActions } from "../store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Debugger } from "../skulpt-connection/drive-project";
 import { faEject, faShoePrints } from '@fortawesome/free-solid-svg-icons';
@@ -10,6 +10,7 @@ declare let Sk: any;
 export const DebugButtons = () => {
   const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState)
   const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine)
+  const displaySize = useStoreState((state) => state.ideLayout.stageDisplaySize)
 
   const continueCallback = () => {
     const project = Sk.pytch.current_live_project
@@ -27,8 +28,12 @@ export const DebugButtons = () => {
     project.continue_on_breakpoint()
   }
 
+  const style = {
+    right: `calc(${displaySize.width}px - 100px)`
+  };
+
   return (
-    <div className="DebugButtons">
+    <div className="DebugButtons" style={style}>
       <Button
         className="ContinueButton"
         variant="warning"
