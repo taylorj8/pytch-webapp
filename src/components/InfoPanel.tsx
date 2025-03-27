@@ -71,7 +71,6 @@ const InfoPanel = () => {
         activeKey={activeKey}
         onSelect={(k) => {
           setActiveKey(k as InfoPanelTabKey)
-          // setDebugState(k === "debug" ? "debug" : "normal")
         }}
       >
         {isTrackingTutorial && (

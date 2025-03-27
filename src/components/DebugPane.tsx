@@ -45,13 +45,11 @@ function saveObjectToFile(obj: any, filename: string) {
     return value;
   }, 2)], { type: 'application/json' });
   saveAs(blob, filename);
+  console.log("saved to json")
 }
 
 export const DebugPane: React.FC<EmptyProps> = () => {
   const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode)
-  const [stage, setStage] = useState<any>();
-  const [actors, setActors] = useState<any[]>([]);
-  const [liveProject, setProject] = useState<any>();
   const [highlightedCard, setHighlightedCard] = useState<string>("");
   const [localVars, setLocalVars] = useState<any>();
   const [globalVars, setGlobalVars] = useState<any>();
@@ -60,11 +58,8 @@ export const DebugPane: React.FC<EmptyProps> = () => {
     const updateCards = () => {
       const project = Sk.pytch.current_live_project;
       if (project && project.actors) {
-        setStage(project.actors[0].instances[0]); // todo: check if there is always only one stage
-        setActors(project.actors[1].instances);
       }
       if (project !== Sk.default_pytch_environment.current_live_project) {
-        setProject(project);
         setLocalVars(project.get_all_local_variables());
         setGlobalVars(project.get_global_variables());
         const suspension = project.get_debug_suspension();
@@ -108,23 +103,34 @@ export const DebugPane: React.FC<EmptyProps> = () => {
             </Card.Text>
           </Card.Body>
         </Card>}
-        {localVars && Object.entries(localVars).map(([name, vars]: [string, any]) => (
+        {localVars && Object.entries(localVars).map(([name, classVars]: [string, any]) => (
           <Card key={name} className={highlightedCard === name ? "highlighted-card" : ""}>
             <Card.Body>
               <Card.Title>
-                <img src={vars.img_src} className="card-title-img" />
+                <img src={classVars.img_src} className="card-title-img" />
                 {name}
               </Card.Title>
+
+              {/* Static variables for the class */}
               <Card.Text className="monospace-font">
-                {vars.position.toString()}
-                {"\nCostume Index: " + vars.appearance_index}
-                {vars.show_variables("static").map((variable: any, index: number) => (
-                  <div key={index} style={{ color: 'blue' }}>{variable}</div>
+                {Object.entries(classVars.static).map(([key, value], index) => (
+                  <div key={`static-${index}`} style={{ color: 'blue' }}>
+                    {`${key}: ${value}`}
+                  </div>
                 ))}
-                {vars.show_variables("local").map((variable: any, index: number) => (
-                    <div key={index}>{variable}</div>
-                  ))}
               </Card.Text>
+              
+              {/* Actor instances (clones) */}
+              {Object.entries(classVars.actors).map(([actorId, actorVars]: [string, any]) => (
+                <div key={actorId} className="actor-instance">
+                  <hr />
+                  <strong>Clone: {actorId}</strong>
+                  <div>{actorVars.position.toString()}</div>
+                  {actorVars.show_variables("local").map((variable: string, index: number) => (
+                    <div key={`local-${actorId}-${index}`}>{variable}</div>
+                  ))}
+                </div>
+              ))}
             </Card.Body>
           </Card>
         ))}
