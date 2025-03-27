@@ -525,6 +525,7 @@ $speech-bubble-max-height: 180px;
     .card-container {
       display: flex;
       flex-wrap: nowrap;
+      align-items: flex-start;
       gap: 1rem;
       margin-left: 0.5rem;
       margin-right: 0.5rem;
@@ -538,6 +539,38 @@ $speech-bubble-max-height: 180px;
       .highlighted-card {
         box-shadow: 0 0 10px 2px red;
         border: 2px solid red;
+      }
+
+      .actor-instance {
+        margin-top: 0.75rem;
+        padding-left: 0.5rem;
+      
+        &.highlighted-clone {
+          background-color: rgba(255, 0, 0, 0.1);
+          border-left: 4px solid red;
+          padding-left: 1rem;
+        }
+      
+        strong {
+          display: block;
+          margin-bottom: 0.25rem;
+        }
+      
+        .list-group-item {
+          font-family: "Courier New", Courier, monospace;
+          font-size: 0.9rem;
+          padding: 0.25rem 0.5rem;
+        }
+      }
+
+      .clone-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.25rem;
+      
+        img.card-title-img {
+          margin-right: 0.5rem;
+        }
       }
     
       .card-title-img {
