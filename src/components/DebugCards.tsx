@@ -13,31 +13,45 @@ interface ActorInstanceProps {
 }
 
 export const ActorInstance: React.FC<ActorInstanceProps> = ({
-  actorId,
-  actorVars,
-  highlighted,
-  isStage,
-}) => (
-  <div className={`actor-instance ${highlighted ? "highlighted-clone" : ""}`}>
-    <hr />
-    <div className="clone-header">
-      <img src={actorVars.img_src} className="card-title-img" />
-      <strong className="ms-2">{actorId}</strong>
-    </div>
-    <div>{!isStage && actorVars.position?.toString()}</div>
-    <div>{"Costume Number: " + actorVars.costume_number}</div>
-    <ListGroup className="monospace-font mt-2">
-      {actorVars
-        .show_variables("local")
-        .sort()
-        .map((variable: string, index: number) => (
-          <ListGroup.Item key={`local-${actorId}-${index}`}>
-            {variable}
-          </ListGroup.Item>
-        ))}
-    </ListGroup>
-  </div>
-);
+    actorId,
+    actorVars,
+    highlighted,
+    isStage,
+  }) => (
+    <Card
+      className={`mb-2 ms-0 me-0 ${highlighted ? "highlighted-clone" : "inner-card"}`}
+      style={{ borderLeft: highlighted ? "4px solid red" : undefined }}
+    >
+      <Card.Body>
+        <Card.Title className="d-flex align-items-center">
+          <img src={actorVars.img_src} className="card-title-img me-2" />
+          <strong>{actorId}</strong>
+        </Card.Title>
+  
+        {!isStage && (
+          <div className="monospace-font mb-1">
+            {actorVars.position?.toString()}
+          </div>
+        )}
+        <div className="monospace-font mb-2">
+          Costume Number: {actorVars.costume_number}
+        </div>
+  
+        <hr className="my-2" />
+  
+        <div className="monospace-font">
+          {actorVars
+            .show_variables("local")
+            .sort()
+            .map((variable: string, index: number) => (
+              <div key={`local-${actorId}-${index}`}>{variable}</div>
+            ))}
+        </div>
+      </Card.Body>
+    </Card>
+  );
+  
+  
 
 export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars }) => (
   <Card>
@@ -72,10 +86,16 @@ export const UnclonedActorCard: React.FC<{
         {name}
       </Card.Title>
 
-      <div className="d-flex flex-row justify-content-between gap-4 mt-2 flex-wrap">
+      <div>
+      {!classVars.is_stage && (
+        <div className="mt-3 monospace-font">
+          {actorVars.position?.toString()}
+        </div>
+      )}
+
+      <div className="monospace-font">Costume Number: {actorVars.costume_number}</div>
         {/* Static variables */}
         <div className="monospace-font flex-fill">
-          <h6>Static Variables</h6>
           {Object.entries(classVars.static)
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([key, value], index) => (
@@ -87,7 +107,6 @@ export const UnclonedActorCard: React.FC<{
 
         {/* Local variables */}
         <div className="monospace-font flex-fill">
-          <h6>Local Variables</h6>
           {actorVars
             .show_variables("local")
             .sort()
@@ -96,13 +115,6 @@ export const UnclonedActorCard: React.FC<{
             ))}
         </div>
       </div>
-
-      {!classVars.is_stage && (
-        <div className="mt-3 monospace-font">
-          {actorVars.position?.toString()}
-        </div>
-      )}
-      <div className="monospace-font">Costume Number: {actorVars.costume_number}</div>
     </Card.Body>
   </Card>
 );
@@ -131,7 +143,12 @@ export const ActorClassCard: React.FC<{
   return (
     <Card className={highlighted ? "highlighted-card" : ""}>
       <Card.Body>
-        <Card.Title>{name}</Card.Title>
+        <Card.Title className="d-flex justify-content-between align-items-center">
+            {name}
+            <span className="badge bg-secondary" style={{ fontSize: "0.7em" }}>
+                {actorEntries.length} instances
+            </span>
+        </Card.Title>
 
         {/* Static variables */}
         <Card.Text className="monospace-font">
@@ -145,15 +162,17 @@ export const ActorClassCard: React.FC<{
         </Card.Text>
 
         {/* Cloned actor instances */}
-        {actorEntries.map(([actorId, actorVars]: [string, any]) => (
-          <ActorInstance
-            key={actorId}
-            actorId={actorId}
-            actorVars={actorVars}
-            highlighted={highlightedClone === actorId}
-            isStage={classVars.is_stage}
-          />
-        ))}
+        <div className="clone-container">
+          {actorEntries.map(([actorId, actorVars]: [string, any]) => (
+            <ActorInstance
+              key={actorId}
+              actorId={actorId}
+              actorVars={actorVars}
+              highlighted={highlightedClone === actorId}
+              isStage={classVars.is_stage}
+            />
+          ))}
+        </div>
       </Card.Body>
     </Card>
   );
