@@ -88,12 +88,12 @@ const InfoPanel = () => {
         <Tab className="InfoPane" eventKey="errors" title="Errors">
           <Errors />
         </Tab>
-
-        <Tab className="InfoPane" eventKey="debug" title="Debug">
-          <DebugPane />
-		    </Tab>
-
-        {/* <DebugTab className="InfoPane" eventKey="debug" title="Debug" mode="edit"></DebugTab> */}
+        {inDebugMode ? (
+          <Tab className="InfoPane" eventKey="debug" title={<span style={{ color: "#B20000" }}>Debug</span>}>
+            <DebugPane />
+		      </Tab>
+        ) : null}
+        
         {liveReloadEnabled() ? (
           <Tab
             className="InfoPane"
