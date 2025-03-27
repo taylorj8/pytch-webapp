@@ -542,6 +542,8 @@ $speech-bubble-max-height: 180px;
       }
   
       .highlighted-card {
+        min-width: 200px;
+        flex: 1 1 auto;
         box-shadow: 0 0 10px 2px red;
         border: 2px solid red;
       }

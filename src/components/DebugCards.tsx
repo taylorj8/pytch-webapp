@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import Card from "react-bootstrap/Card";
-import ListGroup from "react-bootstrap/ListGroup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
 
@@ -18,10 +17,7 @@ export const ActorInstance: React.FC<ActorInstanceProps> = ({
     highlighted,
     isStage,
   }) => (
-    <Card
-      className={`mb-2 ms-0 me-0 ${highlighted ? "highlighted-clone" : "inner-card"}`}
-      style={{ borderLeft: highlighted ? "4px solid red" : undefined }}
-    >
+    <Card className={`mb-2 ms-0 me-0 ${highlighted ? "highlighted-card" : "inner-card"}`}>
       <Card.Body>
         <Card.Title className="d-flex align-items-center">
           <img src={actorVars.img_src} className="card-title-img me-2" />
@@ -78,8 +74,9 @@ export const UnclonedActorCard: React.FC<{
   classVars: any;
   actorId: string;
   actorVars: any;
-}> = ({ name, classVars, actorId, actorVars }) => (
-  <Card>
+  highlighted: boolean;
+}> = ({ name, classVars, actorId, actorVars, highlighted }) => (
+  <Card className={`mb-2 ms-0 me-0 ${highlighted ? "highlighted-card" : ""}`}>
     <Card.Body>
       <Card.Title className="d-flex align-items-center">
         <img src={actorVars.img_src} className="card-title-img me-2" />
@@ -123,8 +120,8 @@ export const ActorClassCard: React.FC<{
   name: string;
   classVars: any;
   highlighted: boolean;
-  highlightedClone: string | null;
-}> = ({ name, classVars, highlighted, highlightedClone }) => {
+  highlightedInstance: string;
+}> = ({ name, classVars, highlighted, highlightedInstance: highlightedClone }) => {
   const hasClones = classVars.has_clones();
   const actorEntries = Object.entries(classVars.actors);
 
@@ -136,6 +133,7 @@ export const ActorClassCard: React.FC<{
         classVars={classVars}
         actorId={actorId}
         actorVars={actorVars}
+        highlighted={highlighted}
       />
     );
   }

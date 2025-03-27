@@ -45,9 +45,6 @@ export const DebugPane: React.FC<EmptyProps> = () => {
     (state) => state.activeProject.inDebugMode
   );
   const [highlightedCard, setHighlightedCard] = useState<string>("");
-  const [highlightedClone, setHighlightedClone] = useState<string | null>(
-    null
-  );
   const [localVars, setLocalVars] = useState<any>();
   const [globalVars, setGlobalVars] = useState<any>();
 
@@ -60,13 +57,10 @@ export const DebugPane: React.FC<EmptyProps> = () => {
         const suspension = project.get_debug_suspension();
         if (suspension === null) {
           setHighlightedCard("");
-          setHighlightedClone(null);
         } else {
           setHighlightedCard(
             suspension.$tmps.self.$pytchActorInstance.info_label
           );
-          const cloneId = suspension.$tmps.self.$pytchActorInstance.instance_id || null;
-          setHighlightedClone(cloneId);
         }
       }
     };
@@ -94,8 +88,8 @@ export const DebugPane: React.FC<EmptyProps> = () => {
               key={name}
               name={name}
               classVars={classVars}
-              highlighted={highlightedCard === name}
-              highlightedClone={highlightedClone}
+              highlighted={highlightedCard === name} // todo fix highlighting for uncloned cards
+              highlightedInstance={highlightedCard}
             />
           ))}
       </div>
