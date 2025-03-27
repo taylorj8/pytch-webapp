@@ -8,6 +8,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
 import { ListGroup, Button } from "react-bootstrap";
 import { saveAs } from "file-saver";
+import {
+  ActorClassCard,
+  GlobalVariablesCard,
+} from "./DebugCards"
 
 declare let Sk: any;
 
@@ -35,96 +39,6 @@ function saveObjectToFile(obj: any, filename: string) {
   console.log("saved to json");
 }
 
-interface ActorInstanceProps {
-  actorId: string;
-  actorVars: any;
-  highlighted: boolean;
-  isStage: boolean;
-}
-
-const ActorInstance: React.FC<ActorInstanceProps> = ({
-  actorId,
-  actorVars,
-  highlighted,
-  isStage,
-}) => (
-  <div className={`actor-instance ${highlighted ? "highlighted-clone" : ""}`}>
-    <hr />
-    <div className="clone-header">
-      <img src={actorVars.img_src} className="card-title-img" />
-      <strong className="ms-2">{actorId}</strong>
-    </div>
-    <div>{!isStage && actorVars.position?.toString()}</div>
-    <div>{"Costume Number: " + actorVars.costume_number}</div>
-    <ListGroup className="monospace-font mt-2">
-      {actorVars
-        .show_variables("local")
-        .sort()
-        .map((variable: string, index: number) => (
-          <ListGroup.Item key={`local-${actorId}-${index}`}>
-            {variable}
-          </ListGroup.Item>
-        ))}
-    </ListGroup>
-  </div>
-);
-
-const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars }) => (
-  <Card>
-    <Card.Body>
-      <Card.Title>
-        <FontAwesomeIcon icon={faEarthEurope} className="card-title-icon" />
-        Global Variables
-      </Card.Title>
-      <Card.Text className="monospace-font">
-        {Object.entries(globalVars)
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([key, value]) => (
-            <div key={key}>
-              {key}: {String(value)}
-            </div>
-          ))}
-      </Card.Text>
-    </Card.Body>
-  </Card>
-);
-
-const ActorClassCard: React.FC<{
-  name: string;
-  classVars: any;
-  highlighted: boolean;
-  highlightedClone: string | null;
-}> = ({ name, classVars, highlighted, highlightedClone }) => (
-  <Card className={highlighted ? "highlighted-card" : ""}>
-    <Card.Body>
-      <Card.Title>{name}</Card.Title>
-
-      {/* Static variables */}
-      <Card.Text className="monospace-font">
-        {Object.entries(classVars.static)
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([key, value], index) => (
-            <div key={`static-${index}`} style={{ color: "blue" }}>
-              {`${key}: ${value}`}
-            </div>
-          ))}
-      </Card.Text>
-
-      {/* Actor Instances */}
-      {Object.entries(classVars.actors).map(
-        ([actorId, actorVars]: [string, any]) => (
-          <ActorInstance
-            key={actorId}
-            actorId={actorId}
-            actorVars={actorVars}
-            highlighted={highlightedClone === actorId}
-            isStage={classVars.is_stage}
-          />
-        )
-      )}
-    </Card.Body>
-  </Card>
-);
 
 export const DebugPane: React.FC<EmptyProps> = () => {
   const inDebugMode = useStoreState(

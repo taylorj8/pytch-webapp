@@ -573,11 +573,14 @@ $speech-bubble-max-height: 180px;
         }
       }
     
+      .monospace-font {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.95rem;
+      }
+      
       .card-title-img {
         max-width: 32px;
         max-height: 32px;
-        width: auto;
-        height: auto;
         margin-right: 0.5rem;
         vertical-align: middle;
       }
