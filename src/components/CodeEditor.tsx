@@ -49,9 +49,9 @@ const CodeAceEditor = () => {
   const saveIsPending = useStoreState(
     (state) => state.activeProject.syncState.loadState === "pending"
   );
-  const inDebugMode = useStoreState(
-    (state) => state.activeProject.inDebugMode
-  )
+  // const inDebugMode = useStoreState(
+  //   (state) => state.activeProject.inDebugMode
+  // )
   const debugLine = useStoreState(
     (state) => state.activeProject.debugLine
   )
@@ -66,10 +66,6 @@ const CodeAceEditor = () => {
   useStoreState((state) => state.ideLayout.stageDisplaySize, eqDisplaySize);
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
-
-  // // todo: is this the best way to do this?
-  // Debugger = new Sk.Debugger("<stdin>.py", null);
-  // console.log("Debugger", Debugger);
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -100,10 +96,10 @@ const CodeAceEditor = () => {
         return;
       }
 
-      var breakpoints = e.editor.session.getBreakpoints(row, 0);
       var row = e.getDocumentPosition().row;
+      var breakpoints = e.editor.session.getBreakpoints(row, 0);
 
-      // If there's a breakpoint already defined, it should be removed, offering the toggle feature
+      // if breakpoint active, toggle it
       if (typeof breakpoints[row] === typeof undefined) {
         e.editor.session.setBreakpoint(row);
         Debugger.add_breakpoint("<stdin>.py", row+1, 0, false);
@@ -126,12 +122,6 @@ const CodeAceEditor = () => {
       ace.editor.session.getUndoManager().reset();
     }
   });
-
-  // const project = Sk.pytch.current_live_project;
-  // if (project !== Sk.default_pytch_environment.current_live_project) {
-  //   const newDebugLine = project.get_debug_line();
-  //   setDebugLine(newDebugLine);
-  // }
 
   useEffect(() => {
     console.log("!!!!! CodeAceEditor effect: debugLine", debugLine);
@@ -175,7 +165,7 @@ const CodeAceEditor = () => {
         height="100%"
         onLoad={setFlatAceController}
         onChange={updateCodeText}
-        readOnly={saveIsPending || inDebugMode}
+        readOnly={saveIsPending}
       />
       <ReadOnlyOverlay />
     </>

@@ -11,7 +11,9 @@ import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content
 import { pathWithinApp } from "../env-utils";
 import { useNavigate } from "react-router-dom";
 import { useRunFlow } from "../model";
-import { action } from "easy-peasy";
+import { Debugger } from "../skulpt-connection/drive-project";
+import { DebugState } from "../model/project";
+import store from "../store";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -19,6 +21,15 @@ declare let Sk: any;
 export const focusStage = () => {
   document.getElementById("pytch-speech-bubbles")?.focus();
 };
+
+const resetDebugging = (debugState: DebugState) => {
+  store.getActions().activeProject.setDebugState(debugState);
+  store.getActions().activeProject.setDebugLine(-1)
+  const project = Sk.pytch.current_live_project
+  project.allow_all_threads_listening()
+  project.continue_on_breakpoint()
+  Debugger.disable_step_mode()
+}
 
 const StaticTooltip: React.FC<PropsWithChildren<{ visible: boolean }>> = ({
   children,
@@ -42,10 +53,9 @@ const GreenFlag = () => {
     (state) => state.ideLayout.buttonTourProgressStage
   );
   const build = useStoreActions((actions) => actions.activeProject.build);
-  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
   const handleClick = () => {
     build({ focusDestination: "running-project", inDebugMode: false });
-    setDebugState("running");
+    resetDebugging("running")
   };
 
   const tooltipIsVisible = buttonTourProgressStage === "green-flag";
@@ -70,7 +80,7 @@ const YellowDebug = () => {
   const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
   const handleClick = () => {
     build({ focusDestination: "running-project", inDebugMode: true });
-    setDebugState("debugging");
+    resetDebugging("debugging")
   };
   return (
     <div className="tooltipped-elt">
@@ -85,11 +95,11 @@ const YellowDebug = () => {
 };
 
 export const RedStop = () => {
-  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
   const redStop = () => {
-    Sk.pytch.current_live_project.on_red_stop_clicked();
+    const project = Sk.pytch.current_live_project
+    project.on_red_stop_clicked();
     focusStage();
-    setDebugState("stopped");
+    resetDebugging("stopped");
   };
   return (
     <Button className="StageControlPseudoButton RedStop" onClick={redStop}>

@@ -331,11 +331,9 @@ export class ProjectEngine {
 
     // only run the one_frame methods if the program isn't at a breakpoint
     if ((debugState === "debugging") && project.has_braked_thread()) {
-      const setDebugState = store.getActions().activeProject.setDebugState;
-      const setDebugLine = store.getActions().activeProject.setDebugLine;
       project.stop_other_threads_listening();
-      setDebugState("paused");
-      setDebugLine(project.get_debug_line());
+      store.getActions().activeProject.setDebugState("paused");
+      store.getActions().activeProject.setDebugLine(project.get_debug_line());
     } 
     else if (debugState === "running" || debugState === "debugging") {
       const maybeQuestionAnswer =
