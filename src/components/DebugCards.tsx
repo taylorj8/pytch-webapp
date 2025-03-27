@@ -122,10 +122,9 @@ export const ActorClassCard: React.FC<{
   highlighted: boolean;
   highlightedInstance: string;
 }> = ({ name, classVars, highlighted, highlightedInstance: highlightedClone }) => {
-  const hasClones = classVars.has_clones();
   const actorEntries = Object.entries(classVars.actors);
 
-  if (!hasClones && actorEntries.length === 1) {
+  if (!classVars.has_clones()) {
     const [actorId, actorVars] = actorEntries[0];
     return (
       <UnclonedActorCard
