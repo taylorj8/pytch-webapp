@@ -77,7 +77,6 @@ const GreenFlag = () => {
 
 const YellowDebug = () => {
   const build = useStoreActions((actions) => actions.activeProject.build);
-  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState);
   const handleClick = () => {
     build({ focusDestination: "running-project", inDebugMode: true });
     resetDebugging("debugging")

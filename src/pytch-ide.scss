@@ -382,7 +382,8 @@ $speech-bubble-max-height: 180px;
   .debugLine {
    position: absolute;
    background: rgba(204, 35, 35, 0.5);
-   z-index: 20
+   z-index: 20;
+   transition: all 0.2s ease-in-out;
   }
 
   .help-sidebar {
@@ -476,6 +477,19 @@ $speech-bubble-max-height: 180px;
     cursor: ns-resize;
     background-color: black;
     opacity: 0.2;
+  }
+}
+
+@mixin as-bootstrap-button($bg, $border) {
+  &.btn,
+  &.btn:focus,
+  &.btn:active,
+  &.btn:focus-visible {
+    @include background-color-as-button($bg);
+    &,
+    &:hover {
+      border: 1px solid $border;
+    }
   }
 }
 
@@ -625,12 +639,16 @@ $speech-bubble-max-height: 180px;
     top: 0px;
     display: flex;
     flex-direction: row;
-    button {
+    .DebugButton {
       height: 32px;
       margin-left: 0.5rem;
       display: flex;
       flex-direction: row;
       align-items: center;
+      @include as-bootstrap-button(rgb(240, 220, 44), rgb(230, 200, 30));
+      svg {
+        filter: drop-shadow(0px 0px 1px grey);
+      }
     }
     .layout-icon {
       width: 24px;
@@ -788,19 +806,6 @@ div.spacer-instead-of-resizer {
   }
 }
 
-@mixin as-bootstrap-button($bg, $border) {
-  &.btn,
-  &.btn:focus,
-  &.btn:active,
-  &.btn:focus-visible {
-    @include background-color-as-button($bg);
-    &,
-    &:hover {
-      border: 1px solid $border;
-    }
-  }
-}
-
 .StageControlPseudoButton {
   width: 3em;
   height: 36px;
@@ -817,14 +822,23 @@ div.spacer-instead-of-resizer {
 
   &.GreenFlag {
     @include as-bootstrap-button(#2c2, #1a1);
+    svg {
+      filter: drop-shadow(0px 0px 1px grey);
+    }
   }
 
   &.YellowDebug {
-    @include as-bootstrap-button(rgb(201, 204, 34), rgb(170, 168, 17));
+    @include as-bootstrap-button(rgb(240, 220, 44), rgb(230, 200, 30));
+    svg {
+      filter: drop-shadow(0px 0px 1px grey);
+    }
   }
 
   &.RedStop {
-    @include as-bootstrap-button(#e33, #c11);
+    @include as-bootstrap-button(#e33, #c11); 
+    svg {
+      filter: drop-shadow(0px 0px 1px grey);
+    }
   }
 }
 

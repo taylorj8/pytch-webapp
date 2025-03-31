@@ -35,15 +35,13 @@ export const DebugButtons = () => {
   return (
     <div className="DebugButtons" style={style}>
       <Button
-        className="ContinueButton"
-        variant="warning"
+        className="DebugButton"
         onClick={continueCallback}
       >
         <FontAwesomeIcon icon={faEject} color="white" rotation={90} />
       </Button>
       <Button
-        className="StepButton"
-        variant="warning"
+        className="DebugButton"
         onClick={stepCallback}
       >
         <FontAwesomeIcon icon={faShoePrints} color="white" />

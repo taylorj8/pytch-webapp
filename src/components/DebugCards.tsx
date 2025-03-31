@@ -103,6 +103,8 @@ export const UnclonedActorCard: React.FC<{
             ))}
         </div>
 
+        {actorVars.has_variables("local") && <hr className="my-2" />}
+
         {/* Local variables */}
         <div className="monospace-font flex-fill">
           {actorVars
@@ -143,20 +145,10 @@ export const ActorClassCard: React.FC<{
     <Card className={highlighted ? "highlighted-card" : ""}>
       <Card.Body>
       <Card.Title className="d-flex justify-content-between align-items-center">
-        <div style={{ cursor: "pointer" }} onClick={() => setIsExpanded(!isExpanded)}>
-          {name}
-          <span className="badge bg-secondary ms-2" style={{ fontSize: "0.7em" }}>
-            {actorEntries.length} instances
-          </span>
-        </div>
-        <Button
-          size="sm"
-          variant="light"
-          onClick={() => setIsExpanded(!isExpanded)}
-          aria-label={isExpanded ? "Collapse" : "Expand"}
-        >
-          {isExpanded ? "▲" : "▼"}
-        </Button>
+        {name}
+        <span className="badge bg-secondary ms-2" style={{ fontSize: "0.7em", cursor: "pointer" }} onClick={() => setIsExpanded(!isExpanded)}>
+            {actorEntries.length} instances   {isExpanded ? "▲" : "▼"}
+        </span>
       </Card.Title>
 
         {/* Static variables */}
