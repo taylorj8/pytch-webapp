@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
-import { Button } from "react-bootstrap";
 import Collapse from "react-bootstrap/Collapse";
 
 interface ActorInstanceProps {

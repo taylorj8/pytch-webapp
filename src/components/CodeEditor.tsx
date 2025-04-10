@@ -91,13 +91,13 @@ const CodeAceEditor = () => {
     });
 
     // toggleable breakpoints
-    ace.editor.on("guttermousedown", (e: any) => {
+    ace.editor.on("guttermousedown", (e) => {
       if (e.domEvent.target.className.indexOf("ace_gutter-cell") == -1) {
         return;
       }
 
-      var row = e.getDocumentPosition().row;
-      var breakpoints = e.editor.session.getBreakpoints(row, 0);
+      let row = e.getDocumentPosition().row;
+      let breakpoints = e.editor.session.getBreakpoints(row, 0);
 
       // if breakpoint active, toggle it
       if (typeof breakpoints[row] === typeof undefined) {

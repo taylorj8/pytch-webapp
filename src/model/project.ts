@@ -89,7 +89,6 @@ import {
   NotableChangesManager,
   NotableChangesManagerOps,
 } from "./notable-changes";
-import { enableMapSet } from "immer";
 
 const ensureKind = PytchProgramOps.ensureKind;
 

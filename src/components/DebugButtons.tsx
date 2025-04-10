@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Debugger } from "../skulpt-connection/drive-project";
 import { faEject, faShoePrints } from '@fortawesome/free-solid-svg-icons';
 
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
 
 export const DebugButtons = () => {
