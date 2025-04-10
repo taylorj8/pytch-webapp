@@ -3,38 +3,12 @@
 import { EmptyProps } from "../utils";
 import { useStoreState } from "../store";
 import React, { useEffect, useState } from "react";
-import { saveAs } from "file-saver";
 import {
   ActorClassCard,
   GlobalVariablesCard,
 } from "./DebugCards"
 
 declare let Sk: any;
-
-function saveObjectToFile(obj: any, filename: string) {
-  const seen = new WeakSet();
-  const blob = new Blob(
-    [
-      JSON.stringify(
-        obj,
-        (key, value) => {
-          if (typeof value === "object" && value !== null) {
-            if (seen.has(value)) {
-              return;
-            }
-            seen.add(value);
-          }
-          return value;
-        },
-        2
-      ),
-    ],
-    { type: "application/json" }
-  );
-  saveAs(blob, filename);
-  console.log("saved to json");
-}
-
 
 export const DebugPane: React.FC<EmptyProps> = () => {
   const inDebugMode = useStoreState(

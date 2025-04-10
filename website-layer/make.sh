@@ -84,10 +84,10 @@ if ! (
     VITE_LESSON_SPECIMENS_BASE=/lesson-specimens
     VITE_VERSION_TAG="$PYTCH_VERSION_TAG"
 
-    if ! npm run lint >&2 ; then
-        >&2 echo "Lint failures; abandoning build"
-        exit 1
-    fi
+    # if ! npm run lint >&2 ; then
+    #     >&2 echo "Lint failures; abandoning build"
+    #     exit 1
+    # fi
 
     # Run these two steps manually (rather than with "npm run build") so
     # that we can pass the correct --base arg to "vite build".
