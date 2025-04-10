@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { EmptyProps } from "../utils";
-import Card from "react-bootstrap/Card";
 import { useStoreState } from "../store";
 import React, { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
-import { ListGroup, Button } from "react-bootstrap";
 import { saveAs } from "file-saver";
 import {
   ActorClassCard,
@@ -84,7 +80,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
         <div>
           {globalVars && <GlobalVariablesCard globalVars={globalVars} />}
           {localVars && Object.entries(localVars)
-        .filter(([_, classVars]) => classVars.is_stage)
+        .filter(([_, classVars]) => (classVars as any).is_stage)
         .map(([name, classVars]) => (
           <ActorClassCard
             key={name}
@@ -97,7 +93,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
         </div>
         {localVars &&
           Object.entries(localVars)
-          .filter(([_, classVars]) => !classVars.is_stage)
+          .filter(([_, classVars]) => !(classVars as any).is_stage)
           .map(([name, classVars]: [string, any]) => (
             <ActorClassCard
               key={name}

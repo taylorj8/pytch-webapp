@@ -93,7 +93,7 @@ const InfoPanel = () => {
 		      </Tab>
         ) : null}
         
-        {liveReloadEnabled() ? (
+        {/* {liveReloadEnabled() ? (
           <Tab
             className="InfoPane"
             eventKey="websocket-log"
@@ -101,7 +101,7 @@ const InfoPanel = () => {
           >
             <EditorWebSocketInfo />
           </Tab>
-        ) : null}
+        ) : null} */}
       </Tabs>
     </div>
   );
