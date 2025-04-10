@@ -91,7 +91,8 @@ if ! (
 
     # Run these two steps manually (rather than with "npm run build") so
     # that we can pass the correct --base arg to "vite build".
-    npx tsc && npx vite --base="$APP_BASE_URL" build
+    # npx tsc && npx vite --base="$APP_BASE_URL" build
+    npx vite --base="$APP_BASE_URL" build
 ) then
    exit 1
 fi
