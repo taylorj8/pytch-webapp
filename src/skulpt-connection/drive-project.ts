@@ -14,7 +14,6 @@ import {
   MaybeUserAnswerSubmissionToVM,
 } from "../model/user-text-input";
 import store from "../store";
-// import { Debugger } from "../components/CodeEditor";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
