@@ -121,9 +121,8 @@ export const UnclonedActorCard: React.FC<{
 export const ActorClassCard: React.FC<{
   name: string;
   classVars: any;
-  highlighted: boolean;
   highlightedInstance: string;
-}> = ({ name, classVars, highlighted, highlightedInstance: highlightedClone }) => {
+}> = ({ name, classVars, highlightedInstance }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const actorEntries = Object.entries(classVars.actors);
 
@@ -135,13 +134,13 @@ export const ActorClassCard: React.FC<{
         classVars={classVars}
         actorId={actorId}
         actorVars={actorVars}
-        highlighted={highlighted}
+        highlighted={name === highlightedInstance.split("-")[0]}
       />
     );
   }
 
   return (
-    <Card className={highlighted ? "highlighted-card" : ""}>
+    <Card>
       <Card.Body>
       <Card.Title className="d-flex justify-content-between align-items-center">
         {name}
@@ -169,7 +168,7 @@ export const ActorClassCard: React.FC<{
                 key={actorId}
                 actorId={actorId}
                 actorVars={actorVars}
-                highlighted={highlightedClone === actorId}
+                highlighted={actorId === highlightedInstance}
                 isStage={classVars.is_stage}
               />
             ))}

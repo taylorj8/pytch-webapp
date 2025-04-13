@@ -60,7 +60,6 @@ export const DebugPane: React.FC<EmptyProps> = () => {
             key={name}
             name={name}
             classVars={classVars}
-            highlighted={highlightedCard === name}
             highlightedInstance={highlightedCard}
           />
         ))}
@@ -73,7 +72,6 @@ export const DebugPane: React.FC<EmptyProps> = () => {
               key={name}
               name={name}
               classVars={classVars}
-              highlighted={highlightedCard === name} // todo fix highlighting for uncloned cards
               highlightedInstance={highlightedCard}
             />
           ))}
