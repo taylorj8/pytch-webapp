@@ -99,7 +99,6 @@ const CodeAceEditor = () => {
       let row = e.getDocumentPosition().row;
       let breakpoints = e.editor.session.getBreakpoints(row, 0);
 
-      // if breakpoint active, toggle it
       if (typeof breakpoints[row] === typeof undefined) {
         e.editor.session.setBreakpoint(row);
         Debugger.add_breakpoint("<stdin>.py", row+1, 0, false);
@@ -124,7 +123,6 @@ const CodeAceEditor = () => {
   });
 
   useEffect(() => {
-    console.log("!!!!! CodeAceEditor effect: debugLine", debugLine);
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
     if (prevMarker !== null)
       ace.editor.session.removeMarker(prevMarker);

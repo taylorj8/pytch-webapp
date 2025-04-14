@@ -24,7 +24,6 @@ declare let Sk: any;
 // TODO: Is this the best place to put this?
 Sk.configure({});
 export let Debugger = new Sk.Debugger("<stdin>.py", null);
-console.log("Debugger", Debugger);
 
 let peId = 1000;
 

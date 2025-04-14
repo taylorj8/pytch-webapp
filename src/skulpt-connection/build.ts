@@ -58,7 +58,6 @@ export const build = async (
   inDebugMode: boolean
 ): Promise<BuildOutcome> => {
   if (inDebugMode) {
-    console.log("build: in debug mode");
     Sk.configure({
       __future__: Sk.python3,
       read: builtinRead,
