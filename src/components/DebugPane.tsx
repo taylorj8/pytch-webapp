@@ -49,7 +49,7 @@ export const DebugPane: React.FC<EmptyProps> = () => {
 
   return (
     <div className="DebugPane">
-      <h2>Debug</h2>
+      <h5 style={{ padding: "8px" }}>Shows your program’s variables and lets you step through its execution.</h5>
       <div className="card-container">
         <div>
           {globalVars && <GlobalVariablesCard globalVars={globalVars} />}
