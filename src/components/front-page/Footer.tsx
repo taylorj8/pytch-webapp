@@ -28,6 +28,11 @@ export const Footer = () => {
               <li>
                 <a href="https://x.com/pytchlang/">X (Twitter)</a>
               </li>
+              <li>
+                <a href="https://bsky.app/profile/pytchlang.bsky.social">
+                  Bluesky
+                </a>
+              </li>
             </ul>
           </div>
           <div className="list-container">
