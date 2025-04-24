@@ -26,7 +26,7 @@ export const Footer = () => {
                 <a href="mailto:info@pytch.org">Email</a>
               </li>
               <li>
-                <a href="https://twitter.com/pytchlang/">Twitter</a>
+                <a href="https://x.com/pytchlang/">X (Twitter)</a>
               </li>
             </ul>
           </div>
@@ -40,7 +40,7 @@ export const Footer = () => {
                 <a href="https://pytch.scss.tcd.ie/who-we-are/">Our team</a>
               </li>
               <li>
-                <a href="https://pytch.scss.tcd.ie/research/">Our research</a>
+                <a href="https://pytch.scss.tcd.ie/blog/">News</a>
               </li>
             </ul>
           </div>
