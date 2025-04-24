@@ -8,7 +8,7 @@ import "./Footer.scss";
 // a particular page within research site.
 
 export const Footer = () => {
-  const sfiLogo = urlWithinApp("/assets/logos/SFI-white-on-transparent.png");
+  const riLogo = urlWithinApp("/assets/logos/RI-white-on-transparent.png");
   const tcdLogo = urlWithinApp("/assets/logos/TCD-white-on-transparent.png");
   const tudLogo = urlWithinApp("/assets/logos/TUD-white-on-transparent.png");
 
@@ -62,7 +62,7 @@ export const Footer = () => {
           </div>
         </div>
         <div className="section-images">
-          <img src={sfiLogo} alt="Science Foundation Ireland" />
+          <img src={riLogo} alt="Research Ireland" />
           <img src={tcdLogo} alt="Trinity College Dublin" />
           <img src={tudLogo} alt="Technological University Dublin" />
         </div>
