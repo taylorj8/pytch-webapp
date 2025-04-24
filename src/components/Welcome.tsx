@@ -11,22 +11,12 @@ import { Footer } from "./front-page/Footer";
 import { useScrollToUrlFragment } from "./hooks/use-fragment-scroll";
 import "./Welcome.scss";
 
+// Leave this placeholder here for when we want to put announcements on
+// the front page.
 const NewsLink: React.FC<EmptyProps> = () => {
-  return (
-    <div className="Welcome-NewsLink">
-      <p>
-        We’re excited to release the redesign of the IDE for working with “one
-        big program” Pytch projects!
-      </p>
-      <p>
-        You can{" "}
-        <a href="https://pytch.scss.tcd.ie/?p=974">
-          read the announcement about it
-        </a>
-        .
-      </p>
-    </div>
-  );
+  return false;
+  // In real use, put content into this div:
+  // return <div className="Welcome-NewsLink"></div>;
 };
 
 const Welcome: React.FC<EmptyProps> = () => {
