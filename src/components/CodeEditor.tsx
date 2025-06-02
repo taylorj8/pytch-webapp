@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AceEditor from "react-ace";
-import { Range } from "ace-builds";
+import { Ace, Range } from "ace-builds";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-searchbox";
@@ -17,6 +17,8 @@ import { LinkedContentBar } from "./LinkedContentBar";
 import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
 import { Debugger } from "../skulpt-connection/drive-project";
+
+const MAIN_FILE = "<stdin>.py";
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -49,9 +51,6 @@ const CodeAceEditor = () => {
   const saveIsPending = useStoreState(
     (state) => state.activeProject.syncState.loadState === "pending"
   );
-  // const inDebugMode = useStoreState(
-  //   (state) => state.activeProject.inDebugMode
-  // )
   const debugLine = useStoreState(
     (state) => state.activeProject.debugLine
   )
@@ -66,6 +65,8 @@ const CodeAceEditor = () => {
   useStoreState((state) => state.ideLayout.stageDisplaySize, eqDisplaySize);
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
+  // const [breakpoints, setBreakpoints] = useState(new Set<number>());
+
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -96,19 +97,66 @@ const CodeAceEditor = () => {
         return;
       }
 
-      let row = e.getDocumentPosition().row;
-      let breakpoints = e.editor.session.getBreakpoints(row, 0);
+      let row = e.getDocumentPosition().row + 1;
+      const breakpoints = Debugger.get_breakpoints_list();
+      console.log(breakpoints);
 
-      if (typeof breakpoints[row] === typeof undefined) {
-        e.editor.session.setBreakpoint(row);
-        Debugger.add_breakpoint("<stdin>.py", row+1, 0, false);
+      if (Debugger.check_breakpoints(MAIN_FILE, row, 0)) {
+        Debugger.clear_breakpoint(MAIN_FILE, row, 0, false);
+        ace.editor.session.clearBreakpoint(row - 1);
       } else {
-        e.editor.session.clearBreakpoint(row);
-        Debugger.clear_breakpoint("<stdin>.py", row+1, 0, false);
+        Debugger.add_breakpoint(MAIN_FILE, row, 0, false);
+        ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
       }
-
+      
       e.stop();
     });
+
+    (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
+      if (delta.end.row == delta.start.row) return;
+      const updatedBreakpoints = new Set<number>();
+      const breakpoints = Debugger.get_breakpoints_list();
+
+      let breakpointMoved = false;
+      Object.values(breakpoints).forEach((breakpoint: any) => {
+        const row = breakpoint.lineno;
+        
+        if (delta.start.row >= row) {
+          updatedBreakpoints.add(row);
+        } else if (delta.action === "insert") {
+
+          const linesAdded = delta.end.row - delta.start.row;
+          console.log("LINES ADDED: " + linesAdded);
+          updatedBreakpoints.add(row + linesAdded)
+          breakpointMoved = true;
+
+        } else if (delta.action === "remove") {
+
+          const linesRemoved = delta.end.row - delta.start.row;
+          const newRow = row - linesRemoved;
+          console.log("LINES REMOVED: " + linesRemoved);
+          if (newRow >= delta.start.row) {
+            updatedBreakpoints.add(newRow);
+            breakpointMoved = true;
+          } else {
+            updatedBreakpoints.add(row);
+          }
+
+        }
+      });
+      console.log(updatedBreakpoints);
+      
+      if (breakpointMoved) {
+        Debugger.clear_all_breakpoints();
+        ace.editor.session.clearBreakpoints();
+
+        updatedBreakpoints.forEach((breakpoint) => {
+          Debugger.add_breakpoint(MAIN_FILE, breakpoint, 0, false);
+          ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint")
+        });
+      }
+    });
+
 
     // It seems common to have not ever heard of "overwrite" mode.  If
     // it gets turned on by mistake, people often get confused.  Ensure

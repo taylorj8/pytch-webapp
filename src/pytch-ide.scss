@@ -364,18 +364,28 @@ $speech-bubble-max-height: 180px;
     font-family: $monospace-fonts;
   }
 
-  .ace_gutter-cell.ace_breakpoint {
+  @mixin breakpoint-dot($color) {
+    content: "";
     position: absolute;
-    &::before {
-      content: "";
+    left: 0.3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background-color: $color;
+    border-radius: 50%;
+  }
+  
+  .ace_gutter-cell {
+    &:hover::before {
+      @include breakpoint-dot(rgba(212, 24, 24, 0.4));
+    }
+
+    &.ace_breakpoint {
       position: absolute;
-      left: 0.3rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 12px;
-      height: 12px;
-      background-color: #d41818;
-      border-radius: 50%;
+      &::before {
+        @include breakpoint-dot(rgb(212, 24, 24));
+      }
     }
   }
 
