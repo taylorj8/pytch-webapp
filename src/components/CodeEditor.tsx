@@ -58,6 +58,7 @@ const CodeAceEditor = () => {
   const lastSyncFromStorageSeqNum = useStoreState(
     (state) => state.activeProject.lastSyncFromStorageSeqNum
   );
+  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
 
   // We don't care about the actual value of the stage display size, but
   // we do need to know when it changes, so we can resize the editor in
@@ -65,8 +66,6 @@ const CodeAceEditor = () => {
   useStoreState((state) => state.ideLayout.stageDisplaySize, eqDisplaySize);
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
-  // const [breakpoints, setBreakpoints] = useState(new Set<number>());
-
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -92,10 +91,10 @@ const CodeAceEditor = () => {
     });
 
     // toggleable breakpoints
+    
     ace.editor.on("guttermousedown", (e) => {
-      if (e.domEvent.target.className.indexOf("ace_gutter-cell") == -1) {
+      if (!showDebugFeatures || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
-      }
 
       let row = e.getDocumentPosition().row + 1;
       const breakpoints = Debugger.get_breakpoints_list();

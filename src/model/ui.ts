@@ -143,8 +143,8 @@ export interface IIDELayout {
   dismissButtonTour: Action<IIDELayout>;
   initiateButtonTour: Action<IIDELayout>;
   maybeAdvanceTour: Action<IIDELayout, ButtonTourStage>;
-  // debugMode: DebugMode;
-  // setDebugMode: Action<IIDELayout, DebugMode>;
+  showDebugFeatures: boolean;
+  toggleDebugFeatures: Action<IIDELayout>;
 }
 
 export const fullScreenStageDisplaySize = (controlsHeight = 36) => {
@@ -327,10 +327,13 @@ export const ideLayout: IIDELayout = {
   }),
 
   helpSidebar,
-  // debugMode: "normal",
-  // setDebugMode: action((state, mode) => {
-  //   state.debugMode = mode;
-  // }),
+  showDebugFeatures: false,
+  toggleDebugFeatures: action((state) =>{
+    state.showDebugFeatures = !state.showDebugFeatures;
+    document.documentElement.style.setProperty(
+      "--show-debug-features", state.showDebugFeatures ? "block" : "none"
+    )
+  }),
 };
 
 export interface IUserConfirmations {

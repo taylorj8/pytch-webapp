@@ -77,6 +77,11 @@ const GreenFlag = () => {
 
 const YellowDebug = () => {
   const build = useStoreActions((actions) => actions.activeProject.build);
+  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
+  if (!showDebugFeatures) {
+    return null;
+  }
+
   const handleClick = () => {
     build({ focusDestination: "running-project", inDebugMode: true });
     resetDebugging("debugging")
@@ -145,6 +150,20 @@ const LaunchCoordsChooserDropdownItem: React.FC<EmptyProps> = () => {
   return (
     <Dropdown.Item onClick={launchCoordsChooser}>
       Show coordinates
+    </Dropdown.Item>
+  );
+};
+
+const DebugFeaturesDropdownItem: React.FC<EmptyProps> = () => {
+  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures)
+  const toggleDebugFeatures = useStoreActions(
+    (actions) => actions.ideLayout.toggleDebugFeatures
+  );
+  const toggleFeatures = () => toggleDebugFeatures();
+
+  return (
+    <Dropdown.Item onClick={toggleFeatures}>
+      {showDebugFeatures ? "Disable Debug Features" : "Enable Debug Features"}
     </Dropdown.Item>
   );
 };
@@ -238,6 +257,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
         <ExportToDriveDropdownItem />
         <LaunchCoordsChooserDropdownItem />
         <Dropdown.Item onClick={onShowTooltips}>Show tooltips</Dropdown.Item>
+        <DebugFeaturesDropdownItem />
       </DropdownButton>
     </div>
   );
