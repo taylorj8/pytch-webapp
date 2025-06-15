@@ -25,9 +25,7 @@ export const focusStage = () => {
 const resetDebugging = (debugState: DebugState) => {
   store.getActions().activeProject.setDebugState(debugState);
   store.getActions().activeProject.setDebugLine(-1)
-  const project = Sk.pytch.current_live_project
-  project.allow_all_threads_listening()
-  project.continue_on_breakpoint()
+  Sk.pytch.current_live_project.continue_on_breakpoint()
   Debugger.disable_step_mode()
 }
 

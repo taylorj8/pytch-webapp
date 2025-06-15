@@ -116,7 +116,6 @@ type UpdatePointerOverStageArgs = {
 };
 
 type EnsureNotFullScreenAction = "restore-layout" | "force-wide-info-pane";
-// export type DebugMode = "normal" | "debug";
 
 export interface IIDELayout {
   kind: IDELayoutKind;
@@ -327,7 +326,7 @@ export const ideLayout: IIDELayout = {
   }),
 
   helpSidebar,
-  showDebugFeatures: false,
+  showDebugFeatures: true, // todo switch back to false
   toggleDebugFeatures: action((state) =>{
     state.showDebugFeatures = !state.showDebugFeatures;
     document.documentElement.style.setProperty(

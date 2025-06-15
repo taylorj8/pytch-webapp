@@ -1314,7 +1314,6 @@ export const activeProject: IActiveProject = {
   debugState: "stopped",
   inDebugMode: false,
   setDebugState: action((state, newDebugState) => {
-    console.log("setDebugState(): ", newDebugState);
     state.debugState = newDebugState;
     state.inDebugMode = newDebugState !== "running" && newDebugState !== "stopped";
   }),

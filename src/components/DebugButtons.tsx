@@ -13,19 +13,16 @@ export const DebugButtons = () => {
   const displaySize = useStoreState((state) => state.ideLayout.stageDisplaySize)
 
   const continueCallback = () => {
-    const project = Sk.pytch.current_live_project
     setDebugLine(-1)
-    project.allow_all_threads_listening()
     Debugger.disable_step_mode()
     setDebugState("debugging")
-    project.continue_on_breakpoint()
+    Sk.pytch.current_live_project.continue_on_breakpoint()
   }
 
   const stepCallback = () => {
-    const project = Sk.pytch.current_live_project
     Debugger.enable_step_mode()
     setDebugState("debugging")
-    project.continue_on_breakpoint()
+    Sk.pytch.current_live_project.set_threads_paused(false);
   }
 
   const style = {

@@ -24,7 +24,10 @@ export const DebugPane: React.FC<EmptyProps> = () => {
       if (project && project !== Sk.default_pytch_environment.current_live_project) {
         setLocalVars(project.get_all_local_variables());
         setGlobalVars(project.get_global_variables());
-        const suspension = project.get_debug_suspension();
+
+        const suspendedThread = project.get_stepping_thread();
+        const suspension = suspendedThread ? suspendedThread.skulpt_susp : null;
+
         if (suspension === null) {
           setHighlightedCard("");
         } else {
