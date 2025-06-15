@@ -331,6 +331,10 @@ export class ProjectEngine {
       store.getActions().activeProject.setDebugLine(project.get_debug_line());
     } 
     else if (debugState === "running" || debugState === "debugging") {
+      // const st = project.get_stepping_thread();
+      // if (st) {
+      //   console.log(st.state);
+      // }
       const maybeQuestionAnswer =
         this.webAppAPI.maybeAcquireUserInputSubmission();
       if (maybeQuestionAnswer != null) {
@@ -341,20 +345,26 @@ export class ProjectEngine {
       }
         
       Sk.pytch.sound_manager.one_frame();
-      const projectState = project.one_frame();
 
-      if (projectState.exception_was_raised) {
-        this.webAppAPI.ensureNotFullScreen();
-      }
-  
-      const question = projectState.maybe_live_question;
-      if (question == null) {
-        this.webAppAPI.clearUserQuestion();
+      const stepping_thread = project.get_stepping_thread();
+      if (stepping_thread != null && stepping_thread.state === "running") {
+        stepping_thread.one_frame();
       } else {
-        this.webAppAPI.askUserQuestion({
-          id: question.id,
-          prompt: question.prompt,
-        });
+        const projectState = project.one_frame();
+
+        if (projectState.exception_was_raised) {
+          this.webAppAPI.ensureNotFullScreen();
+        }
+      
+        const question = projectState.maybe_live_question;
+        if (question == null) {
+          this.webAppAPI.clearUserQuestion();
+        } else {
+          this.webAppAPI.askUserQuestion({
+            id: question.id,
+            prompt: question.prompt,
+          });
+        }
       }
     }
 
