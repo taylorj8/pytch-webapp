@@ -111,52 +111,6 @@ const CodeAceEditor = () => {
       e.stop();
     });
 
-    (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
-      if (delta.end.row == delta.start.row) return;
-      const updatedBreakpoints = new Set<number>();
-      const breakpoints = Debugger.get_breakpoints_list();
-
-      let breakpointMoved = false;
-      Object.values(breakpoints).forEach((breakpoint: any) => {
-        const row = breakpoint.lineno;
-        
-        if (delta.start.row >= row) {
-          updatedBreakpoints.add(row);
-        } else if (delta.action === "insert") {
-
-          const linesAdded = delta.end.row - delta.start.row;
-          console.log("LINES ADDED: " + linesAdded);
-          updatedBreakpoints.add(row + linesAdded)
-          breakpointMoved = true;
-
-        } else if (delta.action === "remove") {
-
-          const linesRemoved = delta.end.row - delta.start.row;
-          const newRow = row - linesRemoved;
-          console.log("LINES REMOVED: " + linesRemoved);
-          if (newRow >= delta.start.row) {
-            updatedBreakpoints.add(newRow);
-            breakpointMoved = true;
-          } else {
-            updatedBreakpoints.add(row);
-          }
-
-        }
-      });
-      console.log(updatedBreakpoints);
-      
-      if (breakpointMoved) {
-        Debugger.clear_all_breakpoints();
-        ace.editor.session.clearBreakpoints();
-
-        updatedBreakpoints.forEach((breakpoint) => {
-          Debugger.add_breakpoint(MAIN_FILE, breakpoint, 0, false);
-          ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint")
-        });
-      }
-    });
-
-
     // It seems common to have not ever heard of "overwrite" mode.  If
     // it gets turned on by mistake, people often get confused.  Ensure
     // we are in "insert" mode, and also remove any bindings for the
@@ -179,6 +133,53 @@ const CodeAceEditor = () => {
       setPrevMarker(marker);
     }
   }, [debugLine]);
+
+  useEffect(() => {
+    const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
+
+    // ensures the breakpoint tracks the code rather than the line number
+    (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
+      if (delta.end.row == delta.start.row) return;
+      const updatedBreakpoints = new Set<number>();
+      const breakpoints = Debugger.get_breakpoints_list();
+
+      let breakpointMoved = false;
+      Object.values(breakpoints).forEach((breakpoint: any) => {
+        const row = breakpoint.lineno;
+        
+        if (delta.start.row >= row) {
+          updatedBreakpoints.add(row);
+        } else if (delta.action === "insert") {
+
+          const linesAdded = delta.end.row - delta.start.row;
+          updatedBreakpoints.add(row + linesAdded)
+          breakpointMoved = true;
+
+        } else if (delta.action === "remove") {
+
+          const linesRemoved = delta.end.row - delta.start.row;
+          const newRow = row - linesRemoved;
+          if (newRow >= delta.start.row) {
+            updatedBreakpoints.add(newRow);
+            breakpointMoved = true;
+          } else {
+            updatedBreakpoints.add(row);
+          }
+
+        }
+      });
+      
+      if (breakpointMoved) {
+        Debugger.clear_all_breakpoints();
+        ace.editor.session.clearBreakpoints();
+
+        updatedBreakpoints.forEach((breakpoint) => {
+          Debugger.add_breakpoint(MAIN_FILE, breakpoint, 0, false);
+          ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint")
+        });
+      }
+    });
+  }, [])
 
   const { build, setCodeText } = useStoreActions(
     (actions) => actions.activeProject
