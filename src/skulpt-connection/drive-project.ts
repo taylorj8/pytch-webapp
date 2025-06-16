@@ -323,14 +323,10 @@ export class ProjectEngine {
       return;
     }
 
-    const debugState = store.getState().activeProject.debugState;
-
-    // only run the one_frame methods if the program isn't at a breakpoint
-    if (debugState === "debugging" && project.threads_are_paused()) {
-      store.getActions().activeProject.setDebugState("paused");
+    if (project.threads_are_paused()) {
       store.getActions().activeProject.setDebugLine(project.get_debug_line());
     } 
-    else if (debugState === "running" || debugState === "debugging") {
+    else {
       const maybeQuestionAnswer =
         this.webAppAPI.maybeAcquireUserInputSubmission();
       if (maybeQuestionAnswer != null) {

@@ -259,7 +259,6 @@ type NoteChangeAugArgs = {
 };
 
 type LoadPhase = "booting" | "booted";
-export type DebugState = "stopped" | "running" | "debugging" | "paused"
 
 export interface IActiveProject {
   changesManager: NotableChangesManager;
@@ -417,9 +416,8 @@ export interface IActiveProject {
   increaseNPendingSyncActions: Action<IActiveProject, number>;
 
   // DEBUGGING
-  debugState: DebugState;
   inDebugMode: boolean;
-  setDebugState: Action<IActiveProject, DebugState>;
+  setDebugMode: Action<IActiveProject, boolean>;
 
   debugLine: number;	
   setDebugLine: Action<IActiveProject, number>;
@@ -1311,11 +1309,9 @@ export const activeProject: IActiveProject = {
   }),
 
   // DEBUGGING
-  debugState: "stopped",
   inDebugMode: false,
-  setDebugState: action((state, newDebugState) => {
-    state.debugState = newDebugState;
-    state.inDebugMode = newDebugState !== "running" && newDebugState !== "stopped";
+  setDebugMode: action((state, newDebugMode) => {
+    state.inDebugMode = newDebugMode;
   }),
 
   debugLine: -1,

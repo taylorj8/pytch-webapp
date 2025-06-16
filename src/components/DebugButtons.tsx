@@ -8,20 +8,17 @@ import { faEject, faShoePrints } from '@fortawesome/free-solid-svg-icons';
 declare let Sk: any;
 
 export const DebugButtons = () => {
-  const setDebugState = useStoreActions((actions) => actions.activeProject.setDebugState)
-  const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine)
-  const displaySize = useStoreState((state) => state.ideLayout.stageDisplaySize)
+  const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine);
+  const displaySize = useStoreState((state) => state.ideLayout.stageDisplaySize);
 
   const continueCallback = () => {
-    setDebugLine(-1)
-    Debugger.disable_step_mode()
-    setDebugState("debugging")
-    Sk.pytch.current_live_project.continue_on_breakpoint()
+    setDebugLine(-1);
+    Debugger.disable_step_mode();
+    Sk.pytch.current_live_project.continue_on_breakpoint();
   }
 
   const stepCallback = () => {
-    Debugger.enable_step_mode()
-    setDebugState("debugging")
+    Debugger.enable_step_mode();
     Sk.pytch.current_live_project.pause_threads(false);
   }
 
