@@ -22,7 +22,7 @@ export const DebugButtons = () => {
   const stepCallback = () => {
     Debugger.enable_step_mode()
     setDebugState("debugging")
-    Sk.pytch.current_live_project.set_threads_paused(false);
+    Sk.pytch.current_live_project.pause_threads(false);
   }
 
   const style = {

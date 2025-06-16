@@ -331,10 +331,6 @@ export class ProjectEngine {
       store.getActions().activeProject.setDebugLine(project.get_debug_line());
     } 
     else if (debugState === "running" || debugState === "debugging") {
-      // const st = project.get_stepping_thread();
-      // if (st) {
-      //   console.log(st.state);
-      // }
       const maybeQuestionAnswer =
         this.webAppAPI.maybeAcquireUserInputSubmission();
       if (maybeQuestionAnswer != null) {
@@ -348,7 +344,7 @@ export class ProjectEngine {
 
       const stepping_thread = project.get_stepping_thread();
       if (stepping_thread != null && stepping_thread.state === "running") {
-        stepping_thread.one_frame();
+        stepping_thread.one_frame(); // todo check this solution with Ben
       } else {
         const projectState = project.one_frame();
 
