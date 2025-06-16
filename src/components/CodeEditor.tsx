@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AceEditor from "react-ace";
-import { Range } from "ace-builds";
+import { Ace, Range } from "ace-builds";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-searchbox";
@@ -16,6 +16,9 @@ import { equalILoadSaveStatus } from "../model/project";
 import { LinkedContentBar } from "./LinkedContentBar";
 import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
+import { Debugger } from "../skulpt-connection/drive-project";
+
+const MAIN_FILE = "<stdin>.py";
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -28,8 +31,8 @@ const ReadOnlyOverlay = () => {
     syncState.loadState === "pending"
       ? "Loading..."
       : syncState.saveState === "pending"
-      ? "Saving..."
-      : null;
+        ? "Saving..."
+        : null;
 
   if (maybeMessage != null) {
     return (
@@ -48,18 +51,21 @@ const CodeAceEditor = () => {
   const saveIsPending = useStoreState(
     (state) => state.activeProject.syncState.loadState === "pending"
   );
-  const inDebugMode = useStoreState(
-    (state) => state.ideLayout.editMode === "debug"
+  const debugLine = useStoreState(
+    (state) => state.activeProject.debugLine
   )
   const editSeqNum = useStoreState((state) => state.activeProject.editSeqNum);
   const lastSyncFromStorageSeqNum = useStoreState(
     (state) => state.activeProject.lastSyncFromStorageSeqNum
   );
+  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
 
   // We don't care about the actual value of the stage display size, but
   // we do need to know when it changes, so we can resize the editor in
   // our useEffect() call below.
   useStoreState((state) => state.ideLayout.stageDisplaySize, eqDisplaySize);
+
+  const [prevMarker, setPrevMarker] = useState<number | null>(null);
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -69,12 +75,12 @@ const CodeAceEditor = () => {
     ace.editor.commands.addCommand({
       name: "buildAndGreenFlag",
       bindKey: { mac: "Ctrl-Enter", win: "Ctrl-Enter" },
-      exec: () => build("running-project"),
+      exec: () => build({ focusDestination: "running-project", inDebugMode: false }),
     });
     ace.editor.commands.addCommand({
       name: "buildAndGreenFlagKeepFocus",
       bindKey: { mac: "Ctrl-Shift-Enter", win: "Ctrl-Shift-Enter" },
-      exec: () => build("editor"),
+      exec: () => build({ focusDestination: "editor", inDebugMode: false }),
     });
     ace.editor.commands.addCommand({
       name: "copySelectionAsHtml",
@@ -84,17 +90,23 @@ const CodeAceEditor = () => {
       },
     });
 
-    ace.editor.session.addMarker(
-      new Range(10, 0, 11, 1),
-      "line-11-marker",
-      "fullLine"
-    );
+    // toggleable breakpoints
+    ace.editor.on("guttermousedown", (e) => {
+      if (!showDebugFeatures || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
+        return;
 
-    ace.editor.session.addMarker(
-      new Range(0, 0, 1, 1),
-      "error-marker",
-      "text"
-    );
+      let row = e.getDocumentPosition().row + 1;
+
+      if (Debugger.check_breakpoints(MAIN_FILE, row, 0)) {
+        Debugger.clear_breakpoint(MAIN_FILE, row, 0, false);
+        ace.editor.session.clearBreakpoint(row - 1);
+      } else {
+        Debugger.add_breakpoint(MAIN_FILE, row, 0, false);
+        ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
+      }
+      
+      e.stop();
+    });
 
     // It seems common to have not ever heard of "overwrite" mode.  If
     // it gets turned on by mistake, people often get confused.  Ensure
@@ -107,6 +119,64 @@ const CodeAceEditor = () => {
       ace.editor.session.getUndoManager().reset();
     }
   });
+
+  useEffect(() => {
+    const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
+    if (prevMarker !== null)
+      ace.editor.session.removeMarker(prevMarker);
+
+    if (debugLine !== null) {
+      const marker = ace.editor.session.addMarker(new Range(debugLine-1, 0, debugLine-1, 1), "debugLine", "fullLine");
+      setPrevMarker(marker);
+    }
+  }, [debugLine]);
+
+  useEffect(() => {
+    const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
+
+    // ensures the breakpoint tracks the code rather than the line number
+    (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
+      if (delta.end.row == delta.start.row) return;
+      const updatedBreakpoints = new Set<number>();
+      const breakpoints = Debugger.get_breakpoints_list();
+
+      let breakpointMoved = false;
+      Object.values(breakpoints).forEach((breakpoint: any) => {
+        const row = breakpoint.lineno;
+        
+        if (delta.start.row >= row) {
+          updatedBreakpoints.add(row);
+        } else if (delta.action === "insert") {
+
+          const linesAdded = delta.end.row - delta.start.row;
+          updatedBreakpoints.add(row + linesAdded)
+          breakpointMoved = true;
+
+        } else if (delta.action === "remove") {
+
+          const linesRemoved = delta.end.row - delta.start.row;
+          const newRow = row - linesRemoved;
+          if (newRow >= delta.start.row) {
+            updatedBreakpoints.add(newRow);
+            breakpointMoved = true;
+          } else {
+            updatedBreakpoints.add(row);
+          }
+
+        }
+      });
+      
+      if (breakpointMoved) {
+        Debugger.clear_all_breakpoints();
+        ace.editor.session.clearBreakpoints();
+
+        updatedBreakpoints.forEach((breakpoint) => {
+          Debugger.add_breakpoint(MAIN_FILE, breakpoint, 0, false);
+          ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint")
+        });
+      }
+    });
+  }, [])
 
   const { build, setCodeText } = useStoreActions(
     (actions) => actions.activeProject
@@ -124,15 +194,6 @@ const CodeAceEditor = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const completers = [new PytchAceAutoCompleter() as any];
 
-  const markers = [{
-    startRow: 0,
-    startCol: 0,
-    endRow: 1,
-    endCol: 1,
-    className: 'error-marker',
-    type: 'text'
-  }];
-
   return (
     <>
       <AceEditor
@@ -147,7 +208,7 @@ const CodeAceEditor = () => {
         height="100%"
         onLoad={setFlatAceController}
         onChange={updateCodeText}
-        readOnly={saveIsPending || inDebugMode}
+        readOnly={saveIsPending}
       />
       <ReadOnlyOverlay />
     </>

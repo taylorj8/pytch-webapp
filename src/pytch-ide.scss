@@ -364,6 +364,38 @@ $speech-bubble-max-height: 180px;
     font-family: $monospace-fonts;
   }
 
+  @mixin breakpoint-dot($color) {
+    content: "";
+    position: absolute;
+    left: 0.3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background-color: $color;
+    border-radius: 50%;
+    display: var(--show-debug-features, "block") // todo change back to none
+  }
+  
+  .ace_gutter-cell {
+    &:hover::before {
+      @include breakpoint-dot(rgba(212, 24, 24, 0.4));
+    }
+
+    &.ace_breakpoint {
+      position: absolute;
+      &::before {
+        @include breakpoint-dot(rgb(212, 24, 24));
+      }
+    }
+  }
+
+  .debugLine {
+   position: absolute;
+   background: rgba(204, 35, 35, 0.5);
+   z-index: 20;
+  }
+
   .help-sidebar {
     display: flex;
     flex-direction: row;
@@ -458,6 +490,19 @@ $speech-bubble-max-height: 180px;
   }
 }
 
+@mixin as-bootstrap-button($bg, $border) {
+  &.btn,
+  &.btn:focus,
+  &.btn:active,
+  &.btn:focus-visible {
+    @include background-color-as-button($bg);
+    &,
+    &:hover {
+      border: 1px solid $border;
+    }
+  }
+}
+
 .InfoPanel-container {
   position: relative;
 
@@ -481,6 +526,139 @@ $speech-bubble-max-height: 180px;
       display: flex;
       flex-direction: row;
       align-items: center;
+    }
+    .layout-icon {
+      width: 24px;
+    }
+  }
+
+  .DebugPane { // todo move styling from debug files into here
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow-x: auto;
+
+    // todo: fix scroll bar
+    &::after {
+      content: "";
+      display: block;
+      flex-grow: 1;
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+  
+      .card {
+        flex: 0 0 300px;
+        min-width: 330px;
+        margin-bottom: 20px;
+      }
+
+      .inner-card {
+        min-width: 200px;
+        flex: 1 1 auto;
+      }
+  
+      .highlighted-card {
+        min-width: 200px;
+        flex: 1 1 auto;
+        box-shadow: 0 0 10px 2px red;
+        border: 2px solid red;
+      }
+
+      .actor-instance {
+        margin-top: 0.75rem;
+        padding-left: 0.5rem;
+      
+        &.highlighted-clone {
+          background-color: rgba(255, 0, 0, 0.1);
+          border-left: 4px solid red;
+          padding-left: 1rem;
+        }
+      
+        strong {
+          display: block;
+          margin-bottom: 0.25rem;
+        }
+      
+        .list-group-item {
+          font-family: "Courier New", Courier, monospace;
+          font-size: 0.9rem;
+          padding: 0.25rem 0.5rem;
+        }
+      }
+
+      .clone-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.25rem;
+      
+        img.card-title-img {
+          margin-right: 0.5rem;
+        }
+      }
+
+      .clone-container {
+        width: 100%;
+        // display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      
+      .actor-instance {
+        width: 100%;
+      }
+    
+      .monospace-font {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.95rem;
+      }
+      
+      .card-title-img {
+        max-width: 32px;
+        max-height: 32px;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+      }
+    
+      .card-title-icon {
+        max-width: 24px;
+        max-height: 24px;
+        width: auto;
+        height: auto;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+      }
+
+      .monospace-font {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.95rem;
+      }
+    }
+  }
+
+  .DebugButtons {
+    position: absolute;
+    height: 32px;
+    top: 0px;
+    display: flex;
+    flex-direction: row;
+    .DebugButton {
+      height: 32px;
+      margin-left: 0.5rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      @include as-bootstrap-button(rgb(240, 220, 44), rgb(230, 200, 30));
+      svg {
+        filter: drop-shadow(0px 0px 1px grey);
+      }
     }
     .layout-icon {
       width: 24px;
@@ -638,19 +816,6 @@ div.spacer-instead-of-resizer {
   }
 }
 
-@mixin as-bootstrap-button($bg, $border) {
-  &.btn,
-  &.btn:focus,
-  &.btn:active,
-  &.btn:focus-visible {
-    @include background-color-as-button($bg);
-    &,
-    &:hover {
-      border: 1px solid $border;
-    }
-  }
-}
-
 .StageControlPseudoButton {
   width: 3em;
   height: 36px;
@@ -667,10 +832,23 @@ div.spacer-instead-of-resizer {
 
   &.GreenFlag {
     @include as-bootstrap-button(#2c2, #1a1);
+    svg {
+      filter: drop-shadow(0px 0px 1px grey);
+    }
+  }
+
+  &.YellowDebug {
+    @include as-bootstrap-button(rgb(240, 220, 44), rgb(230, 200, 30));
+    svg {
+      filter: drop-shadow(0px 0px 1px grey);
+    }
   }
 
   &.RedStop {
-    @include as-bootstrap-button(#e33, #c11);
+    @include as-bootstrap-button(#e33, #c11); 
+    svg {
+      filter: drop-shadow(0px 0px 1px grey);
+    }
   }
 }
 

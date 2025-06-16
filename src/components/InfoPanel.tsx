@@ -4,11 +4,12 @@ import { Tabs, TabWithTypedKey } from "./TabWithTypedKey";
 import Tutorial from "./Tutorial";
 import { ErrorReportList } from "./ErrorReportList";
 import ProjectAssetList from "./ProjectAssetList";
-import EditorWebSocketInfo from "./EditorWebSocketInfo";
 import { LayoutChooser } from "./LayoutChooser";
-import { isEnabled as liveReloadEnabled } from "../model/live-reload";
+// import EditorWebSocketInfo from "./EditorWebSocketInfo";
+// import { isEnabled as liveReloadEnabled } from "../model/live-reload";
 import { InfoPanelTabKey } from "../model/ui";
 import { DebugPane } from "./DebugPane";
+import { DebugButtons } from "./DebugButtons";
 
 const StandardOutput = () => {
   const text = useStoreState((state) => state.standardOutputPane.text);
@@ -53,8 +54,7 @@ const InfoPanel = () => {
     (state) => state.infoPanel.setActiveTabKey
   );
   const layoutKind = useStoreState((state) => state.ideLayout.kind);
-
-  const setEditMode = useStoreActions(actions => actions.ideLayout.setEditMode);
+  const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode);
 
   if (isSyncingFromBackEnd) {
     return null;
@@ -63,6 +63,7 @@ const InfoPanel = () => {
   const Tab = TabWithTypedKey<InfoPanelTabKey>;
   return (
     <div className="InfoPanel-container">
+      {inDebugMode && <DebugButtons/>}
       <LayoutChooser />
       <Tabs
         className={`InfoPanel ${layoutKind}`}
@@ -70,7 +71,6 @@ const InfoPanel = () => {
         activeKey={activeKey}
         onSelect={(k) => {
           setActiveKey(k as InfoPanelTabKey)
-          setEditMode(k === "debug" ? "debug" : "edit")
         }}
       >
         {isTrackingTutorial && (
@@ -87,13 +87,13 @@ const InfoPanel = () => {
         <Tab className="InfoPane" eventKey="errors" title="Errors">
           <Errors />
         </Tab>
-
-        <Tab className="InfoPane" eventKey="debug" title="Debug">
-          <DebugPane />
-		    </Tab>
-
-        {/* <DebugTab className="InfoPane" eventKey="debug" title="Debug" mode="edit"></DebugTab> */}
-        {liveReloadEnabled() ? (
+        {inDebugMode ? (
+          <Tab className="InfoPane" eventKey="debug" title={<span style={{ color: "#B20000" }}>Debug</span>}>
+            <DebugPane />
+		      </Tab>
+        ) : null}
+        
+        {/* {liveReloadEnabled() ? ( // commented out for demo purposes
           <Tab
             className="InfoPane"
             eventKey="websocket-log"
@@ -101,7 +101,7 @@ const InfoPanel = () => {
           >
             <EditorWebSocketInfo />
           </Tab>
-        ) : null}
+        ) : null} */}
       </Tabs>
     </div>
   );

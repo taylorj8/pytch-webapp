@@ -13,6 +13,7 @@ import {
   IQuestionFromVM,
   MaybeUserAnswerSubmissionToVM,
 } from "../model/user-text-input";
+import store from "../store";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -22,6 +23,7 @@ declare let Sk: any;
 //
 // TODO: Is this the best place to put this?
 Sk.configure({});
+export let Debugger = new Sk.Debugger("<stdin>.py", null);
 
 let peId = 1000;
 
@@ -309,7 +311,7 @@ export class ProjectEngine {
 
   oneFrame() {
     const logIntro = `ProjectEngine[${this.id}].oneFrame()`;
-
+    
     if (!this.shouldRun) {
       console.log(`${logIntro}: halt was requested; bailing`);
       return;
@@ -321,29 +323,49 @@ export class ProjectEngine {
       return;
     }
 
-    const maybeQuestionAnswer =
-      this.webAppAPI.maybeAcquireUserInputSubmission();
-    if (maybeQuestionAnswer != null)
-      project.accept_question_answer(
-        maybeQuestionAnswer.questionId,
-        maybeQuestionAnswer.answer
-      );
+    const setDebugLine = store.getActions().activeProject.setDebugLine;
+    if (project.threads_are_paused()) {
+      setDebugLine(project.get_debug_line());
+    } 
+    else {
+      const stepping_thread = project.get_stepping_thread();
+      // if thread terminates while stepping, clear debug line and continue
+      if (stepping_thread && stepping_thread.state === "zombie") {
+        setDebugLine(-1);
+        Debugger.disable_step_mode();
+        project.continue_on_breakpoint();
+      }
 
-    Sk.pytch.sound_manager.one_frame();
-    const projectState = project.one_frame();
+      const maybeQuestionAnswer =
+        this.webAppAPI.maybeAcquireUserInputSubmission();
+      if (maybeQuestionAnswer != null) {
+        project.accept_question_answer(
+          maybeQuestionAnswer.questionId,
+          maybeQuestionAnswer.answer
+        );
+      }
+        
+      Sk.pytch.sound_manager.one_frame();
 
-    if (projectState.exception_was_raised) {
-      this.webAppAPI.ensureNotFullScreen();
-    }
+      if (stepping_thread != null && stepping_thread.state === "running") {
+        stepping_thread.one_frame(); // todo check this solution with Ben
+      } else {
+        const projectState = project.one_frame();
 
-    const question = projectState.maybe_live_question;
-    if (question == null) {
-      this.webAppAPI.clearUserQuestion();
-    } else {
-      this.webAppAPI.askUserQuestion({
-        id: question.id,
-        prompt: question.prompt,
-      });
+        if (projectState.exception_was_raised) {
+          this.webAppAPI.ensureNotFullScreen();
+        }
+      
+        const question = projectState.maybe_live_question;
+        if (question == null) {
+          this.webAppAPI.clearUserQuestion();
+        } else {
+          this.webAppAPI.askUserQuestion({
+            id: question.id,
+            prompt: question.prompt,
+          });
+        }
+      }
     }
 
     const renderResult = this.render(project);

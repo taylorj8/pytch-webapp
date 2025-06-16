@@ -4,6 +4,7 @@ import { assetServer } from "./asset-server";
 import { ensureSoundManager } from "./sound-manager";
 import { ProjectContent } from "../model/project-core";
 import { AssetPresentation } from "../model/asset";
+import { Debugger } from "../skulpt-connection/drive-project";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -53,15 +54,28 @@ export const build = async (
   project: ProjectContent<AssetPresentation>,
   addOutputChunk: (chunk: string) => void,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handleError: (pytchError: any, errorContext: any) => void
+  handleError: (pytchError: any, errorContext: any) => void,
+  inDebugMode: boolean
 ): Promise<BuildOutcome> => {
-  // This also resets the current_live_project slot.
-  Sk.configure({
-    __future__: Sk.python3,
-    read: builtinRead,
-    output: addOutputChunk,
-    pytch: { on_exception: handleError },
-  });
+  if (inDebugMode) {
+    Sk.configure({
+      __future__: Sk.python3,
+      read: builtinRead,
+      output: addOutputChunk,
+      pytch: { on_exception: handleError },
+      debugging: true,
+      breakpoints: Debugger.check_breakpoints.bind(Debugger),
+    });
+  } else {
+    // This also resets the current_live_project slot.
+    Sk.configure({
+      __future__: Sk.python3,
+      read: builtinRead,
+      output: addOutputChunk,
+      pytch: { on_exception: handleError },
+    });
+  }
+
   try {
     ensureSoundManager();
     Sk.pytch.async_load_image = (name: string) => assetServer.loadImage(name);

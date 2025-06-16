@@ -5,11 +5,14 @@ import { useStoreActions, useStoreState } from "../store";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBug } from '@fortawesome/free-solid-svg-icons';
 import { EmptyProps } from "../utils";
 import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content";
 import { pathWithinApp } from "../env-utils";
 import { useNavigate } from "react-router-dom";
 import { useRunFlow } from "../model";
+import { Debugger } from "../skulpt-connection/drive-project";
+import store from "../store";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -17,6 +20,13 @@ declare let Sk: any;
 export const focusStage = () => {
   document.getElementById("pytch-speech-bubbles")?.focus();
 };
+
+const resetDebugging = (inDebugMode: boolean) => {
+  store.getActions().activeProject.setDebugMode(inDebugMode);
+  store.getActions().activeProject.setDebugLine(-1);
+  Sk.pytch.current_live_project.continue_on_breakpoint();
+  Debugger.disable_step_mode();
+}
 
 const StaticTooltip: React.FC<PropsWithChildren<{ visible: boolean }>> = ({
   children,
@@ -40,8 +50,10 @@ const GreenFlag = () => {
     (state) => state.ideLayout.buttonTourProgressStage
   );
   const build = useStoreActions((actions) => actions.activeProject.build);
-
-  const handleClick = () => build("running-project");
+  const handleClick = () => {
+    build({ focusDestination: "running-project", inDebugMode: false });
+    resetDebugging(false);
+  };
 
   const tooltipIsVisible = buttonTourProgressStage === "green-flag";
 
@@ -60,10 +72,35 @@ const GreenFlag = () => {
   );
 };
 
+const YellowDebug = () => {
+  const build = useStoreActions((actions) => actions.activeProject.build);
+  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
+  if (!showDebugFeatures) {
+    return null;
+  }
+
+  const handleClick = () => {
+    build({ focusDestination: "running-project", inDebugMode: true });
+    resetDebugging(true);
+  };
+  return (
+    <div className="tooltipped-elt">
+      <Button
+        className="StageControlPseudoButton YellowDebug"
+        onClick={handleClick}
+      >
+        <FontAwesomeIcon icon={faBug} />
+      </Button>
+    </div>
+  );
+};
+
 export const RedStop = () => {
   const redStop = () => {
-    Sk.pytch.current_live_project.on_red_stop_clicked();
+    const project = Sk.pytch.current_live_project
+    project.on_red_stop_clicked();
     focusStage();
+    resetDebugging(false);
   };
   return (
     <Button className="StageControlPseudoButton RedStop" onClick={redStop}>
@@ -110,6 +147,20 @@ const LaunchCoordsChooserDropdownItem: React.FC<EmptyProps> = () => {
   return (
     <Dropdown.Item onClick={launchCoordsChooser}>
       Show coordinates
+    </Dropdown.Item>
+  );
+};
+
+const DebugFeaturesDropdownItem: React.FC<EmptyProps> = () => {
+  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures)
+  const toggleDebugFeatures = useStoreActions(
+    (actions) => actions.ideLayout.toggleDebugFeatures
+  );
+  const toggleFeatures = () => toggleDebugFeatures();
+
+  return (
+    <Dropdown.Item onClick={toggleFeatures}>
+      {showDebugFeatures ? "Disable Debug Features" : "Enable Debug Features"}
     </Dropdown.Item>
   );
 };
@@ -167,6 +218,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
     <div className="StageControls">
       <div className="run-stop-controls">
         <GreenFlag />
+        <YellowDebug />
         <RedStop />
       </div>
       <Button
@@ -180,6 +232,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
   ) : (
     <div className="StageControls">
       <GreenFlag />
+      <YellowDebug />
       <RedStop />
       <Button
         className={`save-button ${codeStateVsStorage}`}
@@ -201,6 +254,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
         <ExportToDriveDropdownItem />
         <LaunchCoordsChooserDropdownItem />
         <Dropdown.Item onClick={onShowTooltips}>Show tooltips</Dropdown.Item>
+        <DebugFeaturesDropdownItem />
       </DropdownButton>
     </div>
   );

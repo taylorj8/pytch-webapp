@@ -142,6 +142,8 @@ export interface IIDELayout {
   dismissButtonTour: Action<IIDELayout>;
   initiateButtonTour: Action<IIDELayout>;
   maybeAdvanceTour: Action<IIDELayout, ButtonTourStage>;
+  showDebugFeatures: boolean;
+  toggleDebugFeatures: Action<IIDELayout>;
 }
 
 export const fullScreenStageDisplaySize = (controlsHeight = 36) => {
@@ -324,6 +326,13 @@ export const ideLayout: IIDELayout = {
   }),
 
   helpSidebar,
+  showDebugFeatures: true, // todo switch back to false
+  toggleDebugFeatures: action((state) =>{
+    state.showDebugFeatures = !state.showDebugFeatures;
+    document.documentElement.style.setProperty(
+      "--show-debug-features", state.showDebugFeatures ? "block" : "none"
+    )
+  }),
 };
 
 export interface IUserConfirmations {
@@ -426,7 +435,8 @@ export type InfoPanelTabKey =
   | "assets"
   | "output"
   | "errors"
-  | "websocket-log";
+  | "websocket-log"
+  | "debug";
 
 export interface IInfoPanel {
   activeTabKey: InfoPanelTabKey;

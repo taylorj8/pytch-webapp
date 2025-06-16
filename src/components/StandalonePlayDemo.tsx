@@ -206,7 +206,8 @@ export const StandalonePlayDemo: React.FC<EmptyProps> = () => {
         // TODO: Could put up button saying "launch Pytch (in new tab)
         // with this project so you can debug".
         noteErrorOccurred();
-      }
+      },
+      false // build in non-debug mode
     );
 
     if (buildResult.kind === BuildOutcomeKind.Success) {

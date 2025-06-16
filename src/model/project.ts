@@ -243,7 +243,7 @@ function assertLinkedContentSucceededOfKind<KindT extends LinkedContentKind>(
   if (contentKind !== requiredContentKind) {
     throw new Error(
       `required linked-content-kind "${requiredContentKind}"` +
-        ` but have kind "${contentKind}"`
+      ` but have kind "${contentKind}"`
     );
   }
 }
@@ -406,7 +406,7 @@ export interface IActiveProject {
   setActiveTutorialChapter: Action<IActiveProject, number>;
 
   incrementBuildSeqnum: Action<IActiveProject>;
-  build: Thunk<IActiveProject, FocusDestination, void, IPytchAppModel>;
+  build: Thunk<IActiveProject, { focusDestination: FocusDestination; inDebugMode: boolean; }, void, IPytchAppModel>;
 
   ////////////////////////////////////////////////////////////////////////
   // Background sync
@@ -414,6 +414,13 @@ export interface IActiveProject {
   nPendingSyncActions: number;
   pendingSyncActionsExist: Computed<IActiveProject, boolean>;
   increaseNPendingSyncActions: Action<IActiveProject, number>;
+
+  // DEBUGGING
+  inDebugMode: boolean;
+  setDebugMode: Action<IActiveProject, boolean>;
+
+  debugLine: number;	
+  setDebugLine: Action<IActiveProject, number>;
 }
 
 const dummyPytchProgram = PytchProgramOps.fromPythonCode(
@@ -766,7 +773,7 @@ export const activeProject: IActiveProject = {
 
   setCodeTextAndBuild: thunk(async (actions, payload) => {
     actions.setCodeText(payload.codeText);
-    await actions.build(payload.focusDestination);
+    await actions.build({ focusDestination: payload.focusDestination, inDebugMode: false });
   }),
 
   syncDummyProject: action((state) => {
@@ -862,8 +869,8 @@ export const activeProject: IActiveProject = {
       if (liveLoadRequest.seqnum !== ourSeqnum) {
         console.log(
           "ensureSyncFromStorage():" +
-            ` live seqnum is ${liveLoadRequest.seqnum}` +
-            ` but we are working on ${ourSeqnum}; abandoning`
+          ` live seqnum is ${liveLoadRequest.seqnum}` +
+          ` but we are working on ${ourSeqnum}; abandoning`
         );
         return;
       }
@@ -978,7 +985,7 @@ export const activeProject: IActiveProject = {
   addAssetAndSync: thunk(async (actions, descriptor, helpers) => {
     console.log(
       `adding asset ${descriptor.name}: ${descriptor.mimeType}` +
-        ` (${descriptor.data.byteLength} bytes)`
+      ` (${descriptor.data.byteLength} bytes)`
     );
 
     const project = helpers.getState().project;
@@ -1015,17 +1022,17 @@ export const activeProject: IActiveProject = {
     try {
       await renameAssetInProject(project.id, oldName, newName);
     } catch (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      err: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    err: any
     ) {
       if (err.name === "PytchDuplicateAssetNameError") {
         const opContext = descriptor.operationContext;
         throw new Error(
           `Cannot rename "${descriptor.oldNameSuffix}"` +
-            ` to "${descriptor.newNameSuffix}" because` +
-            ` ${opContext.scope} already contains` +
-            ` ${opContext.assetIndefinite} called` +
-            ` "${descriptor.newNameSuffix}".`
+          ` to "${descriptor.newNameSuffix}" because` +
+          ` ${opContext.scope} already contains` +
+          ` ${opContext.assetIndefinite} called` +
+          ` "${descriptor.newNameSuffix}".`
         );
       } else {
         throw err;
@@ -1127,10 +1134,10 @@ export const activeProject: IActiveProject = {
             const wipChapter = newContent.workInProgressChapter;
             appendTimestamped(
               `server:tutorial: update; ${newContent.chapters.length} chapter/s` +
-                (wipChapter != null
-                  ? `; working on chapter ${wipChapter}` +
-                    ` "${newContent.chapters[wipChapter].title}"`
-                  : "")
+              (wipChapter != null
+                ? `; working on chapter ${wipChapter}` +
+                ` "${newContent.chapters[wipChapter].title}"`
+                : "")
             );
             const newTrackedTutorial = {
               content: newContent,
@@ -1165,7 +1172,7 @@ export const activeProject: IActiveProject = {
     const { appendTimestamped } = helpers.getStoreActions().editorWebSocketLog;
     appendTimestamped(
       `error with websocket connection;` +
-        ` ensure server is running at ${liveReloadURL}`
+      ` ensure server is running at ${liveReloadURL}`
     );
   }),
 
@@ -1187,7 +1194,7 @@ export const activeProject: IActiveProject = {
   }),
 
   build: thunk(
-    async (actions, focusDestination, helpers): Promise<BuildOutcome> => {
+    async (actions, { focusDestination, inDebugMode }, helpers): Promise<BuildOutcome> => {
       const project = helpers.getState().project;
       failIfDummy(project, "build");
 
@@ -1229,7 +1236,7 @@ export const activeProject: IActiveProject = {
       // which does mean we need to do this bit ourselves too, ugh:
       helpers.getStoreActions().projectCollection.noteDatabaseChange();
 
-      const buildOutcome = await build(project, appendOutput, recordError);
+      const buildOutcome = await build(project, appendOutput, recordError, inDebugMode);
 
       const programKind = project.program.kind;
       const outcomeKind = BuildOutcomeKindOps.displayName(buildOutcome.kind);
@@ -1295,9 +1302,20 @@ export const activeProject: IActiveProject = {
     if (state.nPendingSyncActions < 0) {
       console.warn(
         `nPendingSyncActions = ${state.nPendingSyncActions} < 0;` +
-          " clamping to zero"
+        " clamping to zero"
       );
       state.nPendingSyncActions = 0;
     }
+  }),
+
+  // DEBUGGING
+  inDebugMode: false,
+  setDebugMode: action((state, newDebugMode) => {
+    state.inDebugMode = newDebugMode;
+  }),
+
+  debugLine: -1,
+  setDebugLine: action((state, line) => {
+    state.debugLine = line;
   }),
 };
