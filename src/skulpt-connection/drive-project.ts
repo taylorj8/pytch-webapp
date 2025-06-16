@@ -323,10 +323,19 @@ export class ProjectEngine {
       return;
     }
 
+    const setDebugLine = store.getActions().activeProject.setDebugLine;
     if (project.threads_are_paused()) {
-      store.getActions().activeProject.setDebugLine(project.get_debug_line());
+      setDebugLine(project.get_debug_line());
     } 
     else {
+      const stepping_thread = project.get_stepping_thread();
+      // if thread terminates while stepping, clear debug line and continue
+      if (stepping_thread && stepping_thread.state === "zombie") {
+        setDebugLine(-1);
+        Debugger.disable_step_mode();
+        project.continue_on_breakpoint();
+      }
+
       const maybeQuestionAnswer =
         this.webAppAPI.maybeAcquireUserInputSubmission();
       if (maybeQuestionAnswer != null) {
@@ -338,7 +347,6 @@ export class ProjectEngine {
         
       Sk.pytch.sound_manager.one_frame();
 
-      const stepping_thread = project.get_stepping_thread();
       if (stepping_thread != null && stepping_thread.state === "running") {
         stepping_thread.one_frame(); // todo check this solution with Ben
       } else {
