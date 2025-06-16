@@ -16,7 +16,6 @@ import {
 } from "../ErrorReportList";
 import { useStoreState } from "../../store";
 
-
 const UserCodeErrorLocation: UserCodeErrorLocationComponent = ({
   lineNo,
   colNo,

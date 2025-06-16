@@ -161,12 +161,14 @@ const GenericProgressTrail: React.FC<GenericProgressTrailProps> = ({
   return (
     <>
       <div className="ProgressTrail">
+        <div className="node-backgrounds">{nodeBackgrounds}</div>
         <div className="track" />
         <div className="nodes">{nodeDivs}</div>
+        <div className="node-hover-targets">{nodeHoverTargets}</div>
       </div>
       <div className="chapter-title">
         {maybeChapterNumberLabel}
-        {chapterTitleElt.element.innerText}
+        {chapterTitleElt.innerText}
       </div>
     </>
   );

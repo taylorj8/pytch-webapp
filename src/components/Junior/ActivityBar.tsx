@@ -7,7 +7,7 @@ import { useJrEditActions, useJrEditState } from "./hooks";
 import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-common-types";
-import { useHasLinkedLesson } from "./lesson/hooks";
+import { useHasLinkedLesson, useHasLinkedSpecimen } from "./lesson/hooks";
 import { EmptyProps } from "../../utils";
 import { useStoreState } from "../../store";
 
@@ -38,7 +38,7 @@ const ActivityBarTab: React.FC<ActivityBarTabProps> = ({ tab, isActive }) => {
 
   const onClick = isActive ? () => collapseAction() : () => expandAction(tab);
   const uiDetails = uiDetailsFromTabKey(tab);
-  const classes = classNames("ActivityBarTab", { isActive });
+  const classes = classNames("ActivityBarTab", { isActive }, `tab-key-${tab}`);
 
   return (
     <div className={classes} onClick={onClick}>
