@@ -24,6 +24,12 @@ describe("Asset operations", () => {
       assert.equal(Ops.mimeMajorTypeSortKey("audio"), 1);
       assert.throws(() => Ops.mimeMajorTypeSortKey("text"), "unknown");
     });
+
+    it("asset mime-type", () => {
+      assert.equal(Ops.mimeAssetKind("image/png"), "image");
+      assert.equal(Ops.mimeAssetKind("audio/mpeg"), "audio");
+      assert.throws(() => Ops.mimeAssetKind("text/plain"), "not suitable");
+    });
   });
 
   describe("content hashing", () => {

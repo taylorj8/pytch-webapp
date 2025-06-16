@@ -16,6 +16,7 @@ export const CodeDiffHelpModal = () => {
       <Modal
         show={true}
         onHide={settle.cancel}
+        className="CodeDiffHelpModal"
         animation={false}
         centered
         size="lg"
@@ -35,10 +36,8 @@ export const CodeDiffHelpModal = () => {
                 <strong>
                   help you find the part of your code which needs changing
                 </strong>
-                . The two numbers (to the left of the vertical divider) show you
-                which line it is. The first number is the line in the code as it
-                is now, and the second number is the line as it will be after
-                your change.
+                . The number (to the left of the vertical divider) shows you
+                which line it is, in the code as it is now.
               </p>
             </Alert>
           )}
@@ -50,9 +49,7 @@ export const CodeDiffHelpModal = () => {
               />
               <p>
                 Lines like this show you{" "}
-                <strong>code you need to delete</strong>. The line number (to
-                the left of the vertical divider) shows you the line number
-                which that line has at the moment, before you delete it.
+                <strong>code you need to delete</strong>.
               </p>
             </Alert>
           )}
@@ -61,10 +58,8 @@ export const CodeDiffHelpModal = () => {
               <RawElement className="patch-container" element={samples.added} />
               <p>
                 Lines like this show you <strong>code you need to add</strong>.
-                The line number (to the left of the vertical divider) shows you
-                the line number which that line will have once you’ve added it.
-                You can use the COPY button to copy the lines of code ready for
-                pasting.
+                You can click on the <span className="add-code-icon">+</span>{" "}
+                button to copy the lines of code ready for pasting.
               </p>
             </Alert>
           )}

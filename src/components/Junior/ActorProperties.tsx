@@ -38,7 +38,7 @@ export const ActorProperties = () => {
 
   const Tab = TabWithTypedKey<TabKey>;
   return (
-    <div className="Junior-ActorProperties-container">
+    <div className="Junior-ActorProperties-container compact-tablist-container">
       <Tabs
         transition={false}
         activeKey={activeTab}

@@ -9,7 +9,6 @@ declare let Sk: any;
 
 export const DebugButtons = () => {
   const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine);
-  const displaySize = useStoreState((state) => state.ideLayout.stageDisplaySize);
 
   const continueCallback = () => {
     setDebugLine(-1);
@@ -22,12 +21,8 @@ export const DebugButtons = () => {
     Sk.pytch.current_live_project.pause_threads(false);
   }
 
-  const style = {
-    right: `calc(${displaySize.width}px - 100px)`
-  };
-
   return (
-    <div className="DebugButtons" style={style}>
+    <div className="DebugButtons">
       <Button
         className="DebugButton"
         onClick={continueCallback}

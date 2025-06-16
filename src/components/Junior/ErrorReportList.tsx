@@ -1,6 +1,6 @@
 import React from "react";
 
-import { EmptyProps } from "../../utils";
+import { assertNever, EmptyProps } from "../../utils";
 import { useJrEditActions } from "./hooks";
 import {
   liveSourceMap,
@@ -14,7 +14,7 @@ import {
   UserCodeErrorLocationComponent,
   ErrorReportList as ErrorReportList_Generic,
 } from "../ErrorReportList";
-
+import { useStoreState } from "../../store";
 
 const UserCodeErrorLocation: UserCodeErrorLocationComponent = ({
   lineNo,
@@ -94,8 +94,21 @@ const juniorComponents: ErrorReportComponents = {
   schedulerStepErrorIntro: SchedulerStepErrorIntro,
 };
 
-export const ErrorReportList: React.FC<EmptyProps> = () => (
-  <componentsContext.Provider value={juniorComponents}>
-    <ErrorReportList_Generic />
-  </componentsContext.Provider>
-);
+export const ErrorReportList: React.FC<EmptyProps> = () => {
+  const programKind = useStoreState(
+    (state) => state.activeProject.project.program.kind
+  );
+  switch (programKind) {
+    case "flat":
+      // The default for the context is suitable for the "flat" IDE.
+      return <ErrorReportList_Generic />;
+    case "per-method":
+      return (
+        <componentsContext.Provider value={juniorComponents}>
+          <ErrorReportList_Generic />
+        </componentsContext.Provider>
+      );
+    default:
+      return assertNever(programKind);
+  }
+};

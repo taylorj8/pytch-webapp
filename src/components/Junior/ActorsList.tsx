@@ -18,7 +18,7 @@ import {
 } from "./hooks";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { ActorPropertiesTabKey } from "../../model/junior/edit-state";
-import { TabWithTypedKey, Tabs } from "../TabWithTypedKey";
+import { SingleTab } from "../SingleTab";
 
 type ActorThumbnailProps = { id: Uuid };
 const ActorThumbnail: React.FC<ActorThumbnailProps> = ({ id }) => {
@@ -150,7 +150,7 @@ const ActorCard: React.FC<ActorCardProps> = ({ isFocused, kind, id, name }) => {
 
   const className = classNames("ActorCard", `kind-${kind}`, { isFocused });
   return (
-    <div className={className} onClick={setFocusedActor}>
+    <div className={className} onClick={setFocusedActor} data-actor-id={id}>
       <div className="ActorCardContent">
         <ActorThumbnail id={id} />
         <div className="label">{name}</div>
@@ -174,34 +174,31 @@ export const ActorsList = () => {
     });
   };
 
-  const Tab = TabWithTypedKey<"actors">;
   return (
-    <div className="Junior-ActorsList-container">
-      <Tabs>
-        <Tab eventKey="actors" title="Stage and sprites">
-          <div className="abs-0000">
-            <div className="ActorsList">
-              {program.actors.map((a) => {
-                const isFocused = a.id === focusedActor;
-                return (
-                  <ActorCard
-                    key={a.id}
-                    isFocused={isFocused}
-                    kind={a.kind}
-                    id={a.id}
-                    name={a.name}
-                  />
-                );
-              })}
-            </div>
-            <AddSomethingSingleButton
-              what="sprite"
-              label="Add sprite"
-              onClick={() => launchAddSpriteModal()}
-            />
+    <div className="Junior-ActorsList-container compact-tablist-container">
+      <SingleTab title="Stage and sprites">
+        <div className="abs-0000">
+          <div className="ActorsList">
+            {program.actors.map((a) => {
+              const isFocused = a.id === focusedActor;
+              return (
+                <ActorCard
+                  key={a.id}
+                  isFocused={isFocused}
+                  kind={a.kind}
+                  id={a.id}
+                  name={a.name}
+                />
+              );
+            })}
           </div>
-        </Tab>
-      </Tabs>
+          <AddSomethingSingleButton
+            what="sprite"
+            label="Add sprite"
+            onClick={() => launchAddSpriteModal()}
+          />
+        </div>
+      </SingleTab>
     </div>
   );
 };

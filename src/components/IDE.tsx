@@ -1,18 +1,24 @@
 import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 import { useStoreState, useStoreActions } from "../store";
 
+import { EmptyProps, assertNever } from "../utils";
 import { ProjectId } from "../model/project-core";
 import { equalILoadSaveStatus } from "../model/project";
 import Button from "react-bootstrap/Button";
 import { Link } from "./LinkWithinApp";
-import { EmptyProps, assertNever } from "../utils";
 import { DivSettingWindowTitle } from "./DivSettingWindowTitle";
-import { useParams } from "react-router-dom";
-import { IDEContents_Flat } from "./IDEContents_Flat";
-import { IDEContents as IDEContents_Junior } from "./Junior/IDEContents";
+import { IDELayout } from "./IDELayout";
 import { ExceptionDisplay } from "./ExceptionDisplay";
 
+// Import order for "ace-theme-pytch" is fragile.  The code in
+// ace-theme-pytch.js expects a global "ace" to exist.  These imports
+// from ace-builds seem to ensure that this global exists.  A better
+// understanding of how this works would be welcome.
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/ext-searchbox";
 import "./ace-theme-pytch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,21 +38,6 @@ const ProjectLoadFailureScreen: React.FC<EmptyProps> = () => (
     </Link>
   </DivSettingWindowTitle>
 );
-
-const IDEContents: React.FC<EmptyProps> = () => {
-  const programKind = useStoreState(
-    (state) => state.activeProject.project.program.kind
-  );
-
-  switch (programKind) {
-    case "flat":
-      return <IDEContents_Flat />;
-    case "per-method":
-      return <IDEContents_Junior />;
-    default:
-      return assertNever(programKind);
-  }
-};
 
 const validProjectIdString = new RegExp("^[1-9][0-9]*$");
 function strictParseProjectId(s: string): ProjectId | null {
@@ -123,7 +114,7 @@ const IDE: React.FC<EmptyProps> = () => {
     case "succeeded": {
       return (
         <ErrorBoundary FallbackComponent={ExceptionDisplay}>
-          <IDEContents />
+          <IDELayout />
         </ErrorBoundary>
       );
     }

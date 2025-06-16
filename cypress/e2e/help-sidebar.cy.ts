@@ -11,21 +11,25 @@ type SidebarTestContext = {
   ensureSidebarHidden(): void;
 };
 
+const perMethodContainerSelector = ".ActivityContent > .HelpSidebar";
+const perMethodToggleSelector = '.tabkey-icon svg[data-icon="circle-question"]';
+
 const flatIdeContext: SidebarTestContext = {
   label: "flat",
-  containerSelector: ".help-sidebar > .content-wrapper",
-  initialVisibilityPredicate: "not.be.visible",
-  hiddenPredicate: "not.be.visible",
-  openControlSelector: ".help-sidebar .control",
-  closeControlSelector: ".help-sidebar > .content-wrapper .dismiss-help",
+  containerSelector: perMethodContainerSelector,
+  initialVisibilityPredicate: "be.visible",
+  hiddenPredicate: "not.exist",
+  openControlSelector: perMethodToggleSelector,
+  closeControlSelector: perMethodToggleSelector,
   before() {
     cy.pytchExactlyOneProject();
   },
-  ensureSidebarHidden: () => null,
+  ensureSidebarHidden() {
+    cy.get(perMethodToggleSelector).click();
+    cy.get(perMethodContainerSelector).should("not.exist");
+  },
 };
 
-const perMethodContainerSelector = ".ActivityContent > .HelpSidebar";
-const perMethodToggleSelector = '.tabkey-icon svg[data-icon="circle-question"]';
 const perMethodIdeContext: SidebarTestContext = {
   label: "per-method",
   containerSelector: perMethodContainerSelector,
@@ -192,7 +196,6 @@ context("Help sidebar (cross-mode)", () => {
     cy.pytchBasicJrProject();
 
     cy.pytchSwitchProject("Test seed project");
-    cy.get(flatIdeContext.openControlSelector).click();
     cy.get(flatIdeContext.containerSelector).should("be.visible");
 
     cy.pytchSwitchProject("Per-method test project");

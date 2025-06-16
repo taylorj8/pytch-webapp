@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AceEditor from "react-ace";
 import { Ace, Range } from "ace-builds";
-import "ace-builds/src-noconflict/mode-python";
-import "ace-builds/src-noconflict/ext-language_tools";
-import "ace-builds/src-noconflict/ext-searchbox";
 import { useStoreState, useStoreActions } from "../store";
 import {
   getFlatAceController,
@@ -11,11 +8,10 @@ import {
 } from "../skulpt-connection/code-editor";
 import { PytchAceAutoCompleter } from "../skulpt-connection/code-completion";
 import { failIfNull } from "../utils";
-import { HelpSidebar, HelpSidebarOpenControl } from "./HelpSidebar";
 import { equalILoadSaveStatus } from "../model/project";
-import { LinkedContentBar } from "./LinkedContentBar";
 import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
+import { SingleTab } from "./SingleTab";
 import { Debugger } from "../skulpt-connection/drive-project";
 
 const MAIN_FILE = "<stdin>.py";
@@ -203,7 +199,7 @@ const CodeAceEditor = () => {
         enableBasicAutocompletion={completers}
         value={codeText}
         name="pytch-ace-editor"
-        fontSize={16}
+        fontSize={14}
         width="100%"
         height="100%"
         onLoad={setFlatAceController}
@@ -215,19 +211,14 @@ const CodeAceEditor = () => {
   );
 };
 
-const CodeEditor = () => {
+export const CodeEditor = () => {
   return (
-    <div className="CodeEditor">
-      <LinkedContentBar />
-      <div className="editor-itself">
-        <div className="help-sidebar">
-          <HelpSidebar />
-          <HelpSidebarOpenControl />
+    <div className="CodeEditor compact-tablist-container">
+      <SingleTab title="Code">
+        <div className="abs-0000">
+          <CodeAceEditor />
         </div>
-        <CodeAceEditor />
-      </div>
+      </SingleTab>
     </div>
   );
 };
-
-export default CodeEditor;

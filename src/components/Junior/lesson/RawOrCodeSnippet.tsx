@@ -20,23 +20,43 @@ const elementIsScratchCode = (elt: HTMLElement) =>
   elementIsCodeOfLanguage(elt, "scratch");
 
 const elementIsPythonCode = (elt: HTMLElement) =>
-  elementIsCodeOfLanguage(elt, "python");
+  elementIsCodeOfLanguage(elt, "python") ||
+  elementIsCodeOfLanguage(elt, "python-expression");
 
 type RawOrCodeSnippetProps = { element: HTMLElement };
 export const RawOrCodeSnippet: React.FC<RawOrCodeSnippetProps> = ({
   element,
 }) => {
+  return <RawElement element={withCodeSnippetsRendered(element)} />;
+};
+
+export const withCodeSnippetsRendered = (element: HTMLElement): HTMLElement => {
   if (elementIsScratchCode(element)) {
-    const sbSvg = makeScratchSVG(element.innerText, 0.8);
-    return <RawElement className="display-scratchblocks" element={sbSvg} />;
-  } else if (elementIsPythonCode(element)) {
-    const codeDiv = document.createElement("div");
-    codeDiv.classList.add("python-snippet");
+    let div = document.createElement("div");
+    div.className = "display-scratchblocks";
+    div.appendChild(makeScratchSVG(element.innerText, 0.8));
+    return div;
+  }
+
+  if (elementIsPythonCode(element)) {
+    const isExpression = elementIsCodeOfLanguage(element, "python-expression");
+    let div = document.createElement("div");
+    div.className =
+      "python-snippet" + (isExpression ? " python-expression" : "");
     const codeText = element.innerText.trimEnd();
     const codeElts = highlightedPreEltsFromCode(codeText);
-    codeElts.forEach((elt) => codeDiv.appendChild(elt));
-    return <RawElement element={codeDiv} />;
-  } else {
-    return <RawElement element={element} />;
+    codeElts.forEach((elt) => div.appendChild(elt));
+    return div;
   }
+
+  let augElement = element.cloneNode() as HTMLElement;
+  element.childNodes.forEach((node) => {
+    augElement.appendChild(
+      node.nodeType === Node.ELEMENT_NODE
+        ? withCodeSnippetsRendered(node as HTMLElement)
+        : node.cloneNode()
+    );
+  });
+
+  return augElement;
 };

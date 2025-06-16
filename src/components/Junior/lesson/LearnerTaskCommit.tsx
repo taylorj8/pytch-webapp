@@ -2,7 +2,8 @@ import React from "react";
 import { LearnerTaskCommit as LTCommit } from "../../../model/junior/jr-tutorial";
 import { assertNever } from "../../../utils";
 import { AddSprite } from "./commit/AddSprite";
-import { AddMedialibAppearance } from "./commit/AddMedialibCostume";
+import { AddMedialibAppearancesEntry } from "./commit/AddMedialibAppearancesEntry";
+import { DeleteAppearance } from "./commit/DeleteAppearance";
 import { AddScript } from "./commit/AddScript";
 import { EditScript } from "./commit/EditScript";
 import { ChangeHatBlock } from "./commit/ChangeHatBlock";
@@ -15,8 +16,10 @@ export const LearnerTaskCommit: React.FC<LearnerTaskCommitProps> = ({
     switch (commit.kind) {
       case "add-sprite":
         return <AddSprite {...commit} />;
-      case "add-medialib-appearance":
-        return <AddMedialibAppearance {...commit} />;
+      case "add-medialib-appearances-entry":
+        return <AddMedialibAppearancesEntry {...commit} />;
+      case "delete-appearance":
+        return <DeleteAppearance {...commit} />;
       case "add-script":
         return <AddScript {...commit} />;
       case "edit-script":

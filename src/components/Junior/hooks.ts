@@ -112,8 +112,9 @@ export const usePytchScriptDrop = (actorId: Uuid, handlerId: Uuid) => {
 type AssetCardDragItem = { fullPathname: string };
 
 type AssetCardDragProps = { isDragging: boolean };
-export const useAssetCardDrag = (fullPathname: string) => {
+export const useAssetCardDrag = (fullPathname: string, allowed: boolean) => {
   return useDrag<AssetCardDragItem, void, AssetCardDragProps>(() => ({
+    canDrag: allowed,
     type: "jr-asset-card",
     item: { fullPathname },
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
@@ -121,7 +122,7 @@ export const useAssetCardDrag = (fullPathname: string) => {
 };
 
 type AssetCardDropProps = { hasDragItemOver: boolean };
-export const useAssetCardDrop = (fullPathname: string) => {
+export const useAssetCardDrop = (fullPathname: string, allowed: boolean) => {
   const projectId = useStoreState((state) => state.activeProject.project.id);
   const reorderAssets = useStoreActions(
     (actions) => actions.activeProject.reorderAssetsAndSync
@@ -129,7 +130,7 @@ export const useAssetCardDrop = (fullPathname: string) => {
 
   return useDrop<AssetCardDragItem, void, AssetCardDropProps>(() => ({
     accept: "jr-asset-card",
-    canDrop: (item) => item.fullPathname !== fullPathname,
+    canDrop: (item) => allowed && item.fullPathname !== fullPathname,
     drop: (item) => {
       console.log("Dropping!", item);
       reorderAssets({

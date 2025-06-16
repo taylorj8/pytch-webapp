@@ -1,19 +1,27 @@
-import React, {
-  ClipboardEventHandler,
-  createRef,
-  useEffect,
-  useRef,
-} from "react";
+import React, { ClipboardEventHandler, createRef } from "react";
 import { useStoreState, useStoreActions } from "../store";
 import RawElement from "./RawElement";
 import Button from "react-bootstrap/Button";
-import { assertNever, failIfNull, isDivOfClass } from "../utils";
+import {
+  assertNever,
+  copyTextToClipboard,
+  failIfNull,
+  isDivOfClass,
+} from "../utils";
 import { DiffHelpSamples } from "../model/user-interactions/code-diff-help";
 import { makeScratchSVG } from "../model/scratchblocks-render";
 
 import "../pytch-tutorial.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRunFlow } from "../model";
+import { ProgressTrail } from "./Junior/lesson/ProgressTrail";
+import { WidthMonitor } from "./Junior/WidthMonitor";
+import { DivScroller } from "./Junior/lesson/DivScroller";
+import { useMappedTrackedTutorial } from "./hooks/tracked-tutorial";
+import {
+  ChapterNavigationButtons,
+  ChapterNavigationButtonsProps,
+} from "./Junior/lesson/ChapterNavigationButtons";
 
 type NavigationDirection = "prev" | "next";
 
@@ -79,12 +87,15 @@ const TutorialElement = ({ element }: TutorialElementProps) => {
     element.firstChild instanceof HTMLElement &&
     element.firstChild.classList.contains("language-scratch")
   ) {
-    const sbSvg = makeScratchSVG(element.innerText, 1.0);
+    const sbSvg = makeScratchSVG(element.innerText, 0.8);
     return <RawElement className="scratchblocks" element={sbSvg} />;
   }
   return <RawElement element={element} />;
 };
 
+// TODO: Remove this feature?  The preferred method for a user to try
+// the finished version of a tutorial is to use the "demo" button in the
+// tutorial's card.
 const TutorialTryWholeProjectElement = () => {
   const maybeTutorial = useStoreState(
     (state) => state.activeProject.project?.trackedTutorial?.content
@@ -135,56 +146,6 @@ interface TutorialPatchElementProps {
 // well as avoiding this kind of hybrid React / direct DOM
 // manipulation.
 
-/* Modifies the passed-in element; returns array of tables found. */
-const addCopyButtons = (div: HTMLDivElement): Array<HTMLTableElement> => {
-  const tableElements = div.querySelectorAll("div.patch table");
-  tableElements.forEach((tableElement) => {
-    const table = tableElement as HTMLTableElement;
-
-    let tbodyAddElts = table.querySelectorAll("tbody.diff-add");
-
-    tbodyAddElts.forEach((tbodyElement) => {
-      const tbody = tbodyElement as HTMLTableSectionElement;
-      let copyButton = document.createElement("div");
-      copyButton.className = "copy-button";
-      copyButton.innerHTML =
-        '<p class="content">COPY</p><p class="feedback">✓&nbsp;Copied!</p>';
-      copyButton.onclick = async (evt: MouseEvent) => {
-        console.log(evt);
-        const pContent = evt.target as HTMLElement;
-        const parentElement = failIfNull(pContent.parentElement, "no parent");
-        parentElement.querySelectorAll("p").forEach((node) => {
-          const elt = node as HTMLParagraphElement;
-          elt.classList.add("active");
-          elt.addEventListener("animationend", () => {
-            elt.classList.remove("active");
-          });
-        });
-        try {
-          const text = tbody.dataset.addedText;
-          if (text != null) {
-            await navigator.clipboard.writeText(text);
-          }
-        } catch (err) {
-          console.log(
-            "Could not copy to clipboard",
-            "(an error is expected if running under Cypress):",
-            err
-          );
-        }
-      };
-
-      let topRightCell = failIfNull(
-        tbody.querySelector("tr > td:last-child"),
-        "top-right cell not found"
-      );
-      topRightCell.appendChild(copyButton);
-    });
-  });
-
-  return Array.from(tableElements) as Array<HTMLTableElement>;
-};
-
 const VerticalEllipsis = () => {
   return (
     <div className="patch-hunk-spacer">
@@ -215,21 +176,58 @@ const showLeadingSpaces = (table: HTMLTableElement) => {
 };
 
 const insertAddAndDelSymbols = (table: HTMLTableElement) => {
+  table.querySelectorAll("tbody tr").forEach((tr) => {
+    tr.removeChild(tr.childNodes[1]);
+    let lastTd = tr.lastChild as HTMLTableCellElement;
+    lastTd.classList.add("code-text");
+  });
+
   let addSpan = document.createElement("span");
   addSpan.classList.add("add-or-del");
   addSpan.innerText = "+";
+
   let delSpan = document.createElement("span");
   delSpan.classList.add("add-or-del");
   delSpan.innerText = "−";
 
-  console.log("add", addSpan);
-  table.querySelectorAll("tbody.diff-add tr td:first-child").forEach((td) => {
-    td.insertBefore(addSpan.cloneNode(true), td.firstChild);
+  table.querySelectorAll("tbody.diff-add").forEach((tbody_) => {
+    const tbody = tbody_ as HTMLTableSectionElement;
+    let firstRow = true;
+    tbody.querySelectorAll("tr").forEach((tr) => {
+      if (firstRow) {
+        let td0 = tr.firstChild as HTMLTableCellElement;
+        td0.setAttribute("rowspan", "0");
+        const addSpanClone = addSpan.cloneNode(true) as HTMLSpanElement;
+        td0.appendChild(addSpanClone);
+        addSpanClone.addEventListener("click", () => {
+          copyTextToClipboard(tbody.dataset.addedText ?? "UNKNOWN CODE SORRY");
+          addSpanClone.innerText = "✓";
+          setTimeout(() => {
+            addSpanClone.innerText = "+";
+          }, 800);
+        });
+        firstRow = false;
+      } else {
+        tr.removeChild(tr.firstChild!);
+      }
+    });
   });
-  console.log("add", addSpan);
-  table.querySelectorAll("tbody.diff-del tr td:nth-child(2)").forEach((td) => {
-    td.insertBefore(delSpan.cloneNode(true), td.firstChild);
+
+  table.querySelectorAll("tbody.diff-del").forEach((tbody) => {
+    let firstRow = true;
+    tbody.querySelectorAll("tr").forEach((tr) => {
+      if (firstRow) {
+        let td0 = tr.firstChild as HTMLTableCellElement;
+        td0.setAttribute("rowspan", "0");
+        td0.innerHTML = "";
+        td0.insertBefore(delSpan.cloneNode(true), null);
+        firstRow = false;
+      } else {
+        tr.removeChild(tr.firstChild!);
+      }
+    });
   });
+
   return table;
 };
 
@@ -243,13 +241,20 @@ const diffSampleOfClass = (
   let maybeSampleRow: HTMLTableRowElement | null = null;
 
   tables.forEach((table) => {
+    // This is fiddly.  We need to save the first row of the tbody
+    // because we only show one [-] or [+] sign spanning the full set of
+    // rows, so the row providing the content might only have one cell.
+    let firstRow: HTMLTableRowElement | null = null;
     table.querySelectorAll(`tbody.${cls} tr`).forEach((row) => {
-      const mCell = row.querySelector("td:nth-child(3) pre");
+      firstRow ??= row as HTMLTableRowElement;
+      const mCell = row.querySelector("td.code-text pre");
       if (mCell != null) {
         const text = mCell.textContent || "";
         if (text.length !== 0) {
           if (maybeSampleRow == null) {
-            maybeSampleRow = row.cloneNode(true) as HTMLTableRowElement;
+            maybeSampleRow = firstRow.cloneNode(true) as HTMLTableRowElement;
+            maybeSampleRow.removeChild(maybeSampleRow.lastChild!);
+            maybeSampleRow.appendChild(mCell.parentElement!.cloneNode(true));
           }
         }
       }
@@ -283,12 +288,20 @@ const diffSamples = (tables: Array<HTMLTableElement>): DiffHelpSamples => {
   };
 };
 
+const nAddHunks = (tables: Array<HTMLTableElement>): number => {
+  return tables
+    .map((table) => table.querySelectorAll("tbody.diff-add").length)
+    .reduce((a, x) => a + x, 0);
+};
+
 const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
   const runCodeDiffHelp = useRunFlow((f) => f.codeDiffHelpFlow);
 
   let divCopy = div.cloneNode(true) as HTMLDivElement;
 
-  const tableElts = addCopyButtons(divCopy);
+  const tableElts = Array.from(
+    divCopy.querySelectorAll("div.patch table")
+  ) as Array<HTMLTableElement>;
 
   if (tableElts.length === 0) {
     // Maybe this is a warning, e.g., for slug-not-found?  Don't crash,
@@ -333,6 +346,26 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
     }
   };
 
+  const nAdds = nAddHunks(tableElts);
+  const mHintDiv =
+    nAdds === 0 ? (
+      false
+    ) : nAdds === 1 ? (
+      <div className="copy-hint">
+        <p>
+          Hint: Click on the <span className="add-code-icon">+</span> button to
+          copy the new code.
+        </p>
+      </div>
+    ) : (
+      <div className="copy-hint">
+        <p>
+          Hint: Click on a <span className="add-code-icon">+</span> button to
+          copy that chunk of new code.
+        </p>
+      </div>
+    );
+
   return (
     <div className="patch-container" onCopy={convertDotsToSpaces}>
       <div className="header">
@@ -341,42 +374,19 @@ const TutorialPatchElement = ({ div }: TutorialPatchElementProps) => {
           <FontAwesomeIcon icon="question-circle" />
         </Button>
       </div>
-      {contentDivs}
+      <div className="patch-contents">{contentDivs}</div>
+      {mHintDiv}
     </div>
   );
-};
-
-interface TutorialScrollerProps {
-  containerDivRef: React.RefObject<HTMLDivElement>;
-}
-
-// This is a bit of a fudge.  The seqnum is used to re-"render" this
-// component, whose only job is to scroll the chapter container to the
-// top.  The seqnum is incremented when an explicit navigation action
-// takes place.  The scroll position is maintained if the user just
-// switches to, say, the Output tab and back again.
-const TutorialScroller: React.FC<TutorialScrollerProps> = (props) => {
-  const seqnum = useStoreState(
-    (state) => state.activeProject.tutorialNavigationSeqnum
-  );
-  const lastActedSeqnumRef = useRef(0);
-
-  useEffect(() => {
-    const containerDiv = props.containerDivRef.current;
-    if (containerDiv != null && seqnum !== lastActedSeqnumRef.current) {
-      containerDiv.scrollTo(0, 0);
-      lastActedSeqnumRef.current = seqnum;
-    }
-  });
-
-  return <></>;
 };
 
 const TutorialChapter = () => {
   const maybeTrackedTutorial = useStoreState(
     (state) => state.activeProject.project?.trackedTutorial
   );
-  const chapterContainerRef: React.RefObject<HTMLDivElement> = createRef();
+  const navigateToChapter = useStoreActions(
+    (actions) => actions.activeProject.setActiveTutorialChapter
+  );
 
   const trackedTutorial = failIfNull(
     maybeTrackedTutorial,
@@ -394,85 +404,74 @@ const TutorialChapter = () => {
   const chapterIndex = Math.min(rawChapterIndex, maxValidIndex);
   const activeChapter = allChapters[chapterIndex];
 
+  const navigateToChapterFun = (chapterIndex: number) => () =>
+    navigateToChapter(chapterIndex);
+
+  let navigationButtonsProps: ChapterNavigationButtonsProps = {};
+  if (activeChapter.maybePrevTitle != null)
+    navigationButtonsProps.prev = {
+      displayTitle: activeChapter.maybePrevTitle,
+      navigate: navigateToChapterFun(chapterIndex - 1),
+    };
+  if (activeChapter.maybeNextTitle != null)
+    navigationButtonsProps.next = {
+      displayTitle: activeChapter.maybeNextTitle,
+      navigate: navigateToChapterFun(chapterIndex + 1),
+    };
+
+  // Discard the first item in contentElements, which is the heading
+  // element.  The chapter title is already shown in the header bar
+  // (progress trail).
+  const contentBodyElements = activeChapter.contentElements.slice(1);
+
   return (
     <div className="TutorialChapter-scrollable">
-      <div className="TutorialChapter-container" ref={chapterContainerRef}>
+      <div className="TutorialChapter-container">
         <div className="TutorialChapter" tabIndex={-1}>
-          {activeChapter.contentElements.map((element, idx) => (
+          {contentBodyElements.map((element, idx) => (
             <TutorialElement key={idx} element={element} />
           ))}
-          <div className="navigation-buttons">
-            {activeChapter.maybePrevTitle && (
-              <TutorialNavigation
-                kind="prev"
-                toChapterIndex={chapterIndex - 1}
-              />
-            )}
-            {activeChapter.maybeNextTitle &&
-              !activeChapter.hasRunProjectMarker && (
-                <TutorialNavigation
-                  kind="next"
-                  toChapterIndex={chapterIndex + 1}
-                />
-              )}
-          </div>
+          <ChapterNavigationButtons {...navigationButtonsProps} />
         </div>
       </div>
-      <TutorialScroller containerDivRef={chapterContainerRef} />
     </div>
   );
 };
 
-interface TutorialTableOfContentsEntryProps {
-  chapterIndex: number;
-  chapterTitle: string;
-}
+const ActiveTutorial = () => {
+  //
+  // TODO: Review the nested structure and simplify if possible.  Also
+  // change class names to reflect fact that they no longer apply to
+  // just "per-method lessons".
+  //
+  // TODO: Implement scrolling behaviour whereby scroll position is
+  // preserved within a chapter but reset when moving to another
+  // chapter.
 
-const TutorialTableOfContentsEntry = ({
-  chapterIndex,
-  chapterTitle,
-}: TutorialTableOfContentsEntryProps) => {
-  const maybeActiveIndex = useStoreState(
-    (state) => state.activeProject.project?.trackedTutorial?.activeChapterIndex
+  const chapterContainerRef: React.RefObject<HTMLDivElement> = createRef();
+  const chapterIndex = useMappedTrackedTutorial(
+    (tutorial) => tutorial.activeChapterIndex
   );
-  const navigateToChapter = useStoreActions(
-    (actions) => actions.activeProject.setActiveTutorialChapter
-  );
-
-  const activeIndex = failIfNull(
-    maybeActiveIndex,
-    "no tutorial to construct ToC entry"
-  );
-
-  const navigate = () => navigateToChapter(chapterIndex);
-  return (
-    <li
-      onClick={navigate}
-      className={chapterIndex === activeIndex ? "active" : undefined}
-    >
-      {chapterTitle}
-    </li>
-  );
-};
-
-const TutorialTableOfContents = () => {
-  const maybeTutorial = useStoreState(
-    (state) => state.activeProject.project?.trackedTutorial?.content
-  );
-  const tutorial = failIfNull(maybeTutorial, "no tutorial to construct ToC");
 
   return (
-    <div className="ToC-scrollable">
-      <div className="ToC-container">
-        <ul className="ToC">
-          {tutorial.chapters.map((chapter, chapterIndex) => (
-            <TutorialTableOfContentsEntry
-              key={chapterIndex}
-              chapterIndex={chapterIndex}
-              chapterTitle={chapter.title}
-            />
-          ))}
-        </ul>
+    <div className="Junior-LessonContent-container">
+      <WidthMonitor nonStageWd={1100} />
+      <div className="Junior-LessonContent-HeaderBar">
+        <ProgressTrail.Flat />
+      </div>
+      <div className="Junior-LessonContent-inner-container">
+        <div
+          className="Junior-LessonContent abs-0000-oflow"
+          ref={chapterContainerRef}
+        >
+          <div className="content">
+            <TutorialChapter />
+          </div>
+        </div>
+        <DivScroller
+          pageKey={chapterIndex}
+          containerDivRef={chapterContainerRef}
+        />
       </div>
     </div>
   );
@@ -489,18 +488,10 @@ const Tutorial = () => {
     case "pending":
       return <div>Loading...</div>;
     case "succeeded":
-      // Fall through to handle these cases.
-      break;
+      return <ActiveTutorial />;
     default:
-      throw new Error(`unknown loadState "${loadState}"`);
+      return assertNever(loadState);
   }
-
-  return (
-    <div className="tutorial-pane">
-      <TutorialTableOfContents />
-      <TutorialChapter />
-    </div>
-  );
 };
 
 export default Tutorial;

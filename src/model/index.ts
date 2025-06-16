@@ -9,10 +9,7 @@ import {
   IIDELayout,
   userConfirmations,
   IUserConfirmations,
-  infoPanel,
-  IInfoPanel,
   standardOutputPane,
-  editorWebSocketLog,
   IPlainTextPane,
   errorReportList,
   IErrorReportList,
@@ -42,7 +39,6 @@ import {
   GoogleDriveIntegration,
   googleDriveIntegration,
 } from "./google-drive-import-export";
-import { VersionOptIn, versionOptIn } from "./version-opt-in";
 import {
   StandalonePlayDemoState,
   standalonePlayDemoState,
@@ -50,7 +46,6 @@ import {
 import { useStoreActions, useStoreState } from "../store";
 
 export interface IPytchAppModel {
-  versionOptIn: VersionOptIn;
   navigationRequestQueue: NavigationRequestQueue;
   projectCollection: IProjectCollection;
   activeProject: IActiveProject;
@@ -58,11 +53,9 @@ export interface IPytchAppModel {
   ideLayout: IIDELayout;
   jrEditState: JrEditState;
   userConfirmations: IUserConfirmations;
-  infoPanel: IInfoPanel;
   standardOutputPane: IPlainTextPane;
   errorReportList: IErrorReportList;
   reloadServer: IReloadServer;
-  editorWebSocketLog: IPlainTextPane;
   userTextInput: IUserTextInput;
   variableWatchers: IVariableWatchers;
   demoFromZipfileURL: IDemoFromZipfileURL;
@@ -75,7 +68,6 @@ export interface IPytchAppModel {
 export type PytchAppModelActions = Actions<IPytchAppModel>;
 
 export const pytchAppModel: IPytchAppModel = {
-  versionOptIn,
   navigationRequestQueue,
   projectCollection,
   activeProject,
@@ -83,11 +75,9 @@ export const pytchAppModel: IPytchAppModel = {
   ideLayout,
   jrEditState,
   userConfirmations,
-  infoPanel,
   standardOutputPane,
   errorReportList,
   reloadServer,
-  editorWebSocketLog,
   userTextInput,
   variableWatchers,
   demoFromZipfileURL,

@@ -1,5 +1,3 @@
-import { VersionTag } from "../../src/model/version-opt-in";
-
 interface IFixtureAsset {
   name: string;
   mimeType: string;
@@ -7,7 +5,6 @@ interface IFixtureAsset {
 
 export interface ResetDatabaseOptions {
   initialUrl?: string;
-  uiVersion?: VersionTag;
   extraAssets?: Array<IFixtureAsset>;
   extraProjectNames?: Array<string>;
   extraWindowActions?: Array<(w: Window) => void>;
