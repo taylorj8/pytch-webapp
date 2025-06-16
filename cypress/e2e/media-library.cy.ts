@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 
+import { launchAdd } from "./junior/utils";
 import { kExpNTutorials } from "./utils";
 
 context("can filter media library by tags", () => {
@@ -7,9 +8,7 @@ context("can filter media library by tags", () => {
     cy.pytchExactlyOneProject();
   });
 
-  beforeEach(() => {
-    cy.get("button").contains("Choose from library").click();
-  });
+  beforeEach(launchAdd.assetFromMediaLibrary);
 
   afterEach(() => {
     cy.get("button").contains("Cancel").click();
@@ -87,7 +86,7 @@ context("Add clipart from library, handling errors", () => {
   };
 
   const launchChooseClipArt = () => {
-    cy.contains("Choose from library").click();
+    launchAdd.assetFromMediaLibrary();
     cy.contains("Add to project").should("be.disabled");
   };
 

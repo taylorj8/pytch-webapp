@@ -1,6 +1,11 @@
 /// <reference types="cypress" />
 
-import { launchShareTutorialModal } from "./utils";
+import {
+  assertCopiedText,
+  assertInIDE,
+  jumpToTutorialChapter,
+  launchShareTutorialModal,
+} from "./utils";
 
 context("Work with tutorials list", () => {
   it("shows list of tutorials", () => {
@@ -22,40 +27,46 @@ context("Interact with a tutorial", () => {
     cy.pytchProjectFollowingTutorial();
   });
 
+  const assertActiveChapterIndex = (expActiveIndex: number) => {
+    cy.get(".ProgressTrail .progress-node-background.isActive").should(
+      "have.length",
+      1
+    );
+    const nChild = expActiveIndex + 1;
+    const selector = `.ProgressTrail .progress-node-background:nth-child(${nChild})`;
+    cy.get(selector).should("have.class", "isActive");
+  };
+
   it("can navigate through tutorial", () => {
-    cy.contains("Get started:").click();
-    cy.get(".ToC > li.active")
-      .should("have.length", 1)
-      .contains("Make the playing area");
-    cy.contains("Back:").click();
-    cy.get(".ToC > li.active")
-      .should("have.length", 1)
-      .contains("Make a Pong-like game");
-    cy.contains("Get started:").click();
+    cy.contains("Next: Make the playing area").click();
+    assertActiveChapterIndex(1);
+    cy.contains("Back: Boing").click();
+    assertActiveChapterIndex(0);
+    cy.contains("Next: Make the playing area").click();
     cy.contains("Next:").click();
     cy.contains("Next:").click();
-    cy.get(".ToC > li.active")
-      .should("have.length", 1)
-      .contains("Add the ball");
+    assertActiveChapterIndex(3);
   });
 
-  it("gives feedback when Copy button clicked", () => {
-    cy.contains("Get started:").click();
-    cy.contains("Next:").click();
-    cy.contains("COPY").click();
-    cy.contains("Copied!");
-    cy.waitUntil(() => cy.contains("Copied!").should("not.be.visible"));
+  it("copies text when [+] label clicked", () => {
+    cy.contains("Next: Make the playing area").click();
+    cy.contains("Next: Add the player's bat").click();
+    cy.get("tbody.diff-add span.add-or-del").eq(0).click();
+    assertCopiedText(
+      (text) =>
+        text.includes("class PlayerBat") && text.includes("player-normal.png")
+    );
   });
 });
 
 context("Scratchblocks rendering", () => {
   it("renders scratchblocks", () => {
     cy.pytchProjectFollowingTutorial("ticket-vending-machine");
-    cy.get(".ToC").contains("Show all ticket types").click();
+    jumpToTutorialChapter(3);
     cy.get(".scratchblocks svg").contains("costume");
-    cy.get(".ToC").contains("Remember cost of chosen ticket").click();
+    jumpToTutorialChapter(5);
     cy.get(".scratchblocks svg").contains("sprite");
-    cy.get(".ToC").contains("Test the program so far").click();
+    jumpToTutorialChapter(6);
     cy.get(".scratchblocks svg").contains("variable");
   });
 });
@@ -66,10 +77,8 @@ context("Demo of a tutorial", () => {
   });
 
   it("creates project and launches IDE", () => {
-    cy.get("ul.InfoPanel").within(() => {
-      cy.contains("Tutorial").should("not.exist");
-    });
-    cy.contains("images and sounds");
+    cy.get(".ActivityBar .ActivityBarTab").should("have.length", 1);
+    assertInIDE("flat");
   });
 
   it("launches button tour for demo", () => {
@@ -158,13 +167,6 @@ context("Tutorial share feature", () => {
     cy.visit("/tutorials");
     launchShareTutorialModal("Bunner");
     cy.get("button[title*='only']").click();
-    cy.waitUntil(() =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      cy.window().then((win: any) => {
-        const copiedText: string =
-          win["PYTCH_CYPRESS"]["latestTextCopied"] ?? "";
-        return copiedText.endsWith("suggested-tutorial/bunner");
-      })
-    );
+    assertCopiedText((text) => text.endsWith("suggested-tutorial/bunner"));
   });
 });

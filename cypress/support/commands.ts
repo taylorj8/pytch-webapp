@@ -51,7 +51,6 @@ const addAssetFromFixture = (
 
 const resetDatabaseDefaults: Required<ResetDatabaseOptions> = {
   initialUrl: "/",
-  uiVersion: "v2",
   extraAssets: [],
   extraProjectNames: [],
   extraWindowActions: [],
@@ -88,14 +87,6 @@ Cypress.Commands.add("pytchResetDatabase", (options?: ResetDatabaseOptions) => {
       addAssetFromFixture(db, projectSummary.id, name, mimeType);
     }
   });
-
-  if (
-    effectiveOptions.initialUrl === "/" &&
-    effectiveOptions.uiVersion === "v1"
-  ) {
-    cy.get(".ToggleUiStylePanel").contains("back to classic Pytch").click();
-    cy.get(".ToggleUiStylePanel").contains("Try it");
-  }
 });
 
 Cypress.Commands.add(
@@ -207,7 +198,7 @@ const createTutorialProject = (
 
   // More/less as per pytchOpenProject() above, except don't let it get
   // fooled by the buttons on the tutorials page:
-  cy.contains("images and sounds");
+  cy.get(".Junior-InfoPanel");
   cy.get(".ReadOnlyOverlay").should("not.exist");
 
   cy.pytchHomeFromIDE();
@@ -230,10 +221,7 @@ Cypress.Commands.add(
   "pytchShouldShowAssets",
   (expectedNames: Array<string>) => {
     const nExpNames = expectedNames.length;
-    cy.get(".InfoPanel .nav-link")
-      .contains("Images and sounds")
-      .should("have.class", "active");
-    cy.get(".AssetCard .card-header code")
+    cy.get(".AssetCardContent .label pre")
       .should("have.length", nExpNames)
       .then(($codes) => {
         const orderedExpectedNames = [...expectedNames];
@@ -276,7 +264,7 @@ Cypress.Commands.add("pytchBuild", () => {
 
 Cypress.Commands.add("pytchBuildCode", (rawCodeText: string) => {
   cy.pytchSetCodeWithDeIndent(rawCodeText);
-  cy.contains("Images and sounds").click();
+  cy.get(".Junior-InfoPanel .nav-link").contains("Output").click();
   cy.pytchBuild();
 });
 
@@ -339,7 +327,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("pytchShouldHaveBuiltWithoutErrors", () => {
-  cy.get(".InfoPanel .nav-link")
+  cy.get(".Junior-InfoPanel .nav-link")
     .contains("Errors")
     .should("not.have.class", "active")
     .click();
@@ -347,7 +335,7 @@ Cypress.Commands.add("pytchShouldHaveBuiltWithoutErrors", () => {
   cy.get(".ErrorReportAlert").should("not.exist");
 });
 
-const shouldBeShowingErrorPane = (infoPanelClass = "InfoPanel") => {
+const shouldBeShowingErrorPane = (infoPanelClass = "Junior-InfoPanel") => {
   cy.get(`.${infoPanelClass} .nav-link`)
     .contains("Errors")
     .should("have.class", "active");
@@ -427,28 +415,6 @@ Cypress.Commands.add("pytchClickStage", (stageX: number, stageY: number) => {
   });
 });
 
-Cypress.Commands.add("pytchDragStageDivider", (sizeIncrease: number) => {
-  const moveEvent = (x: number, y: number) => ({ clientX: x, clientY: y });
-  return cy
-    .get(".drag-resizer.vertical")
-    .as("resizer")
-    .then(($el) => {
-      // Get the client coords of the centre of the resizer.
-      const rect = $el[0].getBoundingClientRect();
-      const sizerX = Math.round(rect.left + 0.5 * rect.width);
-      const sizerY = Math.round(rect.top + 0.5 * rect.height);
-
-      // Drag the resizer as per spec, then release mouse-button, then
-      // move mouse down by arbitrary amount (150).
-      cy.get("@resizer")
-        .trigger("movemove", moveEvent(sizerX, sizerY))
-        .trigger("mousedown")
-        .trigger("mousemove", moveEvent(sizerX + 10, sizerY + sizeIncrease))
-        .trigger("mouseup")
-        .trigger("mousemove", moveEvent(sizerX + 10, sizerY + 150));
-    });
-});
-
 Cypress.Commands.add("pytchSendKeysToApp", (keys: string) => {
   cy.focused().type(keys);
 });
@@ -466,8 +432,10 @@ function doNothing() {
 Cypress.Commands.add(
   "pytchActivateAssetDropdown",
   (assetName: string, maybeChooseItem = doNothing) => {
-    cy.get(".card-header")
+    cy.get(".AssetCardContent .label")
       .contains(assetName)
+      .parent()
+      .parent()
       .parent()
       .within(() => {
         cy.get(".dropdown").click();

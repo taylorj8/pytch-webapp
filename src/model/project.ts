@@ -55,7 +55,6 @@ import {
   valueCell,
 } from "../utils";
 import { codeJustBeforeWipChapter, tutorialContentFromHTML } from "./tutorial";
-import { liveReloadURL } from "./live-reload";
 
 import { fireAndForgetEvent } from "./anonymous-instrumentation";
 
@@ -290,7 +289,6 @@ export interface IActiveProject {
   lastSyncFromStorageSeqNum: number;
   codeStateVsStorage: CodeStateVsStorage;
   buildSeqnum: number;
-  tutorialNavigationSeqnum: number;
 
   haveProject: Computed<IActiveProject, boolean>;
 
@@ -401,7 +399,6 @@ export interface IActiveProject {
   replaceTutorialAndSyncCode: Action<IActiveProject, ITrackedTutorial>;
 
   handleLiveReloadMessage: Thunk<IActiveProject, string, void, IPytchAppModel>;
-  handleLiveReloadError: Thunk<IActiveProject, void, void, IPytchAppModel>;
 
   setActiveTutorialChapter: Action<IActiveProject, number>;
 
@@ -527,7 +524,6 @@ export const activeProject: IActiveProject = {
 
   codeStateVsStorage: "no-changes-since-last-save",
   buildSeqnum: 0,
-  tutorialNavigationSeqnum: 0,
 
   noteCodeChange: action((state) => {
     state.codeStateVsStorage = "unsaved-changes-exist";
@@ -842,8 +838,6 @@ export const activeProject: IActiveProject = {
       });
 
       const descriptor = await projectDescriptor(projectId);
-      const initialTabKey =
-        descriptor.trackedTutorial != null ? "tutorial" : "assets";
 
       // TODO: Should the asset-server be local to the project?  Might
       // save all the to/fro with prepare/clear and knowing when to revoke
@@ -884,17 +878,30 @@ export const activeProject: IActiveProject = {
 
       storeActions.ideLayout.helpSidebar.hideAllContent();
 
-      if (content.program.kind === "per-method") {
-        const bootData = {
-          program: content.program.program,
-          linkedContentKind: content.linkedContentRef.kind,
-        };
-        storeActions.jrEditState.bootForProgram(bootData);
+      const programKind = content.program.kind;
+      switch (programKind) {
+        case "per-method": {
+          const bootData = {
+            program: content.program.program,
+            linkedContentKind: content.linkedContentRef.kind,
+          };
+          storeActions.jrEditState.bootForProgram(bootData);
+          break;
+        }
+        case "flat": {
+          const flatBootData = {
+            linkedContentKind: content.linkedContentRef.kind,
+            isTrackingTutorial: content.trackedTutorial != null,
+          };
+          storeActions.jrEditState.bootForFlatProgram(flatBootData);
+          break;
+        }
+        default:
+          assertNever(programKind);
       }
 
       actions.noteLoadRequestOutcome("succeeded");
       fireAndForgetEvent("project-loaded", `${projectId}`);
-      storeActions.infoPanel.setActiveTabKey(initialTabKey);
     } catch (err) {
       // TODO: Is there anything more intelligent we can do as
       // far as reporting to the user is concerned?
@@ -1097,19 +1104,17 @@ export const activeProject: IActiveProject = {
     }
   }),
 
-  handleLiveReloadMessage: thunk((actions, messageString, helpers) => {
-    const { appendTimestamped } = helpers.getStoreActions().editorWebSocketLog;
-
+  handleLiveReloadMessage: thunk((actions, messageString) => {
     const message = JSON.parse(messageString) as ILiveReloadMessage;
 
     switch (message.kind) {
       case "info": {
-        appendTimestamped(`server:info: ${message.message}`);
+        console.log(`server:info: ${message.message}`);
         break;
       }
       case "code": {
         const codeText: string = message.text;
-        appendTimestamped(`server:code: update of length ${codeText.length}`);
+        console.log(`server:code: update of length ${codeText.length}`);
 
         actions.setCodeTextAndBuild({
           codeText,
@@ -1132,7 +1137,7 @@ export const activeProject: IActiveProject = {
               message.text
             );
             const wipChapter = newContent.workInProgressChapter;
-            appendTimestamped(
+            console.log(
               `server:tutorial: update; ${newContent.chapters.length} chapter/s` +
               (wipChapter != null
                 ? `; working on chapter ${wipChapter}` +
@@ -1168,14 +1173,6 @@ export const activeProject: IActiveProject = {
     }
   }),
 
-  handleLiveReloadError: thunk((_actions, _voidPayload, helpers) => {
-    const { appendTimestamped } = helpers.getStoreActions().editorWebSocketLog;
-    appendTimestamped(
-      `error with websocket connection;` +
-      ` ensure server is running at ${liveReloadURL}`
-    );
-  }),
-
   setActiveTutorialChapter: action((state, chapterIndex) => {
     const project = state.project;
     failIfDummy(project, "setActiveTutorialChapter");
@@ -1186,7 +1183,6 @@ export const activeProject: IActiveProject = {
     );
 
     trackedTutorial.activeChapterIndex = chapterIndex;
-    state.tutorialNavigationSeqnum += 1;
   }),
 
   incrementBuildSeqnum: action((state) => {
@@ -1208,10 +1204,7 @@ export const activeProject: IActiveProject = {
       const appendOutput = storeActions.standardOutputPane.append;
       const appendError = storeActions.errorReportList.append;
 
-      // Switch both UIs to the "errors" pane; the one we're not using
-      // won't mind.
       const switchToErrorPane = () => {
-        storeActions.infoPanel.setActiveTabKey("errors");
         storeActions.jrEditState.expandAndSetActive("errors");
       };
 
@@ -1281,7 +1274,7 @@ export const activeProject: IActiveProject = {
           });
         }
 
-        ensureNotFullScreen("force-wide-info-pane");
+        ensureNotFullScreen();
       }
 
       actions.incrementBuildSeqnum();

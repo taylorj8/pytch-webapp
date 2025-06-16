@@ -168,7 +168,7 @@ context("Front page", () => {
     it("launches demo", () => {
       cy.viewport(1440, 960);
       cy.get(".alert.TutorialMiniCard").contains("Boing").click();
-      cy.get("h1").contains("images and sounds");
+      cy.get(".Junior-InfoPanel");
       cy.get(".ReadOnlyOverlay").should("not.exist");
       cy.go("back");
       assertVisibleCardNames(allNames.slice(0, 3));

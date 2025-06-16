@@ -1,7 +1,6 @@
 /// <reference types="cypress" />
 
 import { saveButton } from "./utils";
-import { stageHeight } from "../../src/constants";
 
 context("Interact with code editor", () => {
   before(() => {
@@ -33,16 +32,6 @@ context("Interact with code editor", () => {
       .should("be.visible");
     cy.pytchSendKeysToApp("{enter}");
     cy.pytchCodeTextShouldContain("self.play_sound_until_done");
-  });
-
-  it("keeps code content when changing layout", () => {
-    cy.get("#pytch-ace-editor").type("# HELLO WORLD{enter}");
-    cy.get(".layout-icon.tall-code").click();
-    cy.get("button.tall-code.btn-primary");
-    cy.pytchCodeTextShouldContain("HELLO WORLD");
-    cy.get(".layout-icon.wide-info").click();
-    cy.get("button.wide-info.btn-primary");
-    cy.pytchCodeTextShouldContain("HELLO WORLD");
   });
 
   it("indicates when unsaved changes exist", () => {
@@ -166,53 +155,5 @@ context("Undo history", () => {
     cy.pytchSendKeysToApp("{end}");
     cy.pytchSendKeysToApp("# HELLO");
     cy.pytchCodeTextShouldEqual("import pytch\n\n# HELLO");
-  });
-});
-
-context("Drag vertical resizer", () => {
-  beforeEach(() => {
-    cy.pytchExactlyOneProject();
-  });
-
-  [
-    { resizeDelta: 50, expectedEffectiveDelta: 50 },
-    { resizeDelta: -50, expectedEffectiveDelta: -50 },
-    // The following two have to match the clamping performed in
-    // VerticalResizer.onTouchMove().
-    { resizeDelta: -200, expectedEffectiveDelta: -stageHeight / 2 },
-    { resizeDelta: +200, expectedEffectiveDelta: stageHeight / 4 },
-  ].forEach((spec) =>
-    it(`can drag vertical UI divider by ${spec.resizeDelta}`, () => {
-      cy.pytchDragStageDivider(spec.resizeDelta);
-
-      cy.get("#pytch-canvas")
-        .invoke("height")
-        .should("eq", stageHeight + spec.expectedEffectiveDelta);
-    })
-  );
-});
-
-context("Tall-code-editor has full-width info pane", () => {
-  it("displays info pane across right-hand half", () => {
-    cy.pytchExactlyOneProject();
-
-    cy.pytchBuildCode(`
-      import pytch
-      print("X")
-    `);
-
-    cy.pytchDragStageDivider(500);
-    cy.get(".layout-icon.tall-code").click();
-    cy.get("button.tall-code.btn-primary");
-    cy.get(".InfoPanel").within(() => {
-      // Show the "Output" tab, which has naturally-narrow content,
-      // being just the "X" which was printed at build time.
-      cy.contains("Output").click();
-    });
-
-    // This is pretty fragile.  The threshold will need changing if the
-    // Cypress viewport setting is changed, and probably for other
-    // reasons too.  Try it like this, and see if it becomes annoying.
-    cy.get(".tab-content").invoke("width").should("be.gt", 550);
   });
 });

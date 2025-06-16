@@ -345,7 +345,7 @@ export class ScriptOps {
   static launchAddHandler() {
     selectSprite("Snake");
     selectActorAspect("Code");
-    cy.get(".Junior-CodeEditor .AddSomethingButton").click();
+    launchAdd.script();
   }
 
   /** Add a script to the focused actor.  The given
@@ -418,25 +418,32 @@ export class ScriptOps {
   }
 }
 
-/** Assuming that we are in the per-method IDE, click the "Add sprite"
- * button. */
-export const launchAddSprite = () =>
-  cy
-    .get(".Junior-ActorsList-container .AddSomethingButton")
-    .should("have.length", 1)
-    .click();
-
 /** Assuming that we are in the per-method IDE, click one of the "add
  * something" buttons.  The arg `match` should be contained in the label
  * of the button to click. */
 export const clickAddSomething = (match: string) =>
-  cy.get("div.tab-pane.active .AddSomethingButton").contains(match).click();
+  cy
+    .get(".IDELayout div.tab-pane.active .AddSomethingButton")
+    .contains(match)
+    .should("have.length", 1)
+    .click();
+
+const launchAddFun = (match: string) => () => clickAddSomething(match);
+
+/** Assuming that we are in the IDE, click, an "add something" button,
+ * according to the function-valued property. */
+export const launchAdd = {
+  sprite: launchAddFun("Add sprite"),
+  assetFromThisDevice: launchAddFun("Add from this device"),
+  assetFromMediaLibrary: launchAddFun("Add from media library"),
+  script: launchAddFun("Add script"),
+};
 
 /** Assuming that we are in the per-method IDE, launch the "add from
  * media library" modal dialog, and for each of the given `matches`,
  * select the matching card. */
 export const initiateAddFromMediaLib = (matches: Array<string>) => {
-  clickAddSomething("from media library");
+  launchAdd.assetFromMediaLibrary();
 
   for (const match of matches) {
     // Sometimes the media library is scrolled such that the chosen

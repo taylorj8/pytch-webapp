@@ -1,13 +1,7 @@
 import React from "react";
 import classNames from "classnames";
-import {
-  AssetPresentationDataKind,
-  AssetPresentation,
-} from "../../model/asset";
-import {
-  ActorKind,
-  AssetMetaDataOps,
-} from "../../model/junior/structured-program";
+import { AssetPresentation } from "../../model/asset";
+import { PytchProgramOps } from "../../model/pytch-program";
 import { useStoreState } from "../../store";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { AssetThumbnail } from "../AssetThumbnail";
@@ -19,33 +13,37 @@ import { DragPreviewImage } from "react-dnd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ProjectId } from "../../model/project-core";
 import { useRunFlow } from "../../model";
+import { AssetMimeType } from "../../model/junior/structured-program/asset";
+import { AssetOperationScope } from "../../model/asset/core";
+import { copyTextToClipboard } from "../../utils";
+import { pyStringRepr } from "../../skulpt-connection/utils";
 
 type RenameDropdownItemProps = {
-  actorKind: ActorKind;
-  assetKind: AssetPresentationDataKind;
+  operationScope: AssetOperationScope;
+  assetKind: AssetMimeType;
   fullPathname: string;
 };
 const RenameDropdownItem: React.FC<RenameDropdownItemProps> = ({
-  actorKind,
+  operationScope,
   assetKind,
   fullPathname,
 }) => {
   const runRenameAsset = useRunFlow((f) => f.renameAssetFlow);
 
-  const operationContextKey = `${actorKind}/${assetKind}` as const;
-  const { actorId, basename } = AssetMetaDataOps.pathComponents(fullPathname);
+  const operationContextKey = `${operationScope}/${assetKind}` as const;
+  const nameAffixes = PytchProgramOps.assetPathAffixes(fullPathname);
   const launchRename = () =>
     runRenameAsset({
       operationContextKey,
-      fixedPrefix: `${actorId}/`,
-      oldNameSuffix: basename,
+      fixedPrefix: nameAffixes.prefix,
+      oldNameSuffix: nameAffixes.suffix,
     });
 
   return <Dropdown.Item onClick={launchRename}>Rename</Dropdown.Item>;
 };
 
 type DeleteDropdownItemProps = {
-  assetKind: AssetPresentationDataKind;
+  assetKind: AssetMimeType;
   fullPathname: string;
   displayName: string;
   isAllowed: boolean;
@@ -122,36 +120,53 @@ const CropScaleDropdownItem: React.FC<CropScaleDropdownItemProps> = ({
   );
 };
 
+type CopyAssetNameDropdownItemProps = { assetName: string };
+const CopyAssetNameDropdownItem: React.FC<CopyAssetNameDropdownItemProps> = ({
+  assetName,
+}) => {
+  const nameStringLiteral = pyStringRepr(assetName);
+  const onCopyName = () => copyTextToClipboard(nameStringLiteral);
+  return (
+    <Dropdown.Item onClick={onCopyName}>
+      <span className="with-icon">
+        <span>Copy name</span>
+        <FontAwesomeIcon icon="copy" />
+      </span>
+    </Dropdown.Item>
+  );
+};
+
 type AssetCardDropdownProps = {
-  actorKind: ActorKind;
+  operationScope: AssetOperationScope;
   presentation: AssetPresentation;
   deleteIsAllowed: boolean;
 };
 const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
-  actorKind,
+  operationScope,
   presentation,
   deleteIsAllowed,
 }) => {
   const projectId = useStoreState((state) => state.activeProject.project.id);
   const fullPathname = presentation.assetInProject.name;
-  const basename = AssetMetaDataOps.basename(fullPathname);
+  const displayName = PytchProgramOps.assetPathAffixes(fullPathname).suffix;
   const assetKind = presentation.presentation.kind;
 
   return (
     <DropdownButton align="end" title="⋮">
+      <CopyAssetNameDropdownItem assetName={displayName} />
       <CropScaleDropdownItem
         projectId={projectId}
         presentation={presentation}
       />
       <RenameDropdownItem
-        actorKind={actorKind}
+        operationScope={operationScope}
         assetKind={assetKind}
         fullPathname={fullPathname}
       />
       <DeleteDropdownItem
         assetKind={assetKind}
         fullPathname={fullPathname}
-        displayName={basename}
+        displayName={displayName}
         isAllowed={deleteIsAllowed}
       />
     </DropdownButton>
@@ -159,42 +174,45 @@ const AssetCardDropdown: React.FC<AssetCardDropdownProps> = ({
 };
 
 type AssetCardProps = {
-  assetKind: AssetPresentationDataKind;
-  expectedPresentationKind: "image" | "sound";
-  actorKind: ActorKind;
-  displayIndex: number;
+  dragDropAllowed: boolean;
+  assetKind: AssetMimeType;
+  operationScope: AssetOperationScope;
+  displayIndex: number | null;
   assetPresentation: AssetPresentation;
   canBeDeleted: boolean;
 };
 export const AssetCard: React.FC<AssetCardProps> = ({
+  dragDropAllowed,
   assetKind,
-  expectedPresentationKind,
-  actorKind,
+  operationScope,
   displayIndex,
   assetPresentation,
   canBeDeleted,
 }) => {
   const fullPathname = assetPresentation.name;
 
-  const [dragProps, dragRef, preview] = useAssetCardDrag(fullPathname);
-  const [dropProps, dropRef] = useAssetCardDrop(fullPathname);
+  const [dragProps, dragRef, preview] = useAssetCardDrag(
+    fullPathname,
+    dragDropAllowed
+  );
+  const [dropProps, dropRef] = useAssetCardDrop(fullPathname, dragDropAllowed);
 
   const presentation = assetPresentation.presentation;
-  if (presentation.kind !== expectedPresentationKind) {
+  if (presentation.kind !== assetKind) {
     throw new Error(
       `expecting asset "${fullPathname}" to` +
-        ` have presentation of kind "${expectedPresentationKind}"` +
+        ` have presentation of kind "${assetKind}"` +
         ` but it is of kind "${presentation.kind}"`
     );
   }
 
   const classes = classNames(
     "AssetCard",
-    `kind-${actorKind}`,
+    `kind-${operationScope}`,
     dragProps,
     dropProps
   );
-  const basename = AssetMetaDataOps.basename(fullPathname);
+  const label = PytchProgramOps.assetPathAffixes(fullPathname).suffix;
 
   const dragPreview =
     assetKind === "image" ? ImageAssetPreview : SoundAssetPreview;
@@ -206,8 +224,8 @@ export const AssetCard: React.FC<AssetCardProps> = ({
   // first time you drag a particular asset.  It works correctly in a
   // static preview or release build.
 
-  const indexLabel = (
-    <div className={classNames("asset-card-display-index", actorKind)}>
+  const mIndexLabel = displayIndex != null && (
+    <div className={classNames("asset-card-display-index", operationScope)}>
       <p>
         <code>{displayIndex}</code>
       </p>
@@ -227,12 +245,12 @@ export const AssetCard: React.FC<AssetCardProps> = ({
                     <AssetThumbnail presentationData={presentation} />
                   </div>
                   <div className="label">
-                    <pre>{basename}</pre>
+                    <pre>{label}</pre>
                   </div>
                 </div>
-                {indexLabel}
+                {mIndexLabel}
                 <AssetCardDropdown
-                  actorKind={actorKind}
+                  operationScope={operationScope}
                   presentation={assetPresentation}
                   deleteIsAllowed={canBeDeleted}
                 />

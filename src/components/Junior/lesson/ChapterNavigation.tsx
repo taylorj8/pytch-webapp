@@ -1,6 +1,5 @@
 import React from "react";
 import { EmptyProps } from "../../../utils";
-import { Button } from "react-bootstrap";
 import { useMappedLinkedJrTutorial } from "./hooks";
 import { useStoreActions } from "../../../store";
 import classNames from "classnames";
@@ -8,6 +7,10 @@ import {
   LinkedJrTutorial,
   allTasksDoneInCurrentChapter,
 } from "../../../model/junior/jr-tutorial";
+import {
+  ChapterNavigationButtons,
+  ChapterNavigationButtonsProps,
+} from "./ChapterNavigationButtons";
 
 type ChapterNavigationState = {
   allChapterTasksDone: boolean;
@@ -39,34 +42,15 @@ export const ChapterNavigation: React.FC<EmptyProps> = () => {
     (actions) => actions.activeProject.setLinkedLessonChapterIndex
   );
 
-  const nextIsEnabled = state.chapterIdx < state.nChapters - 1;
-  const prevIsEnabled = state.chapterIdx > 0;
+  if (!state.allChapterTasksDone && !allowRandomChapterAccess) return null;
 
-  const prevChapter = () => {
-    if (prevIsEnabled) setChapterIndex(state.chapterIdx - 1);
-  };
-  const nextChapter = () => {
-    if (nextIsEnabled) setChapterIndex(state.chapterIdx + 1);
-  };
+  let props: ChapterNavigationButtonsProps = {};
+  if (state.mNextChapterTitle != null) {
+    props.next = {
+      displayTitle: state.mNextChapterTitle,
+      navigate: () => setChapterIndex(state.chapterIdx + 1),
+    };
+  }
 
-  const prevClasses = classNames("prev", { isEnabled: prevIsEnabled });
-  const nextClasses = classNames("next", { isEnabled: nextIsEnabled });
-
-  const mNextButton = state.allChapterTasksDone && (
-    <Button className={nextClasses} onClick={nextChapter}>
-      Next
-    </Button>
-  );
-
-  const classes = classNames("Junior-ChapterNavigation", {
-    someTasksRemain: !state.allChapterTasksDone,
-  });
-  return (
-    <div className={classes}>
-      <Button className={prevClasses} onClick={prevChapter}>
-        Back
-      </Button>
-      {mNextButton}
-    </div>
-  );
+  return <ChapterNavigationButtons {...props} />;
 };

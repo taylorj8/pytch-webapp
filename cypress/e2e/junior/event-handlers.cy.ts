@@ -11,6 +11,7 @@ import {
   duplicateHandlerByIndex,
   aceControllerMapFromWindow,
   usingPytchJrProgram,
+  launchAdd,
 } from "./utils";
 import { saveButton } from "../utils";
 
@@ -62,7 +63,7 @@ context("Create/modify/delete event handlers", () => {
     it(`can choose which event handler to add (${spriteKindSpec.label})`, () => {
       spriteKindSpec.selectAction();
       selectActorAspect("Code");
-      cy.get(".Junior-CodeEditor .AddSomethingButton").click();
+      launchAdd.script();
 
       let eventKindMatches: Array<string> = [
         "when green flag clicked",

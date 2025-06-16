@@ -253,7 +253,7 @@ $task-checkbox-not-done-colour: #999;
   height: $chapter-final-content-height;
   display: flex;
   flex-direction: row;
-  justify-content: end;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -270,7 +270,7 @@ $task-checkbox-not-done-colour: #999;
 
 $progress-node-strip-x-margin: 16px;
 
-$progress-node-box-size: 18px;
+$progress-node-box-size: 26px;
 $progress-node-future-size: 10px;
 $progress-node-future-padding: calc(
   ($progress-node-box-size - $progress-node-future-size) / 2
@@ -284,7 +284,7 @@ $progress-track-thickness: 2px;
 // It would look better if these were bigger, but if they're too big, a
 // 12-chapter tutorial's progress trail is too wide when the viewport is
 // narrow.
-$progress-node-background-box-size: 30px;
+$progress-node-background-box-size: 36px;
 
 $progress-node-backgrounds-strip-x-margin: calc(
   $progress-node-strip-x-margin -
@@ -312,6 +312,7 @@ $progress-node-backgrounds-strip-x-margin: calc(
   }
 
   .progress-node-hover-target,
+  .progress-node-no-hover,
   .progress-node-background {
     position: relative;
     border: 2px solid transparent;
@@ -395,26 +396,31 @@ $progress-node-backgrounds-strip-x-margin: calc(
 
       @include align-center-middle();
 
-      &.completed {
-        border-radius: 50%;
+      span.progress-node-label {
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      border-radius: 30%;
+      border: 2px solid $pytch-colour-main-yellow;
+
+      &.kind-normal {
+        background-color: $pytch-colour-main-blue;
+        color: $pytch-colour-main-yellow;
+      }
+      &.kind-inverse {
         background-color: $pytch-colour-main-yellow;
         color: $pytch-colour-main-blue;
-        span {
-          position: relative;
-          top: 0.1111rem;
-        }
       }
-      &.current {
-        border-radius: 50%;
+      &.kind-ellipsis {
         background-color: $pytch-colour-main-blue;
-        border: 2px solid $pytch-colour-main-yellow;
-      }
-      &.future {
-        padding: $progress-node-future-padding;
-        div.future-node {
-          width: $progress-node-future-size;
-          height: $progress-node-future-size;
-          border-radius: 50%;
+        border-color: transparent;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        .ellipsis-dot {
+          width: 2px;
+          height: 2px;
           background-color: $pytch-colour-main-yellow;
         }
       }
@@ -489,10 +495,25 @@ $progress-node-backgrounds-strip-x-margin: calc(
         margin-bottom: 0px;
       }
     }
+
     code {
       margin: 0px 2px;
-      color: #a00;
     }
+    p > code,
+    strong > code,
+    li > code {
+      color: $pytch-colour-main-blue-darkened;
+      font-style: italic;
+    }
+    em > code {
+      padding-left: 1px;
+      color: $pytch-colour-main-blue-darkened;
+      font-style: normal;
+    }
+    pre code {
+      font-style: normal;
+    }
+
     p.img-center {
       text-align: center;
     }
@@ -503,13 +524,12 @@ $progress-node-backgrounds-strip-x-margin: calc(
       font-style: italic;
     }
 
-    // TODO: Eliminate duplication with pytch-tutorial.scss
     .asset-credits {
       .credit-intro {
         margin-bottom: 0.25rem;
       }
       .asset-filename {
-        color: #a00;
+        color: $pytch-colour-main-blue-darkened;
       }
       .credits {
         margin: 0rem 3rem;

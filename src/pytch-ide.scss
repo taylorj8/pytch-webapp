@@ -2,7 +2,6 @@
 @import "./pytch-mixins.scss";
 @import "./pytch-variables.scss";
 
-$drag-resizer-height: 0.5rem;
 $tooltip-background-color: #151;
 
 // It's possible there's a cleaner way to achieve this.  The value comes
@@ -17,24 +16,9 @@ $stage-controls-height: 37.6px;
   right: 0px;
 }
 
-.ProjectIDE {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: 0.5rem;
+.FullScreenLayout {
+  margin: 0px;
   display: flex;
-
-  &.wide-info-pane {
-    flex-direction: column;
-  }
-  &.tall-code-editor {
-    flex-direction: row;
-  }
-  &.full-screen {
-    margin: 0px;
-  }
 
   .FullScreenStage {
     margin: auto;
@@ -249,20 +233,6 @@ $stage-controls-height: 37.6px;
   }
 }
 
-#stage-resize-indicator {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  background-color: #888;
-  border: 1px solid #444;
-  box-sizing: content-box;
-  visibility: hidden;
-
-  &.resize-active {
-    visibility: visible;
-  }
-}
-
 $speech-bubble-background: #e8e8e8;
 $speech-bubble-arrow: #ccc;
 $speech-bubble-width: 210px;
@@ -321,40 +291,13 @@ $speech-bubble-max-height: 180px;
   }
 }
 
-.LinkedContentBar {
-  background-color: $pytch-colour-main-blue;
-  border-radius: 6px 6px 0px 0px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  p {
-    margin: 0.25rem 0.5rem;
-    font-size: 0.9rem;
-    font-style: italic;
-    color: #fff792;
-  }
-  button {
-    padding: 0px 10px 0px 0px;
-    margin-right: 8px;
-    background-color: transparent;
-    border-color: transparent;
-    color: #fff792;
-  }
-}
-
 .CodeEditor {
   flex-grow: 1;
   flex-shrink: 1;
-  margin-right: 0.5rem;
   display: grid;
   grid-template-rows: auto 1fr;
   position: relative;
   z-index: 0;
-
-  .editor-itself {
-    display: flex;
-    position: relative;
-  }
 
   /* Override Ace's ordering of fonts to avoid Monaco-related
      mis-rendering in Safari.
@@ -441,11 +384,6 @@ $speech-bubble-max-height: 180px;
     }
   }
 
-  #editor {
-    background-color: white;
-    flex-grow: 1;
-  }
-
   .ReadOnlyOverlay {
     z-index: 10;
     position: absolute;
@@ -468,28 +406,6 @@ $speech-bubble-max-height: 180px;
   }
 }
 
-.CodeAndStage {
-  display: flex;
-  flex-direction: row;
-}
-
-.StageAndInfo {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.drag-resizer {
-  height: $drag-resizer-height;
-  flex-shrink: 0;
-
-  &:hover {
-    cursor: ns-resize;
-    background-color: black;
-    opacity: 0.2;
-  }
-}
-
 @mixin as-bootstrap-button($bg, $border) {
   &.btn,
   &.btn:focus,
@@ -503,145 +419,116 @@ $speech-bubble-max-height: 180px;
   }
 }
 
-.InfoPanel-container {
-  position: relative;
-
-  min-height: 0;
-  flex-grow: 1;
-  flex-shrink: 1;
-
+.DebugPane { // todo move styling from debug files into here
+  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  overflow-x: auto;
 
-  .LayoutChooser {
-    position: absolute;
-    height: 32px;
-    top: 0px;
-    right: 0px;
-    display: flex;
-    flex-direction: row;
-    button {
-      height: 32px;
-      margin-left: 0.5rem;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-    }
-    .layout-icon {
-      width: 24px;
-    }
+  // todo: fix scroll bar
+  &::after {
+    content: "";
+    display: block;
+    flex-grow: 1;
   }
 
-  .DebugPane { // todo move styling from debug files into here
-    flex: 1;
+  .card-container {
     display: flex;
-    flex-direction: column;
+    flex-wrap: nowrap;
     align-items: flex-start;
-    overflow-x: auto;
+    gap: 1rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 
-    // todo: fix scroll bar
-    &::after {
-      content: "";
-      display: block;
-      flex-grow: 1;
+    .card {
+      flex: 0 0 300px;
+      min-width: 330px;
+      margin-bottom: 20px;
     }
 
-    .card-container {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: flex-start;
-      gap: 1rem;
-      margin-left: 0.5rem;
-      margin-right: 0.5rem;
-  
-      .card {
-        flex: 0 0 300px;
-        min-width: 330px;
-        margin-bottom: 20px;
-      }
+    .inner-card {
+      min-width: 200px;
+      flex: 1 1 auto;
+    }
 
-      .inner-card {
-        min-width: 200px;
-        flex: 1 1 auto;
-      }
-  
-      .highlighted-card {
-        min-width: 200px;
-        flex: 1 1 auto;
-        box-shadow: 0 0 10px 2px red;
-        border: 2px solid red;
-      }
+    .highlighted-card {
+      min-width: 200px;
+      flex: 1 1 auto;
+      box-shadow: 0 0 10px 2px red;
+      border: 2px solid red;
+    }
 
-      .actor-instance {
-        margin-top: 0.75rem;
-        padding-left: 0.5rem;
-      
-        &.highlighted-clone {
-          background-color: rgba(255, 0, 0, 0.1);
-          border-left: 4px solid red;
-          padding-left: 1rem;
-        }
-      
-        strong {
-          display: block;
-          margin-bottom: 0.25rem;
-        }
-      
-        .list-group-item {
-          font-family: "Courier New", Courier, monospace;
-          font-size: 0.9rem;
-          padding: 0.25rem 0.5rem;
-        }
+    .actor-instance {
+      margin-top: 0.75rem;
+      padding-left: 0.5rem;
+    
+      &.highlighted-clone {
+        background-color: rgba(255, 0, 0, 0.1);
+        border-left: 4px solid red;
+        padding-left: 1rem;
       }
-
-      .clone-header {
-        display: flex;
-        align-items: center;
+    
+      strong {
+        display: block;
         margin-bottom: 0.25rem;
-      
-        img.card-title-img {
-          margin-right: 0.5rem;
-        }
-      }
-
-      .clone-container {
-        width: 100%;
-        // display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-      
-      .actor-instance {
-        width: 100%;
       }
     
-      .monospace-font {
+      .list-group-item {
         font-family: "Courier New", Courier, monospace;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        padding: 0.25rem 0.5rem;
       }
-      
-      .card-title-img {
-        max-width: 32px;
-        max-height: 32px;
-        margin-right: 0.5rem;
-        vertical-align: middle;
-      }
-    
-      .card-title-icon {
-        max-width: 24px;
-        max-height: 24px;
-        width: auto;
-        height: auto;
-        margin-right: 0.5rem;
-        vertical-align: middle;
-      }
+    }
 
-      .monospace-font {
-        font-family: "Courier New", Courier, monospace;
-        font-size: 0.95rem;
+    .clone-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    
+      img.card-title-img {
+        margin-right: 0.5rem;
       }
+    }
+
+    .clone-container {
+      width: 100%;
+      // display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .actor-instance {
+      width: 100%;
+    }
+  
+    .monospace-font {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.95rem;
+    }
+    
+    .card-title-img {
+      max-width: 32px;
+      max-height: 32px;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+    
+    .card-title-icon {
+      max-width: 24px;
+      max-height: 24px;
+      width: auto;
+      height: auto;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .monospace-font {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.95rem;
     }
   }
+}
 
   .DebugButtons {
     position: absolute;
@@ -664,42 +551,9 @@ $speech-bubble-max-height: 180px;
       width: 24px;
     }
   }
-}
-
-div.spacer-instead-of-resizer {
-  width: 100%;
-  height: $drag-resizer-height;
-  flex-shrink: 0;
-}
-
-.InfoPanel {
-  min-height: 0;
-  flex-grow: 0;
-  flex-shrink: 0;
-  margin-top: 0px;
-  a {
-    background-color: #eef;
-  }
-}
-
-.InfoPanel + div {
-  min-height: 0;
-  flex-grow: 1;
-  flex-shrink: 1;
-  overflow-y: auto;
-  background-color: white;
-  position: relative;
-}
-
-.InfoPane {
-  min-height: 0;
-  flex-grow: 1;
-  flex-shrink: 1;
-}
 
 .AssetCardPane,
 .StandardOutputPane,
-.EditorWebSocketInfo,
 .ErrorsPane {
   flex-grow: 1;
   flex-shrink: 1;
@@ -711,8 +565,7 @@ div.spacer-instead-of-resizer {
   }
 }
 
-.StandardOutputPane,
-.EditorWebSocketInfo {
+.StandardOutputPane {
   pre {
     margin: 2rem 3rem;
   }
@@ -730,39 +583,6 @@ div.spacer-instead-of-resizer {
     .assets-button {
       margin-right: 1rem;
       margin-left: 1rem;
-    }
-  }
-}
-
-.AssetCardList {
-  margin: 1rem 0px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-
-  .AssetCard {
-    width: 20rem;
-    margin: 1rem 3rem;
-    background-color: #afa;
-
-    .card-header {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-
-      code {
-        font-size: 1.25rem;
-        color: black;
-      }
-    }
-
-    .asset-preview {
-      text-align: center;
-
-      img {
-        background-color: #bbb;
-      }
     }
   }
 }

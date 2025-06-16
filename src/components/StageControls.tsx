@@ -188,8 +188,6 @@ export const StageControls: React.FC<EmptyProps> = () => {
     (actions) => actions.ideLayout.setIsFullScreen
   );
 
-  const programKind = project.program.kind;
-
   const handleSave = () => requestSyncToStorage();
 
   const runDisplayScreenshot = useRunFlow((f) => f.displayScreenshotFlow);
@@ -208,7 +206,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
   const copyArgs = { sourceProjectId: project.id, sourceName: project.name };
   const onCreateCopy = () => runSaveProjectAs(copyArgs);
 
-  const mFullScreenButton = programKind === "per-method" && (
+  const fullScreenButton = (
     <Button className="full-screen" onClick={() => setIsFullScreen(true)}>
       <FontAwesomeIcon className="fa-lg" icon="expand" />
     </Button>
@@ -240,7 +238,7 @@ export const StageControls: React.FC<EmptyProps> = () => {
       >
         <span>Save</span>
       </Button>
-      {mFullScreenButton}
+      {fullScreenButton}
       <Link to="/">
         <Button>
           <FontAwesomeIcon aria-label="Home" icon="home" />

@@ -6,7 +6,9 @@ export interface AssetMetaData {
   assetInProject: { mimeType: string };
 }
 
-type AssetNames = { fullPathname: string; basename: string };
+export type AssetNames = { fullPathname: string; basename: string };
+
+export type AssetMimeType = "image" | "audio";
 
 type AssetNamesByKind = {
   appearances: Array<AssetNames>;
@@ -63,6 +65,19 @@ export class AssetMetaDataOps {
       throw new Error(`could not parse mime-type "${mimeFullType}"`);
     }
     return mimeFullType.slice(0, slashIdx).toLowerCase();
+  }
+
+  /** Return the "type" (as opposed to the "subtype") of the given
+   * `mimeType`, forced to all-lowercase, ensuring it is suitable for an
+   * asset, i.e., is one of `"image"` or `"audio"`.  The "type" is the
+   * part up to but not including the first `/` character.  If the type
+   * is neither `"image"` nor `"audio"`, throw an error. */
+  static mimeAssetKind(mimeFullType: string): AssetMimeType {
+    const rawType = AssetMetaDataOps.mimeMajorType(mimeFullType);
+    if (rawType !== "image" && rawType !== "audio") {
+      throw new Error(`mime-type "${rawType}" is not suitable for an asset`);
+    }
+    return rawType;
   }
 
   /** Return an integer corresponding to the given `mimeMajorType`

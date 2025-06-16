@@ -6,8 +6,10 @@ import {
   thunk,
   Computed,
   computed,
+  Generic,
+  generic,
 } from "easy-peasy";
-import { delaySeconds } from "../../utils";
+import { delaySeconds, propSetterAction } from "../../utils";
 import { NavigationAbandonmentGuard } from "../../navigation-abandonment-guard";
 
 type UserSettleResult = "cancel" | "submit";
@@ -39,7 +41,7 @@ function assertInteracting<RunStateT>(
 }
 
 export type AsyncUserFlowState<RunStateT> = {
-  fsmState: AsyncUserFlowFsmState<RunStateT>;
+  fsmState: Generic<AsyncUserFlowFsmState<RunStateT>>;
   isSubmittable: Computed<AsyncUserFlowState<RunStateT>, boolean>;
 };
 
@@ -87,7 +89,7 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
   options: AsyncUserFlowOptions
 ): AsyncUserFlowSlice<AppModelT, RunArgsT, RunStateT> {
   return {
-    fsmState: { kind: "idle" },
+    fsmState: generic({ kind: "idle" }),
     isSubmittable: computed((state) => {
       const fsmState = state.fsmState as AsyncUserFlowFsmState<RunStateT>;
       return (
@@ -95,11 +97,7 @@ function baseAsyncUserFlowSlice<AppModelT extends object, RunArgsT, RunStateT>(
       );
     }),
 
-    // Did not get to the bottom of what's going on with the typing
-    // such that I can't use propSetterAction() here.
-    setFsmState: action((s, val) => {
-      s.fsmState = val;
-    }),
+    setFsmState: propSetterAction("fsmState"),
 
     run: thunk(async (actions, args, helpers) => {
       const fsmStateKind = helpers.getState().fsmState.kind;
@@ -351,7 +349,6 @@ export function flowFocusOrBlurFun<Elt extends HTMLElement, RunStateT>(
     }
 
     const element = elementRef.current;
-
     if (element == null) {
       // Shouldn't happen.
       return;

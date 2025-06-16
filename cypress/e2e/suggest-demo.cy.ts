@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import { interceptDemoZipfile } from "./utils";
+import { assertInIDE, interceptDemoZipfile } from "./utils";
 
 context("Work with suggested demos", () => {
   beforeEach(() => {
@@ -14,8 +14,7 @@ context("Work with suggested demos", () => {
     cy.visit("/suggested-demo/fake-build-id-for-tests/bubbles");
     cy.contains("Bubbles");
     cy.get("button[title*='Try this project']").click();
-    cy.contains("images and sounds");
-    cy.get(".ReadOnlyOverlay").should("not.exist");
+    assertInIDE("flat");
     cy.contains("Click the green flag");
   });
 

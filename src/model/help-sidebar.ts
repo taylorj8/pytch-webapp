@@ -9,8 +9,10 @@ import {
   ActorKind,
   ActorKindOps,
   EventDescriptor,
+  StructuredProgramOps,
 } from "./junior/structured-program";
 import { highlightedPreEltsFromCode } from "./highlight-as-ace";
+import { useStoreState } from "../store";
 
 export type ElementArray = Array<Element>;
 
@@ -413,10 +415,7 @@ type HelpEntryLocation = {
 
 export interface IHelpSidebar {
   contentFetchState: ContentFetchState;
-  isVisible: boolean;
   sectionVisibility: SectionVisibility;
-  _toggleVisibility: Action<IHelpSidebar>;
-  toggleVisibility: Thunk<IHelpSidebar>;
 
   toggleHelpEntryVisibility: Action<IHelpSidebar, HelpEntryLocation>;
   hideAllHelpEntries: Action<IHelpSidebar>;
@@ -436,18 +435,7 @@ const sectionsCollapsed: SectionVisibility = { status: "all-collapsed" };
 
 export const helpSidebar: IHelpSidebar = {
   contentFetchState: { state: "idle" },
-  isVisible: false,
   sectionVisibility: sectionsCollapsed,
-  _toggleVisibility: action((state) => {
-    state.isVisible = !state.isVisible;
-  }),
-  toggleVisibility: thunk((actions) => {
-    actions._toggleVisibility();
-
-    // Goal is to make sure that everything is collapsed when sidebar is
-    // freshly opened; may as well do so on any change to visibility.
-    actions.hideAllContent();
-  }),
 
   toggleHelpEntryVisibility: action((state, entryLocation) => {
     if (state.contentFetchState.state !== "available") {
@@ -530,3 +518,25 @@ export const helpSidebar: IHelpSidebar = {
     }
   }),
 };
+
+export function useHelpDisplayContext(): HelpDisplayContext {
+  return useStoreState((state) => {
+    const program = state.activeProject.project.program;
+    const programKind = program.kind;
+    switch (programKind) {
+      case "flat":
+        return { programKind: "flat" };
+      case "per-method": {
+        const focusedActorId = state.jrEditState.focusedActor;
+        const focusedActor = StructuredProgramOps.uniqueActorById(
+          program.program,
+          focusedActorId
+        );
+        const actorKind = focusedActor.kind;
+        return { programKind: "per-method", actorKind };
+      }
+      default:
+        return assertNever(programKind);
+    }
+  });
+}

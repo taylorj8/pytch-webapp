@@ -7,14 +7,14 @@ import {
   launchShareTutorialModal,
   selectUniqueProject,
   assertOnHomepage,
+  jumpToTutorialChapter,
 } from "./utils";
 import {
   assertActorNames,
   assertCostumeNames,
   assertHatBlockLabels,
-  clickAddSomething,
   clickUniqueButton,
-  launchAddSprite,
+  launchAdd,
   launchDeleteActorByIndex,
   launchDeleteAssetByIndex,
   launchDeleteHandlerByIndex,
@@ -299,14 +299,14 @@ context("Modals are cancelled when navigating away", () => {
 
   itCanAbandon("add assets (flat)", {
     page: { kind: "ide", projectIdx: kFlatProjectIdx },
-    runModal: () => cy.contains("Add an image").click(),
+    runModal: launchAdd.assetFromThisDevice,
     afterwardsExpect: assertFlatAssetsUnchanged,
   });
 
   itCanAbandon("add clip art (flat)", {
     page: { kind: "ide", projectIdx: kFlatProjectIdx },
     runModal: () => {
-      cy.contains("Choose from library").click();
+      launchAdd.assetFromMediaLibrary();
       cy.get(".clipart-card").contains("blocks").click();
     },
     afterwardsExpect: assertFlatAssetsUnchanged,
@@ -332,7 +332,7 @@ context("Modals are cancelled when navigating away", () => {
 
   itCanAbandon("add sprite", {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
-    runModal: launchAddSprite,
+    runModal: launchAdd.sprite,
     afterwardsExpect: assertActorNamesUnchanged,
   });
 
@@ -355,7 +355,7 @@ context("Modals are cancelled when navigating away", () => {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
     runModal: () => {
       selectSnakeCode();
-      clickAddSomething("Add script");
+      launchAdd.script();
     },
     afterwardsExpect: assertSnakeHatBlocksUnchanged,
   });
@@ -383,7 +383,7 @@ context("Modals are cancelled when navigating away", () => {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
     runModal: () => {
       selectSnakeCostumes();
-      clickAddSomething("from this device");
+      launchAdd.assetFromThisDevice();
     },
   });
 
@@ -422,7 +422,7 @@ context("Modals are cancelled when navigating away", () => {
     page: { kind: "ide", projectIdx: kPerMethodProjectIdx },
     runModal: () => {
       selectSnakeCostumes();
-      clickAddSomething("Add from media library");
+      launchAdd.assetFromMediaLibrary();
       cy.get(".clipart-card").contains("blocks").click();
     },
     afterwardsExpect: assertSnakeCostumesUnchanged,
@@ -455,7 +455,7 @@ context("Modals are cancelled when navigating away", () => {
   itCanAbandon("code diff help", {
     page: { kind: "ide", projectIdx: kTutorialFollowingProjectIdx },
     runModal: () => {
-      cy.get("ul.ToC").contains("Start the bowl").click();
+      jumpToTutorialChapter(2);
       cy.get(".patch-container .header button").eq(0).click();
       cy.contains("What changes should I make to my code?");
     },
@@ -463,10 +463,7 @@ context("Modals are cancelled when navigating away", () => {
 
   itCanAbandon("view code diff", {
     page: { kind: "specimen-linked-project" },
-    runModal: () => {
-      cy.get(".LinkedContentBar.linked-content .dropdown button").click();
-      cy.contains("Compare to original").click();
-    },
+    runModal: () => cy.get("button").contains("Compare to original").click(),
   });
 
   // #endregion

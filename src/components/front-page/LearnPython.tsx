@@ -71,7 +71,7 @@ export const LearnPython: React.FC<EmptyProps> = () => {
             </div>
 
             <div className="annotated-screenshot narrow">
-              <h4>One flat program</h4>
+              <h4>One big program</h4>
               <LaptopScreenshot
                 imageUrl={flatPreview}
                 tutorialSlug="catch-apple"

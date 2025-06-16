@@ -15,7 +15,7 @@ export const AssetThumbnail: React.FC<AssetThumbnailProps> = ({
       return (
         <AssetImageThumbnail image={presentationData.image} maxSize={120} />
       );
-    case "sound":
+    case "audio":
       return (
         <div className="asset-preview">
           <img src={SoundWaveIcon} alt="Sound-Wave" />

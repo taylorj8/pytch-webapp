@@ -31,9 +31,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-.Junior-IDEContents {
-  margin: $ide-gap;
-
+.IDELayout {
   // If the sprites list is allowed to get too short, the "+" button
   // ends up being positioned outside the panel.  If we impose a minimum
   // height on the sprites list, the height of the coding area doesn't
@@ -49,6 +47,7 @@
   // The special-casing for each type of activity is a bit clunky but
   // it will do for now.
 
+  &.activity-content-expanded-tutorial,
   &.activity-content-expanded-lesson {
     @include grid-hstack-four(
       $activity-bar-width,
@@ -58,15 +57,7 @@
     );
   }
 
-  &.activity-content-expanded-specimen {
-    @include grid-hstack-four(
-      $activity-bar-width,
-      $help-sidebar-content-width,
-      minmax($min-actor-properties-width, 1fr),
-      auto
-    );
-  }
-
+  &.activity-content-expanded-specimen,
   &.activity-content-expanded-helpsidebar {
     @include grid-hstack-four(
       $activity-bar-width,
@@ -144,7 +135,6 @@
 
 .ActivityContent-container {
   position: relative;
-  margin-left: -$ide-gap;
   border-left: 1px solid $panel-divider-color;
 }
 
@@ -162,7 +152,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-.Junior-EditorAndInfo {
+.EditorAndOutErr {
   @include min-dimens-zero();
   @include grid-vstack-two(2fr, 1fr);
 
@@ -173,7 +163,7 @@
   }
 }
 
-.Junior-StageAndActorsList {
+.StageAndActorsOrAssets {
   @include min-dimens-zero();
   @include grid-vstack-two(auto, 1fr);
 
@@ -183,14 +173,27 @@
     background-color: $main-bg-color;
     padding: 6px;
   }
+
+  > *:nth-child(2) {
+    position: relative;
+    background-color: $panel-background;
+    border-top: $panel-divider-border-spec;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-.Junior-InfoPanel-container,
-.Junior-ActorsList-container,
-.Junior-ActorProperties-container {
+.compact-tablist-container {
+  @include min-dimens-zero();
+  @include grid-vstack-two(auto, 1fr);
+  position: relative;
+
   background-color: $panel-background;
+
+  .tab-content {
+    overflow: auto;
+    position: relative;
+  }
 
   ul.nav-tabs {
     > li > button,
@@ -206,6 +209,7 @@
     border-bottom-color: $panel-background;
     background-color: $secondary-bg-color;
   }
+
   button.nav-link {
     padding-top: 2px;
     padding-bottom: 2px;
@@ -214,6 +218,7 @@
     font-size: 0.875rem;
     text-transform: uppercase;
     color: $inactive-text-option-color;
+
     &.active {
       border-bottom-color: $panel-background;
       background-color: $panel-background;
@@ -222,27 +227,7 @@
   }
 }
 
-.Junior-ActorsList-container {
-  @include min-dimens-zero();
-  @include grid-vstack-two(auto, 1fr);
-  position: relative;
-
-  .tab-content {
-    overflow: auto;
-    position: relative;
-  }
-}
-
 .Junior-ActorProperties-container {
-  @include min-dimens-zero();
-  @include grid-vstack-two(auto, 1fr);
-  position: relative;
-
-  .tab-content {
-    overflow: auto;
-    position: relative;
-  }
-
   .AppearancesTabTitle {
     display: grid;
     .title-option {
@@ -278,9 +263,6 @@
 }
 
 .Junior-InfoPanel-container {
-  @include min-dimens-zero();
-  @include grid-vstack-two(auto, 1fr);
-  position: relative;
   border-top: $panel-divider-border-spec;
 
   button.collapse-or-expand-button {
@@ -302,28 +284,19 @@
       display: none;
     }
   }
-
-  .tab-content {
-    overflow: auto;
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-.Junior-ActorsList-container {
-  position: relative;
-  background-color: $panel-background;
-  border-top: $panel-divider-border-spec;
+.AssetCardPane .AssetCardList,
+.Junior-ActorsList-container .ActorsList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-content: flex-start;
 
-  .ActorsList {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-    align-content: flex-start;
-
-    margin-top: 0.5rem;
-  }
+  margin-top: 0.5rem;
 }
 
 .Junior-CodeEditor.hasDragItemOver,
@@ -345,6 +318,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+.AssetCardList > .AssetCard,
 .Junior-AssetsList > .AssetCard,
 .ActorCard {
   .drag-masked-card {
@@ -355,7 +329,6 @@
     }
   }
 
-  cursor: pointer;
   user-select: none;
   position: relative;
 
@@ -433,7 +406,7 @@
     .label,
     .label > pre {
       padding: 0.25rem;
-      font-size: 0.875rem;
+      font-size: 13px;
       text-align: center;
       color: white;
       overflow-x: hidden;
@@ -451,6 +424,7 @@
     @include border-and-label-bg($stage-card-background);
   }
 
+  &.kind-flat .AssetCardContent,
   &.kind-sprite .AssetCardContent,
   &.kind-sprite .ActorCardContent {
     @include border-and-label-bg($sprite-card-background);
@@ -492,6 +466,10 @@
   }
 }
 
+.ActorCard {
+  cursor: pointer;
+}
+
 // TMP: Will fold this into above once drag/drop working for Sprites
 // too.
 .Junior-AssetsList > .AssetCard {
@@ -502,6 +480,9 @@
 
 .NoContentHelp {
   margin: 2rem 3rem 1rem;
+  p {
+    margin: 0px;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -564,6 +545,7 @@
       color: $scratch-hat-block-text-colour;
     }
     &.add-sprite,
+    &.add-flat-asset,
     &.add-sprite-asset {
       @include background-color-as-button($sprite-card-background);
     }

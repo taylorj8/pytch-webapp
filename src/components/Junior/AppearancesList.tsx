@@ -47,10 +47,10 @@ const AppearancesContent: React.FC<AppearancesContentProps> = ({
     <>
       {appearances.map((a, idx) => (
         <AssetCard
+          dragDropAllowed={true}
           key={a.name}
           assetKind="image"
-          expectedPresentationKind="image"
-          actorKind={actorKind}
+          operationScope={actorKind}
           displayIndex={idx}
           assetPresentation={a}
           canBeDeleted={canBeDeleted}
@@ -108,7 +108,7 @@ export const AppearancesList = () => {
   const addWhat = `${focusedActorKind}-asset` as const;
 
   return (
-    <div className="abs-0000-oflow">
+    <div className="Junior-AppearancesList">
       <div className={classes}>{content}</div>
       <AddSomethingButtonStrip>
         <AddSomethingButton

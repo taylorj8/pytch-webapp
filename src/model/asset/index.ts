@@ -17,7 +17,6 @@ export {
   type ImageAssetPresentationData,
   type SoundAssetPresentationData,
   type AssetPresentationData,
-  type AssetPresentationDataKind,
   type AssetOperationContextKey,
   type AssetOperationContext,
   unknownAssetOperationContext,
@@ -84,7 +83,7 @@ export class AssetPresentation {
         // const audioBuffer = await audioContext.decodeAudioData(audioData);
         // but where to get an AudioContext?
         const audioBuffer = null;
-        presentation = { kind: "sound", audioBuffer };
+        presentation = { kind: "audio", audioBuffer };
         break;
       }
       default:

@@ -1,44 +1,11 @@
-import React, { KeyboardEventHandler, useEffect } from "react";
+import React, { KeyboardEventHandler } from "react";
 import { EmptyProps, assertNever } from "../../utils";
-import { useStoreActions } from "../../store";
-import { useJrEditState, useMappedProgram } from "./hooks";
-import { HelpSidebarInnerContent } from "../HelpSidebar";
+import { useJrEditState } from "./hooks";
 import { MaybeContent as MaybeLessonContent } from "./lesson/MaybeContent";
-import { StructuredProgramOps } from "../../model/junior/structured-program";
-import { HelpDisplayContext } from "../../model/help-sidebar";
 import { aceControllerMap } from "../../skulpt-connection/code-editor";
 import { WidthMonitor } from "./WidthMonitor";
-
-const HelpSidebar = () => {
-  const ensureHaveContent = useStoreActions(
-    (actions) => actions.ideLayout.helpSidebar.ensureHaveContent
-  );
-  const focusedActorId = useJrEditState((s) => s.focusedActor);
-  const focusedActorKind = useMappedProgram(
-    "<HelpSidebar>",
-    (program) =>
-      StructuredProgramOps.uniqueActorById(program, focusedActorId).kind
-  );
-
-  useEffect(() => {
-    ensureHaveContent();
-  });
-
-  const displayContext: HelpDisplayContext = {
-    programKind: "per-method",
-    actorKind: focusedActorKind,
-  };
-
-  return (
-    <div className="HelpSidebar">
-      <div className="content">
-        <div className="inner-content">
-          <HelpSidebarInnerContent displayContext={displayContext} />
-        </div>
-      </div>
-    </div>
-  );
-};
+import { HelpSidebar } from "../HelpSidebar";
+import Tutorial from "../Tutorial";
 
 export const ActivityContent: React.FC<EmptyProps> = () => {
   const s = useJrEditState((s) => s.activityContentState);
@@ -71,6 +38,8 @@ export const ActivityContent: React.FC<EmptyProps> = () => {
         );
       case "lesson":
         return <MaybeLessonContent />;
+      case "tutorial":
+        return <Tutorial />;
       default:
         return assertNever(s.tab);
     }
