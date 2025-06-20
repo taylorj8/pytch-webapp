@@ -14,7 +14,7 @@ import { NoContentHelp } from "./NoContentHelp";
 import { PytchScriptEditor } from "./PytchScriptEditor";
 
 import { AddSomethingSingleButton } from "./AddSomethingButton";
-import { EmptyProps, PYTCH_CYPRESS } from "../../utils";
+import { EmptyProps, failIfNull, PYTCH_CYPRESS } from "../../utils";
 import { aceControllerMap } from "../../skulpt-connection/code-editor";
 import { useNotableChanges } from "../hooks/notable-changes";
 import { ConjoinedResizeObserver } from "../../model/junior/conjoined-resize-observer";

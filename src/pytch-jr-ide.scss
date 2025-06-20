@@ -706,6 +706,39 @@
     font-family: $monospace-fonts;
   }
 
+  // todo remove duplication with pytch-ide.scss
+  @mixin breakpoint-dot($color) {
+    content: "";
+    position: absolute;
+    left: 0.3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background-color: $color;
+    border-radius: 50%;
+    display: var(--show-debug-features, "block") // todo change back to none
+  }
+  
+  .ace_gutter-cell {
+    &:hover::before {
+      @include breakpoint-dot(rgba(212, 24, 24, 0.4));
+    }
+
+    &.ace_breakpoint {
+      position: absolute;
+      &::before {
+        @include breakpoint-dot(rgb(212, 24, 24));
+      }
+    }
+  }
+
+  .debugLine {
+   position: absolute;
+   background: rgba(204, 35, 35, 0.5);
+   z-index: 20;
+  }
+
   &.isDragging {
     .drag-masked-editor .drag-mask {
       z-index: 5;

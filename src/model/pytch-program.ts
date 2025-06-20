@@ -24,7 +24,7 @@ import { validate as _untypedValidate } from "./pytch-program-json-validation";
 const validatePytchProgramJson = _untypedValidate as any;
 
 export type PytchProgram =
-  | { kind: "flat"; text: string }
+  | { kind: "flat"; text: string; }
   | { kind: "per-method"; program: StructuredProgram };
 
 export type PytchProgramKind = PytchProgram["kind"];

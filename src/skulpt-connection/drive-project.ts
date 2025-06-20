@@ -331,7 +331,7 @@ export class ProjectEngine {
       const stepping_thread = project.get_stepping_thread();
       // if thread terminates while stepping, clear debug line and continue
       if (stepping_thread && stepping_thread.state === "zombie") {
-        setDebugLine(-1);
+        setDebugLine(-1); // todo move to project.js?
         Debugger.disable_step_mode();
         project.continue_on_breakpoint();
       }
