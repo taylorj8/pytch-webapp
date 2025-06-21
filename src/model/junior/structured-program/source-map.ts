@@ -70,4 +70,15 @@ export class SourceMap {
       lineWithinHandler: globalLine - entry.startLine,
     };
   }
+
+  /** Given an actorId, handlerId, and lineWithinHandler, return the corresponding
+   * global line number. Throws if no matching entry is found. */
+  globalFromLocal(loc: LocationWithinHandler): number {
+    const entry = this.entries.find(
+      (e) => e.actorId === loc.actorId && e.handlerId === loc.handlerId
+    );
+    if (!entry)
+      throw new Error(`No entry for actorId=${loc.actorId}, handlerId=${loc.handlerId}`);
+    return entry.startLine + loc.lineWithinHandler;
+  }
 }
