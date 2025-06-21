@@ -89,9 +89,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   const debugLine = useStoreState((state) => state.activeProject.debugLine);
 
   const breakpointStore = useStoreState((state) => state.activeProject.breakpointStore);
-  const setBreakpointStore = useStoreActions((actions) => actions.activeProject.setBreakpointStore);
-  const addBreakpoint = useStoreActions((actions) => actions.activeProject.addBreakpoint);
-  const removeBreakpoint = useStoreActions((actions) => actions.activeProject.removeBreakpoint);
+  const { setBreakpoints, addBreakpoint, removeBreakpoint } = useStoreActions((actions) => actions.activeProject);
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
 
@@ -164,14 +162,14 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
         return;
 
       const row = e.getDocumentPosition().row;
-      const breakpointId = handlerId + "_" + (row + 1);
+      const breakpointKey = `${actorId}:${handlerId}:${row + 1}`;
 
-      if (breakpointStoreRef.current.has(breakpointId)) {
+      if (breakpointStoreRef.current.has(breakpointKey)) {
         ace.editor.session.clearBreakpoint(row);
-        removeBreakpoint(breakpointId);
+        removeBreakpoint(breakpointKey);
       } else {
         ace.editor.session.setBreakpoint(row, "ace_breakpoint");
-        addBreakpoint(breakpointId);
+        addBreakpoint(breakpointKey);
       }
       
       e.stop();
@@ -185,8 +183,16 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
       const updatedBreakpoints = new Set<number>();
 
       let breakpointMoved = false;
-      breakpointStoreRef.current.forEach((breakpoint: string) => {
-        const row = parseInt(breakpoint.split("_")[1]);
+      const updatedSet = new Set<string>();
+      breakpointStoreRef.current.forEach((breakpointKey: string) => {
+        const key = breakpointKey.split(":");
+        // if breakpoint under another actor/handler then add straight to updated set
+        if (key[0] !== actorId || key[1] !== handlerId) {
+          updatedSet.add(breakpointKey);
+          return;
+        }
+
+        const row = parseInt(key[2]);
         
         if (delta.start.row >= row) {
           updatedBreakpoints.add(row);
@@ -210,19 +216,18 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
       });
       
       if (breakpointMoved) {
-        const newSet = new Set<string>();
-        updatedBreakpoints.forEach((breakpoint) => {
-          const breakpointId = handlerId + "_" + breakpoint;
-          newSet.add(breakpointId);
-          ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint");
+        updatedBreakpoints.forEach((breakpointLine) => {
+          const breakpointKey = `${actorId}:${handlerId}:${breakpointLine}`;
+          updatedSet.add(breakpointKey);
+          ace.editor.session.setBreakpoint(breakpointLine - 1, "ace_breakpoint");
         });
-        setBreakpointStore(newSet);
+        setBreakpoints(updatedSet);
         ace.editor.session.clearBreakpoints();
         // (re-add breakpoints after clearing)
-        newSet.forEach(breakpointId => {
-          const parts = breakpointId.split("_");
-          const row = parseInt(parts[1]);
-          if (parts[0] === handlerId && !isNaN(row)) {
+        updatedSet.forEach(breakpointKey => {
+          const key = breakpointKey.split(":");
+          const row = parseInt(key[2]);
+          if (key[0] === actorId && key[1] === handlerId && !isNaN(row)) {
             ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
           }
         });
@@ -253,11 +258,10 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     console.log(breakpointStore);
 
     // Get all breakpoints for this handler from the local breakpointStore
-    breakpointStore.forEach((breakpointId) => {
-      // breakpointId format: handlerId-row
-      const parts = breakpointId.split("_");
-      const row = parseInt(parts[1]);
-      if (parts[0] === handlerId && !isNaN(row)) {
+    breakpointStore.forEach((breakpointKey) => {
+      const key = breakpointKey.split(":");
+      const row = parseInt(key[2]);
+      if (key[0] === actorId && key[1] === handlerId && !isNaN(row)) {
         ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
       }
     });

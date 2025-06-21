@@ -75,7 +75,7 @@ import {
   HandlerDuplicationDescriptor,
 } from "./junior/structured-program/program";
 import { AssetOperationContext } from "./asset";
-import { AssetMetaDataOps } from "./junior/structured-program";
+import { AssetMetaDataOps, LocationWithinHandler } from "./junior/structured-program";
 import {
   JrTutorialContent,
   LinkedJrTutorial,
@@ -423,7 +423,7 @@ export interface IActiveProject {
   setDebugLine: Action<IActiveProject, number>;
 
   breakpointStore: Set<string>;
-  setBreakpointStore: Action<IActiveProject, Set<string>>;
+  setBreakpoints: Action<IActiveProject, Set<string>>;
   addBreakpoint: Action<IActiveProject, string>;
   removeBreakpoint: Action<IActiveProject, string>;
 }
@@ -1321,16 +1321,14 @@ export const activeProject: IActiveProject = {
   }),
 
   breakpointStore: new Set(),
-  setBreakpointStore: action((state, newSet) => {
+  setBreakpoints: action((state, newSet) => {
     state.breakpointStore = newSet;
   }),
-  addBreakpoint: action((state, breakpointId) => {
-    const temp = new Set(state.breakpointStore);
-    temp.add(breakpointId)
-    state.breakpointStore = temp;
+  addBreakpoint: action((state, breakpointLoc) => {
+    state.breakpointStore.add(breakpointLoc);
   }),
-  removeBreakpoint: action((state, breakpointId) => {
-    state.breakpointStore.delete(breakpointId);
+  removeBreakpoint: action((state, breakpointLoc) => {
+    state.breakpointStore.delete(breakpointLoc);
   }),
 
 };
