@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import AceEditor from "react-ace";
 import { Ace, Range } from "ace-builds";
 import { PytchAceAutoCompleter } from "../../skulpt-connection/code-completion";
@@ -34,7 +34,7 @@ import { scrollCursorRowIntoView } from "./PytchScriptEditor-scroller";
 import { failIfNull } from "../../utils";
 
 import { Debugger } from "../../skulpt-connection/drive-project";
-import { setDate } from "date-fns";
+
 
 const MAIN_FILE = "<stdin>.py";
 
@@ -87,6 +87,11 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
   const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
   const debugLine = useStoreState((state) => state.activeProject.debugLine);
+
+  const breakpointStore = useStoreState((state) => state.activeProject.breakpointStore);
+  const setBreakpointStore = useStoreActions((actions) => actions.activeProject.setBreakpointStore);
+  const addBreakpoint = useStoreActions((actions) => actions.activeProject.addBreakpoint);
+  const removeBreakpoint = useStoreActions((actions) => actions.activeProject.removeBreakpoint);
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
 
@@ -149,40 +154,39 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   }, [aceParentRef, conjoinedResizeObserver]);
 
   // todo remove duplication with CodeEditor.tsx
+  const breakpointStoreRef = useRef(breakpointStore);
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "PytchScriptEditor effect: aceRef is null");
-    console.log(aceRef);
 
     // toggleable breakpoints
     ace.editor.on("guttermousedown", (e) => {
       if (!showDebugFeatures || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
 
-      const row = e.getDocumentPosition().row + 1;
+      const row = e.getDocumentPosition().row;
+      const breakpointId = handlerId + "_" + (row + 1);
 
-      if (Debugger.check_breakpoints(handlerId, row, 0)) {
-        Debugger.clear_breakpoint(handlerId, row, 0, false);
-        ace.editor.session.clearBreakpoint(row - 1);
+      if (breakpointStoreRef.current.has(breakpointId)) {
+        ace.editor.session.clearBreakpoint(row);
+        removeBreakpoint(breakpointId);
       } else {
-        Debugger.add_breakpoint(handlerId, row, 0, false);
-        ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
+        ace.editor.session.setBreakpoint(row, "ace_breakpoint");
+        addBreakpoint(breakpointId);
       }
-
-      // console.log(Debugger.dbg_breakpoints);
-      // console.log(ace.editor.session.getBreakpoints());
       
       e.stop();
     });
+    
 
     // ensures the breakpoint tracks the code rather than the line number
     (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
+      console.log("change")
       if (delta.end.row == delta.start.row) return;
       const updatedBreakpoints = new Set<number>();
-      const breakpoints = Debugger.get_breakpoints_list();
 
       let breakpointMoved = false;
-      Object.values(breakpoints).forEach((breakpoint: any) => {
-        const row = breakpoint.lineno;
+      breakpointStoreRef.current.forEach((breakpoint: string) => {
+        const row = parseInt(breakpoint.split("_")[1]);
         
         if (delta.start.row >= row) {
           updatedBreakpoints.add(row);
@@ -202,21 +206,33 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
           } else {
             updatedBreakpoints.add(row);
           }
-
         }
       });
       
       if (breakpointMoved) {
-        Debugger.clear_all_breakpoints();
-        ace.editor.session.clearBreakpoints();
-
+        const newSet = new Set<string>();
         updatedBreakpoints.forEach((breakpoint) => {
-          Debugger.add_breakpoint(MAIN_FILE, breakpoint, 0, false);
-          ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint")
+          const breakpointId = handlerId + "_" + breakpoint;
+          newSet.add(breakpointId);
+          ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint");
+        });
+        setBreakpointStore(newSet);
+        ace.editor.session.clearBreakpoints();
+        // (re-add breakpoints after clearing)
+        newSet.forEach(breakpointId => {
+          const parts = breakpointId.split("_");
+          const row = parseInt(parts[1]);
+          if (parts[0] === handlerId && !isNaN(row)) {
+            ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
+          }
         });
       }
     });
   }, []);
+
+  useEffect(() => {
+    breakpointStoreRef.current = breakpointStore;
+  }, [breakpointStore]);
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -233,11 +249,16 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
     ace.editor.session.clearBreakpoints();
-    
-    // Get all breakpoints for this handler
-    Object.values(Debugger.get_breakpoints_list()).forEach((breakpoint: any) => {
-      if (breakpoint.filename === handlerId) {
-        ace.editor.session.setBreakpoint(breakpoint.lineno - 1, "ace_breakpoint");
+
+    console.log(breakpointStore);
+
+    // Get all breakpoints for this handler from the local breakpointStore
+    breakpointStore.forEach((breakpointId) => {
+      // breakpointId format: handlerId-row
+      const parts = breakpointId.split("_");
+      const row = parseInt(parts[1]);
+      if (parts[0] === handlerId && !isNaN(row)) {
+        ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
       }
     });
   }, [actorId]);

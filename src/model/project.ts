@@ -89,6 +89,9 @@ import {
   NotableChangesManagerOps,
 } from "./notable-changes";
 
+import { enableMapSet } from "immer";
+enableMapSet();
+
 const ensureKind = PytchProgramOps.ensureKind;
 
 type FocusDestination = "editor" | "running-project";
@@ -418,6 +421,11 @@ export interface IActiveProject {
 
   debugLine: number;	
   setDebugLine: Action<IActiveProject, number>;
+
+  breakpointStore: Set<string>;
+  setBreakpointStore: Action<IActiveProject, Set<string>>;
+  addBreakpoint: Action<IActiveProject, string>;
+  removeBreakpoint: Action<IActiveProject, string>;
 }
 
 const dummyPytchProgram = PytchProgramOps.fromPythonCode(
@@ -1311,4 +1319,18 @@ export const activeProject: IActiveProject = {
   setDebugLine: action((state, line) => {
     state.debugLine = line;
   }),
+
+  breakpointStore: new Set(),
+  setBreakpointStore: action((state, newSet) => {
+    state.breakpointStore = newSet;
+  }),
+  addBreakpoint: action((state, breakpointId) => {
+    const temp = new Set(state.breakpointStore);
+    temp.add(breakpointId)
+    state.breakpointStore = temp;
+  }),
+  removeBreakpoint: action((state, breakpointId) => {
+    state.breakpointStore.delete(breakpointId);
+  }),
+
 };
