@@ -13,6 +13,7 @@ import { useStoreActions, useStoreState } from "../../store";
 import {
   AceEditorT,
   aceControllerMap,
+  liveSourceMap,
   pendingCursorWarp,
 } from "../../skulpt-connection/code-editor";
 
@@ -91,7 +92,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   const breakpointStore = useStoreState((state) => state.activeProject.breakpointStore);
   const { setBreakpoints, addBreakpoint, removeBreakpoint } = useStoreActions((actions) => actions.activeProject);
 
-  const [prevMarker, setPrevMarker] = useState<number | null>(null);
+  const [prevMarker, setPrevMarker] = useState<number>(-1);
 
   useEffect(() => {
     const scroll = () => scrollCursorRowIntoView(handlerId);
@@ -241,11 +242,12 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
-    if (prevMarker !== null)
-      ace.editor.session.removeMarker(prevMarker);
-
-    if (debugLine !== null) {
-      const marker = ace.editor.session.addMarker(new Range(debugLine-1, 0, debugLine-1, 1), "debugLine", "fullLine");
+    ace.editor.session.removeMarker(prevMarker);
+    if (debugLine === -1) return;
+    
+    const debugLineLoc = liveSourceMap.localFromGlobal(debugLine);
+    if (debugLineLoc.actorId === actorId && debugLineLoc.handlerId === handlerId) {
+      const marker = ace.editor.session.addMarker(new Range(debugLineLoc.lineWithinHandler - 1, 0, debugLineLoc.lineWithinHandler - 1, 1), "debugLine", "fullLine");
       setPrevMarker(marker);
     }
   }, [debugLine]);
