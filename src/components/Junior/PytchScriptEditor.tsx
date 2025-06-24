@@ -164,13 +164,32 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
       const row = e.getDocumentPosition().row;
       const breakpointKey = `${actorId}:${handlerId}:${row + 1}`;
+      let globalLineNo: number | null = null;
+      try {
+        globalLineNo = liveSourceMap.globalFromLocal({
+          actorId: actorId,
+          handlerId: handlerId,
+          lineWithinHandler: row + 1,
+        });
+      } catch (err) {
+        globalLineNo = null;
+      }
 
+      // breakpoints are added to a separate store and set in the debugger on build
+      // they are also set directly to the debugger to handle the case when a
+      // breakpoint is added while the program is running
       if (breakpointStoreRef.current.has(breakpointKey)) {
         ace.editor.session.clearBreakpoint(row);
         removeBreakpoint(breakpointKey);
+        if (globalLineNo !== null) {
+          Debugger.clear_breakpoint("<stdin>.py", globalLineNo, 0, false);
+        }
       } else {
         ace.editor.session.setBreakpoint(row, "ace_breakpoint");
         addBreakpoint(breakpointKey);
+        if (globalLineNo !== null) {
+          Debugger.add_breakpoint("<stdin>.py", globalLineNo, 0);
+        }
       }
       
       e.stop();
@@ -179,7 +198,6 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
     // ensures the breakpoint tracks the code rather than the line number
     (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
-      console.log("change")
       if (delta.end.row == delta.start.row) return;
       const updatedBreakpoints = new Set<number>();
 
@@ -256,8 +274,6 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
     ace.editor.session.clearBreakpoints();
-
-    console.log(breakpointStore);
 
     // Get all breakpoints for this handler from the local breakpointStore
     breakpointStore.forEach((breakpointKey) => {

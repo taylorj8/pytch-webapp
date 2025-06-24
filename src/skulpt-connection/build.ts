@@ -89,6 +89,7 @@ export const build = async (
     liveSourceMap.setEntries(flattenedProgram.mapEntries);
 
     // todo - is this the best way to do this?
+    // when program is built, translate the global position of all breakpoints and add them
     if (inDebugMode && project.program.kind === "per-method") {
       Debugger.clear_all_breakpoints();
       const breakpointStore = store.getState().activeProject.breakpointStore;
