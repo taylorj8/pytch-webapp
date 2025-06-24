@@ -224,7 +224,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
         });
         setBreakpoints(updatedSet);
         ace.editor.session.clearBreakpoints();
-        // (re-add breakpoints after clearing)
+        // re-add breakpoints after clearing
         updatedSet.forEach(breakpointKey => {
           const key = breakpointKey.split(":");
           const row = parseInt(key[2]);

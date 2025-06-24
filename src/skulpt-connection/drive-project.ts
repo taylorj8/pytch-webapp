@@ -14,6 +14,7 @@ import {
   MaybeUserAnswerSubmissionToVM,
 } from "../model/user-text-input";
 import store from "../store";
+import { goToEditorLocation, liveSourceMap } from "./code-editor";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -309,6 +310,8 @@ export class ProjectEngine {
     };
   }
 
+  private prevDebugLine: number = -1;
+
   oneFrame() {
     const logIntro = `ProjectEngine[${this.id}].oneFrame()`;
     
@@ -325,7 +328,15 @@ export class ProjectEngine {
 
     const setDebugLine = store.getActions().activeProject.setDebugLine;
     if (project.threads_are_paused()) {
-      setDebugLine(project.get_debug_line());
+      const globalLineNo = project.get_debug_line();
+      if (globalLineNo !== this.prevDebugLine) {
+        if (globalLineNo !== -1) {
+          const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
+          setDebugLine(globalLineNo);
+          goToEditorLocation(contextualLoc, null);
+        }
+        this.prevDebugLine = globalLineNo;
+      }
     } 
     else {
       const stepping_thread = project.get_stepping_thread();
@@ -348,7 +359,7 @@ export class ProjectEngine {
       Sk.pytch.sound_manager.one_frame();
 
       if (stepping_thread != null && stepping_thread.state === "running") {
-        stepping_thread.one_frame(); // todo check this solution with Ben
+        stepping_thread.one_frame();
       } else {
         const projectState = project.one_frame();
 

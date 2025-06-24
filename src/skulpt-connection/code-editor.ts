@@ -3,13 +3,16 @@
 
 import { IAceEditorProps } from "react-ace";
 import { PYTCH_CYPRESS, ancestorHavingClass } from "../utils";
-import { SourceMap, Uuid } from "../model/junior/structured-program";
+import { LocationWithinHandler, SourceMap, Uuid } from "../model/junior/structured-program";
 import { PendingCursorWarp } from "../model/junior/structured-program";
 
 import {
   lineAsElement,
   lineIntersectsSelection,
 } from "../model/highlight-as-ace";
+import { ActorPropertiesTabKey } from "../model/junior/edit-state";
+import { useJrEditActions } from "../components/Junior/hooks";
+import store from "../store";
 
 // Is this defined somewhere I can get at it?
 export type AceEditorT = Parameters<Required<IAceEditorProps>["onLoad"]>[0];
@@ -192,3 +195,31 @@ export const setFlatAceController = (editor: AceEditorT) =>
 
 export let liveSourceMap = new SourceMap();
 export let pendingCursorWarp = new PendingCursorWarp();
+
+// todo - is this the best location for this?
+// function to move the user to a location in the program
+export function goToEditorLocation(
+  contextualLoc: LocationWithinHandler,
+  localColNo: number | null
+) {
+  const maybeController = aceControllerMap.get(contextualLoc.handlerId);
+
+    // If we're already displaying the Ace editor for this script, warp
+    // its cursor.  Otherwise, note a warp request and switch to the
+    // correct actor and property-tab --- this also covers the case that
+    // the correct actor is active but not the Code tab.
+  if (maybeController != null) {
+    maybeController.gotoLocation(contextualLoc.lineWithinHandler, localColNo);
+    maybeController.focus();
+    maybeController.scrollIntoView(contextualLoc.lineWithinHandler);
+  } else {
+    pendingCursorWarp.set({
+      handlerId: contextualLoc.handlerId,
+      lineNo: contextualLoc.lineWithinHandler,
+      colNo: localColNo,
+    });
+
+    store.getActions().jrEditState.setFocusedActor(contextualLoc.actorId);
+    store.getActions().jrEditState.setActorPropertiesActiveTab("code");
+  }
+}
