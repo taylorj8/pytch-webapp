@@ -2,7 +2,7 @@ import Button from "react-bootstrap/Button";
 import { useStoreActions } from "../store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Debugger } from "../skulpt-connection/drive-project";
-import { faEject, faShoePrints } from '@fortawesome/free-solid-svg-icons';
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -27,13 +27,13 @@ export const DebugButtons = () => {
         className="DebugButton"
         onClick={continueCallback}
       >
-        <FontAwesomeIcon icon={faEject} color="white" rotation={90} />
+        <FontAwesomeIcon icon="eject" color="white" rotation={90} />
       </Button>
       <Button
         className="DebugButton"
         onClick={stepCallback}
       >
-        <FontAwesomeIcon icon={faShoePrints} color="white" />
+        <FontAwesomeIcon icon="shoe-prints" color="white" />
       </Button>
     </div>
   );

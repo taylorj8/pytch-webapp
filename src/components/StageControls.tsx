@@ -5,7 +5,6 @@ import { useStoreActions, useStoreState } from "../store";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBug } from '@fortawesome/free-solid-svg-icons';
 import { EmptyProps } from "../utils";
 import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content";
 import { pathWithinApp } from "../env-utils";
@@ -93,7 +92,7 @@ const YellowDebug = () => {
         className="StageControlPseudoButton YellowDebug"
         onClick={handleClick}
       >
-        <FontAwesomeIcon icon={faBug} />
+        <FontAwesomeIcon icon="bug" />
       </Button>
     </div>
   );
