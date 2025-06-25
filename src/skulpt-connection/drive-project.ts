@@ -310,8 +310,6 @@ export class ProjectEngine {
     };
   }
 
-  private prevDebugLine: number = -1;
-
   oneFrame() {
     const logIntro = `ProjectEngine[${this.id}].oneFrame()`;
     
@@ -326,16 +324,14 @@ export class ProjectEngine {
       return;
     }
 
+    const currentDebugLine = store.getState().activeProject.debugLine;
     const setDebugLine = store.getActions().activeProject.setDebugLine;
     if (project.threads_are_paused()) {
       const globalLineNo = project.get_debug_line();
-      if (globalLineNo !== this.prevDebugLine) {
-        if (globalLineNo !== -1) {
-          const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
-          setDebugLine(globalLineNo);
-          goToEditorLocation(contextualLoc, null);
-        }
-        this.prevDebugLine = globalLineNo;
+      if (globalLineNo !== -1 && globalLineNo !== currentDebugLine) {
+        const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
+        setDebugLine(globalLineNo);
+        goToEditorLocation(contextualLoc, null);
       }
     } 
     else {
