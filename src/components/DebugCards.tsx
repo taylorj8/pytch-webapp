@@ -56,7 +56,7 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
         <FontAwesomeIcon icon={faEarthEurope} className="card-title-icon" />
         Global Variables
       </Card.Title>
-      <Card.Text className="monospace-font">
+      <div className="monospace-font">
         {Object.entries(globalVars)
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([key, value]) => (
@@ -64,7 +64,7 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
               {key}: {String(value)}
             </div>
           ))}
-      </Card.Text>
+      </div>
     </Card.Body>
   </Card>
 );
@@ -156,7 +156,7 @@ export const ActorClassCard: React.FC<{
 
         {/* Static variables */}
         <div className="monospace-font">{classVars.show_costumes()}</div>
-        <Card.Text className="monospace-font">
+        <div className="monospace-font">
           {Object.entries(classVars.static)
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([key, value], index) => (
@@ -164,7 +164,7 @@ export const ActorClassCard: React.FC<{
                 {`${key}: ${value}`}
               </div>
             ))}
-        </Card.Text>
+        </div>
 
         {/* Cloned actor instances */}
         <Collapse in={isExpanded}>
