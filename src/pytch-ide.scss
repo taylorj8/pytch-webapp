@@ -530,6 +530,63 @@ $speech-bubble-max-height: 180px;
   }
 }
 
+.DebugSidebar {
+  width: 26rem;
+
+  .card,
+  .inner-card,
+  .highlighted-card {
+    min-width: 0;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+
+  .highlighted-card {
+    box-shadow: 0 0 10px 2px red;
+    border: 2px solid red;
+  }
+
+  .actor-instance {
+    &.highlighted-clone {
+      background-color: rgba(255, 0, 0, 0.1);
+      border-left: 4px solid red;
+      // padding-left: 1rem;
+    }
+
+    strong {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  .clone-header {
+    margin-bottom: 0.25rem;
+
+    img.card-title-img {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .monospace-font {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.95rem;
+  }
+
+  .card-title-img {
+    max-width: 32px;
+    max-height: 32px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
+  .card-title-icon {
+    max-width: 24px;
+    max-height: 24px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+}
+
 .DebugButtons {
   position: absolute;
   top: 1px;

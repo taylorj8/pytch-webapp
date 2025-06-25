@@ -88,12 +88,6 @@ export const InfoPanel = () => {
         <Tab eventKey="errors" title="Errors">
           <Errors />
         </Tab>
-        {inDebugMode ? (
-          <Tab eventKey="debug" title={<span style={{ color: "#B20000" }}>Debug</span>}>
-            <DebugPane />
-          </Tab>
-        ) : null}
-
       </Tabs>
     </div>
   );

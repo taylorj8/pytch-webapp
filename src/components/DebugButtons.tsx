@@ -1,5 +1,5 @@
 import Button from "react-bootstrap/Button";
-import { useStoreState, useStoreActions } from "../store";
+import { useStoreActions } from "../store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Debugger } from "../skulpt-connection/drive-project";
 import { faEject, faShoePrints } from '@fortawesome/free-solid-svg-icons';

@@ -7,6 +7,7 @@ import { useJrEditActions, useJrEditState } from "./hooks";
 import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-common-types";
+// import { faBug } from "@fortawesome/free-solid-svg-icons"
 import { useHasLinkedLesson, useHasLinkedSpecimen } from "./lesson/hooks";
 import { EmptyProps } from "../../utils";
 import { useStoreState } from "../../store";
@@ -18,6 +19,7 @@ const uiDetailsFromTabKeyLut = new Map<ActivityBarTabKey, TabKeyUiDetails>([
   ["lesson", { icon: "book", tooltip: "Lesson content" }],
   ["tutorial", { icon: "book", tooltip: "Tutorial content" }],
   ["specimen", { icon: "book", tooltip: "Lesson information" }],
+  ["debugpanel", {icon: "bug", tooltip: "Debug"}],
 ]);
 
 function uiDetailsFromTabKey(tab: ActivityBarTabKey): TabKeyUiDetails {
@@ -63,6 +65,9 @@ export const ActivityBar: React.FC<EmptyProps> = () => {
   const hasLinkedTutorial = useStoreState(
     (state) => state.activeProject.project?.trackedTutorial != null
   );
+  const inDebugMode = useStoreState(
+    (state) => state.activeProject.inDebugMode
+  );
 
   const tabs: Array<ActivityBarTabKey> = hasLinkedLesson
     ? ["helpsidebar", "lesson"]
@@ -71,6 +76,10 @@ export const ActivityBar: React.FC<EmptyProps> = () => {
     : hasLinkedTutorial
     ? ["helpsidebar", "tutorial"]
     : ["helpsidebar"];
+
+  if (inDebugMode) {
+    tabs.push("debugpanel");
+  }
 
   const syncClasses = classNames("sync-indicator", { pendingActionsExist });
   return (

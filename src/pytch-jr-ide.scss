@@ -57,6 +57,7 @@
     );
   }
 
+  &.activity-content-expanded-debugpanel,
   &.activity-content-expanded-specimen,
   &.activity-content-expanded-helpsidebar {
     @include grid-hstack-four(
@@ -147,6 +148,13 @@
   }
   > .Junior-LessonContent-container {
     height: 100%;
+  }
+  > .DebugSidebar {
+    padding: 1rem;
+    background-color: $main-bg-color;
+    height: 100%;
+    overflow: auto;
+    border-right: $panel-divider-border-spec;
   }
 }
 
