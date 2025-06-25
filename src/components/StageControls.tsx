@@ -24,8 +24,12 @@ export const focusStage = () => {
 const resetDebugging = (inDebugMode: boolean) => {
   store.getActions().activeProject.setDebugMode(inDebugMode);
   store.getActions().activeProject.setDebugLine(-1);
-  Sk.pytch.current_live_project.continue_on_breakpoint();
   Debugger.disable_step_mode();
+
+  const project = Sk.pytch.current_live_project;
+  if (project !== Sk.default_pytch_environment.current_live_project) {
+    Sk.pytch.current_live_project.continue_on_breakpoint();
+  }
 }
 
 const StaticTooltip: React.FC<PropsWithChildren<{ visible: boolean }>> = ({

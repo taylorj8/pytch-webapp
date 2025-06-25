@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import AceEditor from "react-ace";
+import { Ace, Range } from "ace-builds";
 import { PytchAceAutoCompleter } from "../../skulpt-connection/code-completion";
 
 import {
@@ -7,11 +8,12 @@ import {
   StructuredProgramOps,
   Uuid,
 } from "../../model/junior/structured-program";
-import { useStoreActions } from "../../store";
+import { useStoreActions, useStoreState } from "../../store";
 
 import {
   AceEditorT,
   aceControllerMap,
+  liveSourceMap,
   pendingCursorWarp,
 } from "../../skulpt-connection/code-editor";
 
@@ -30,6 +32,12 @@ import { DragPreviewImage } from "react-dnd";
 import { useNotableChanges } from "../hooks/notable-changes";
 import { ConjoinedResizeObserver } from "../../model/junior/conjoined-resize-observer";
 import { scrollCursorRowIntoView } from "./PytchScriptEditor-scroller";
+import { failIfNull } from "../../utils";
+
+import { Debugger } from "../../skulpt-connection/drive-project";
+
+
+const MAIN_FILE = "<stdin>.py";
 
 // Adapted from https://stackoverflow.com/a/71952718
 const insertElectricFullStop = (editor: AceEditorT) => {
@@ -56,6 +64,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   const [dragProps, dragRef, preview] = usePytchScriptDrag(handlerId);
   const [dropProps, dropRef] = usePytchScriptDrop(actorId, handlerId);
   const aceParentRef: React.RefObject<HTMLDivElement> = React.createRef();
+  const aceRef: React.RefObject<AceEditor> = React.createRef();
 
   const handler = useMappedProgram("<PytchScriptEditor>", (program) =>
     StructuredProgramOps.uniqueHandlerByIdGlobally(program, handlerId)
@@ -76,6 +85,14 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   const updateCodeText = (code: string) => {
     setHandlerPythonCode({ actorId, handlerId, code });
   };
+
+  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
+  const debugLine = useStoreState((state) => state.activeProject.debugLine);
+
+  const breakpointStore = useStoreState((state) => state.activeProject.breakpointStore);
+  const { setBreakpoints, addBreakpoint, removeBreakpoint } = useStoreActions((actions) => actions.activeProject);
+
+  const [prevMarker, setPrevMarker] = useState<number>(-1);
 
   useEffect(() => {
     const scroll = () => scrollCursorRowIntoView(handlerId);
@@ -134,6 +151,139 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
     return disconnectObserver;
   }, [aceParentRef, conjoinedResizeObserver]);
+
+  // todo remove duplication with CodeEditor.tsx
+  const breakpointStoreRef = useRef(breakpointStore);
+  useEffect(() => {
+    const ace = failIfNull(aceRef.current, "PytchScriptEditor effect: aceRef is null");
+
+    // toggleable breakpoints
+    ace.editor.on("guttermousedown", (e) => {
+      if (!showDebugFeatures || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
+        return;
+
+      const row = e.getDocumentPosition().row;
+      const breakpointKey = `${actorId}:${handlerId}:${row + 1}`;
+      let globalLineNo: number | null = null;
+      try {
+        globalLineNo = liveSourceMap.globalFromLocal({
+          actorId: actorId,
+          handlerId: handlerId,
+          lineWithinHandler: row + 1,
+        });
+      } catch (err) {
+        globalLineNo = null;
+      }
+
+      // breakpoints are added to a separate store and set in the debugger on build
+      // they are also set directly to the debugger to handle the case when a
+      // breakpoint is added while the program is running
+      if (breakpointStoreRef.current.has(breakpointKey)) {
+        ace.editor.session.clearBreakpoint(row);
+        removeBreakpoint(breakpointKey);
+        if (globalLineNo !== null) {
+          Debugger.clear_breakpoint("<stdin>.py", globalLineNo, 0, false);
+        }
+      } else {
+        ace.editor.session.setBreakpoint(row, "ace_breakpoint");
+        addBreakpoint(breakpointKey);
+        if (globalLineNo !== null) {
+          Debugger.add_breakpoint("<stdin>.py", globalLineNo, 0);
+        }
+      }
+      
+      e.stop();
+    });
+    
+
+    // ensures the breakpoint tracks the code rather than the line number
+    (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
+      if (delta.end.row == delta.start.row) return;
+      const updatedBreakpoints = new Set<number>();
+
+      let breakpointMoved = false;
+      const updatedSet = new Set<string>();
+      breakpointStoreRef.current.forEach((breakpointKey: string) => {
+        const key = breakpointKey.split(":");
+        // if breakpoint under another actor/handler then add straight to updated set
+        if (key[0] !== actorId || key[1] !== handlerId) {
+          updatedSet.add(breakpointKey);
+          return;
+        }
+
+        const row = parseInt(key[2]);
+        
+        if (delta.start.row >= row) {
+          updatedBreakpoints.add(row);
+        } else if (delta.action === "insert") {
+
+          const linesAdded = delta.end.row - delta.start.row;
+          updatedBreakpoints.add(row + linesAdded)
+          breakpointMoved = true;
+
+        } else if (delta.action === "remove") {
+
+          const linesRemoved = delta.end.row - delta.start.row;
+          const newRow = row - linesRemoved;
+          if (newRow >= delta.start.row) {
+            updatedBreakpoints.add(newRow);
+            breakpointMoved = true;
+          } else {
+            updatedBreakpoints.add(row);
+          }
+        }
+      });
+      
+      if (breakpointMoved) {
+        updatedBreakpoints.forEach((breakpointLine) => {
+          const breakpointKey = `${actorId}:${handlerId}:${breakpointLine}`;
+          updatedSet.add(breakpointKey);
+          ace.editor.session.setBreakpoint(breakpointLine - 1, "ace_breakpoint");
+        });
+        setBreakpoints(updatedSet);
+        ace.editor.session.clearBreakpoints();
+        // re-add breakpoints after clearing
+        updatedSet.forEach(breakpointKey => {
+          const key = breakpointKey.split(":");
+          const row = parseInt(key[2]);
+          if (key[0] === actorId && key[1] === handlerId && !isNaN(row)) {
+            ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
+          }
+        });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    breakpointStoreRef.current = breakpointStore;
+  }, [breakpointStore]);
+
+  useEffect(() => {
+    const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
+    ace.editor.session.removeMarker(prevMarker);
+    if (debugLine === -1) return;
+    
+    const debugLineLoc = liveSourceMap.localFromGlobal(debugLine);
+    if (debugLineLoc.actorId === actorId && debugLineLoc.handlerId === handlerId) {
+      const marker = ace.editor.session.addMarker(new Range(debugLineLoc.lineWithinHandler - 1, 0, debugLineLoc.lineWithinHandler - 1, 1), "debugLine", "fullLine");
+      setPrevMarker(marker);
+    }
+  }, [debugLine]);
+
+  // replaces breakpoints when switching between actors
+  useEffect(() => {
+    const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
+    ace.editor.session.clearBreakpoints();
+
+    // Get all breakpoints for this handler from the local breakpointStore
+    breakpointStore.forEach((breakpointKey) => {
+      const key = breakpointKey.split(":");
+      const row = parseInt(key[2]);
+      if (key[0] === actorId && key[1] === handlerId && !isNaN(row)) {
+        ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
+      }
+    });
+  }, [actorId]);
 
   /** Once the editor has loaded, there are a few things we have to do:
    *
@@ -215,6 +365,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
           <div ref={aceParentRef} id={aceParentDivId}>
             <div className="hat-code-spacer" />
             <AceEditor
+              ref={aceRef}
               mode="python"
               theme="pytch"
               enableBasicAutocompletion={completers}

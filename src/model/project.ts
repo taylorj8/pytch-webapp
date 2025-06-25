@@ -75,7 +75,7 @@ import {
   HandlerDuplicationDescriptor,
 } from "./junior/structured-program/program";
 import { AssetOperationContext } from "./asset";
-import { AssetMetaDataOps } from "./junior/structured-program";
+import { AssetMetaDataOps, LocationWithinHandler } from "./junior/structured-program";
 import {
   JrTutorialContent,
   LinkedJrTutorial,
@@ -88,6 +88,9 @@ import {
   NotableChangesManager,
   NotableChangesManagerOps,
 } from "./notable-changes";
+
+import { enableMapSet } from "immer";
+enableMapSet();
 
 const ensureKind = PytchProgramOps.ensureKind;
 
@@ -418,6 +421,11 @@ export interface IActiveProject {
 
   debugLine: number;	
   setDebugLine: Action<IActiveProject, number>;
+
+  breakpointStore: Set<string>;
+  setBreakpoints: Action<IActiveProject, Set<string>>;
+  addBreakpoint: Action<IActiveProject, string>;
+  removeBreakpoint: Action<IActiveProject, string>;
 }
 
 const dummyPytchProgram = PytchProgramOps.fromPythonCode(
@@ -1311,4 +1319,16 @@ export const activeProject: IActiveProject = {
   setDebugLine: action((state, line) => {
     state.debugLine = line;
   }),
+
+  breakpointStore: new Set(),
+  setBreakpoints: action((state, newSet) => {
+    state.breakpointStore = newSet;
+  }),
+  addBreakpoint: action((state, breakpointLoc) => {
+    state.breakpointStore.add(breakpointLoc);
+  }),
+  removeBreakpoint: action((state, breakpointLoc) => {
+    state.breakpointStore.delete(breakpointLoc);
+  }),
+
 };

@@ -14,6 +14,7 @@ import {
   MaybeUserAnswerSubmissionToVM,
 } from "../model/user-text-input";
 import store from "../store";
+import { goToEditorLocation, liveSourceMap } from "./code-editor";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -323,15 +324,21 @@ export class ProjectEngine {
       return;
     }
 
+    const currentDebugLine = store.getState().activeProject.debugLine;
     const setDebugLine = store.getActions().activeProject.setDebugLine;
     if (project.threads_are_paused()) {
-      setDebugLine(project.get_debug_line());
+      const globalLineNo = project.get_debug_line();
+      if (globalLineNo !== -1 && globalLineNo !== currentDebugLine) {
+        const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
+        setDebugLine(globalLineNo);
+        goToEditorLocation(contextualLoc, null);
+      }
     } 
     else {
       const stepping_thread = project.get_stepping_thread();
       // if thread terminates while stepping, clear debug line and continue
       if (stepping_thread && stepping_thread.state === "zombie") {
-        setDebugLine(-1);
+        setDebugLine(-1); // todo move to project.js?
         Debugger.disable_step_mode();
         project.continue_on_breakpoint();
       }
@@ -348,7 +355,7 @@ export class ProjectEngine {
       Sk.pytch.sound_manager.one_frame();
 
       if (stepping_thread != null && stepping_thread.state === "running") {
-        stepping_thread.one_frame(); // todo check this solution with Ben
+        stepping_thread.one_frame();
       } else {
         const projectState = project.one_frame();
 

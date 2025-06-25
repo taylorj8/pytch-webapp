@@ -6,6 +6,7 @@ import {
   liveSourceMap,
   aceControllerMap,
   pendingCursorWarp,
+  goToEditorLocation,
 } from "../../skulpt-connection/code-editor";
 import {
   ErrorReportComponents,
@@ -21,11 +22,6 @@ const UserCodeErrorLocation: UserCodeErrorLocationComponent = ({
   colNo,
   isFirst,
 }) => {
-  const setFocusedActor = useJrEditActions((a) => a.setFocusedActor);
-  const setActorPropertiesActiveTab = useJrEditActions(
-    (a) => a.setActorPropertiesActiveTab
-  );
-
   const contextualLoc = liveSourceMap.localFromGlobal(lineNo);
   const localLineNo = contextualLoc.lineWithinHandler;
 
@@ -34,26 +30,7 @@ const UserCodeErrorLocation: UserCodeErrorLocationComponent = ({
 
   const gotoLine = () => {
     console.log("go to line", lineNo, colNo, contextualLoc);
-
-    const maybeController = aceControllerMap.get(contextualLoc.handlerId);
-
-    // If we're already displaying the Ace editor for this script, warp
-    // its cursor.  Otherwise, note a warp request and switch to the
-    // correct actor and property-tab --- this also covers the case that
-    // the correct actor is active but not the Code tab.
-    if (maybeController != null) {
-      maybeController.gotoLocation(localLineNo, localColNo);
-      maybeController.focus();
-      maybeController.scrollIntoView(localLineNo);
-    } else {
-      pendingCursorWarp.set({
-        handlerId: contextualLoc.handlerId,
-        lineNo: localLineNo,
-        colNo: localColNo,
-      });
-      setFocusedActor(contextualLoc.actorId);
-      setActorPropertiesActiveTab("code");
-    }
+    goToEditorLocation(contextualLoc, localColNo);
   };
 
   const lineText = isFirst ? "Line" : "line";
