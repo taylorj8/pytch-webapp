@@ -86,7 +86,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     setHandlerPythonCode({ actorId, handlerId, code });
   };
 
-  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
+  const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
   const debugLine = useStoreState((state) => state.activeProject.debugLine);
 
   const breakpointStore = useStoreState((state) => state.activeProject.breakpointStore);
@@ -159,7 +159,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
     // toggleable breakpoints
     ace.editor.on("guttermousedown", (e) => {
-      if (!showDebugFeatures || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
+      if (!debugFeaturesEnabled || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
 
       const row = e.getDocumentPosition().row;
@@ -191,10 +191,10 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
           Debugger.add_breakpoint("<stdin>.py", globalLineNo, 0);
         }
       }
-      
+
       e.stop();
     });
-    
+
 
     // ensures the breakpoint tracks the code rather than the line number
     (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
@@ -212,7 +212,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
         }
 
         const row = parseInt(key[2]);
-        
+
         if (delta.start.row >= row) {
           updatedBreakpoints.add(row);
         } else if (delta.action === "insert") {
@@ -233,7 +233,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
           }
         }
       });
-      
+
       if (breakpointMoved) {
         updatedBreakpoints.forEach((breakpointLine) => {
           const breakpointKey = `${actorId}:${handlerId}:${breakpointLine}`;
@@ -262,7 +262,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
     ace.editor.session.removeMarker(prevMarker);
     if (debugLine === -1) return;
-    
+
     const debugLineLoc = liveSourceMap.localFromGlobal(debugLine);
     if (debugLineLoc.actorId === actorId && debugLineLoc.handlerId === handlerId) {
       const marker = ace.editor.session.addMarker(new Range(debugLineLoc.lineWithinHandler - 1, 0, debugLineLoc.lineWithinHandler - 1, 1), "debugLine", "fullLine");

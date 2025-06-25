@@ -54,7 +54,7 @@ const CodeAceEditor = () => {
   const lastSyncFromStorageSeqNum = useStoreState(
     (state) => state.activeProject.lastSyncFromStorageSeqNum
   );
-  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
+  const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
 
   // We don't care about the actual value of the stage display size, but
   // we do need to know when it changes, so we can resize the editor in
@@ -88,7 +88,7 @@ const CodeAceEditor = () => {
 
     // toggleable breakpoints
     ace.editor.on("guttermousedown", (e) => {
-      if (!showDebugFeatures || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
+      if (!debugFeaturesEnabled || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
 
       let row = e.getDocumentPosition().row + 1;
@@ -100,7 +100,7 @@ const CodeAceEditor = () => {
         Debugger.add_breakpoint(MAIN_FILE, row, 0, false);
         ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
       }
-      
+
       e.stop();
     });
 
@@ -122,7 +122,7 @@ const CodeAceEditor = () => {
       ace.editor.session.removeMarker(prevMarker);
 
     if (debugLine !== null) {
-      const marker = ace.editor.session.addMarker(new Range(debugLine-1, 0, debugLine-1, 1), "debugLine", "fullLine");
+      const marker = ace.editor.session.addMarker(new Range(debugLine - 1, 0, debugLine - 1, 1), "debugLine", "fullLine");
       setPrevMarker(marker);
     }
   }, [debugLine]);
@@ -139,7 +139,7 @@ const CodeAceEditor = () => {
       let breakpointMoved = false;
       Object.values(breakpoints).forEach((breakpoint: any) => {
         const row = breakpoint.lineno;
-        
+
         if (delta.start.row >= row) {
           updatedBreakpoints.add(row);
         } else if (delta.action === "insert") {
@@ -161,7 +161,7 @@ const CodeAceEditor = () => {
 
         }
       });
-      
+
       if (breakpointMoved) {
         Debugger.clear_all_breakpoints();
         ace.editor.session.clearBreakpoints();

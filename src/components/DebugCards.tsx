@@ -38,7 +38,7 @@ export const ActorInstance: React.FC<ActorInstanceProps> = ({
   
         <div className="monospace-font">
           {actorVars
-            .show_variables("local")
+            .display_variables("local")
             .sort()
             .map((variable: string, index: number) => (
               <div key={`local-${actorId}-${index}`}>{variable}</div>
@@ -90,7 +90,7 @@ export const UnclonedActorCard: React.FC<{
         </div>
       )}
 
-      <div className="monospace-font">{classVars.show_costumes()}</div>
+      <div className="monospace-font">{classVars.display_costumes()}</div>
       <div className="monospace-font">
         {classVars.is_stage
           ? `Backdrop Index: ${actorVars.costume_index}`
@@ -112,7 +112,7 @@ export const UnclonedActorCard: React.FC<{
         {/* Local variables */}
         <div className="monospace-font flex-fill">
           {actorVars
-            .show_variables("local")
+            .display_variables("local")
             .sort()
             .map((variable: string, index: number) => (
               <div key={`local-${actorId}-${index}`}>{variable}</div>
@@ -155,7 +155,7 @@ export const ActorClassCard: React.FC<{
       </Card.Title>
 
         {/* Static variables */}
-        <div className="monospace-font">{classVars.show_costumes()}</div>
+        <div className="monospace-font">{classVars.display_costumes()}</div>
         <div className="monospace-font">
           {Object.entries(classVars.static)
             .sort(([a], [b]) => a.localeCompare(b))

@@ -123,7 +123,7 @@ export interface IIDELayout {
   dismissButtonTour: Action<IIDELayout>;
   initiateButtonTour: Action<IIDELayout>;
   maybeAdvanceTour: Action<IIDELayout, ButtonTourStage>;
-  showDebugFeatures: boolean;
+  debugFeaturesEnabled: boolean;
   toggleDebugFeatures: Action<IIDELayout>;
 }
 
@@ -280,11 +280,11 @@ export const ideLayout: IIDELayout = {
   }),
 
   helpSidebar,
-  showDebugFeatures: true, // todo switch back to false
-  toggleDebugFeatures: action((state) =>{
-    state.showDebugFeatures = !state.showDebugFeatures;
+  debugFeaturesEnabled: true, // todo switch back to false
+  toggleDebugFeatures: action((state) => {
+    state.debugFeaturesEnabled = !state.debugFeaturesEnabled;
     document.documentElement.style.setProperty(
-      "--show-debug-features", state.showDebugFeatures ? "block" : "none"
+      "--show-debug-features", state.debugFeaturesEnabled ? "block" : "none"
     )
   }),
 };

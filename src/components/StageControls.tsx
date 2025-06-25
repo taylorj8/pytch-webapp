@@ -77,8 +77,8 @@ const GreenFlag = () => {
 
 const YellowDebug = () => {
   const build = useStoreActions((actions) => actions.activeProject.build);
-  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
-  if (!showDebugFeatures) {
+  const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
+  if (!debugFeaturesEnabled) {
     return null;
   }
 
@@ -155,7 +155,7 @@ const LaunchCoordsChooserDropdownItem: React.FC<EmptyProps> = () => {
 };
 
 const DebugFeaturesDropdownItem: React.FC<EmptyProps> = () => {
-  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures)
+  const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled)
   const toggleDebugFeatures = useStoreActions(
     (actions) => actions.ideLayout.toggleDebugFeatures
   );
@@ -163,7 +163,7 @@ const DebugFeaturesDropdownItem: React.FC<EmptyProps> = () => {
 
   return (
     <Dropdown.Item onClick={toggleFeatures}>
-      {showDebugFeatures ? "Disable Debug Features" : "Enable Debug Features"}
+      {debugFeaturesEnabled ? "Disable Debug Features" : "Enable Debug Features"}
     </Dropdown.Item>
   );
 };
