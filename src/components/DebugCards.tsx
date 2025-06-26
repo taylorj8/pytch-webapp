@@ -15,7 +15,7 @@ interface VariableListProps {
 }
 
 
-export const VariableList: React.FC<VariableListProps> = ({ variables, actorId, prefix = "local" }) => {
+const VariableList: React.FC<VariableListProps> = ({ variables, actorId, prefix = "local" }) => {
   const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
 
   const toggleString = (key: string) => {
@@ -36,10 +36,12 @@ export const VariableList: React.FC<VariableListProps> = ({ variables, actorId, 
             <span style={{ fontWeight: "bold", color: "black" }}>{variable.key}: </span>
 
             {variable.type === "string" ? (() => {
+              console.log
+              const fullWidth = 29;
               const isExpanded = expandedStrings[key] ?? false;
-              const shouldTruncate = valueStr.length > 25;
+              const shouldTruncate = variable.key.length + valueStr.length > fullWidth;
               const displayStr = shouldTruncate && !isExpanded
-                ? valueStr.slice(0, 22) + "[…]"
+                ? valueStr.slice(0, fullWidth - variable.key.length - 3) + "[…]"
                 : valueStr;
 
               return (
