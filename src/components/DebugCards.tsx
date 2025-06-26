@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
 import Collapse from "react-bootstrap/Collapse";
 
+const maxStringWidth = 29;
 
 type Variable = { key: string; val: any; };
 
@@ -113,7 +114,6 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   return <span>{String(value)}</span>;
 };
 
-
 interface VariableListProps {
   variables: Variable[];
 }
@@ -128,7 +128,7 @@ const VariableList: React.FC<VariableListProps> = ({variables}) => {
             <FormattedValue
               k={variable.key}
               value={variable.val}
-              maxStringWidth={29}
+              maxStringWidth={maxStringWidth}
             />
           </div>
         );
@@ -150,24 +150,23 @@ export const ActorInstance: React.FC<ActorInstanceProps> = ({
     highlighted,
     isStage,
   }) => (
-    <Card className={`mb-2 ms-0 me-0 ${highlighted ? "highlighted-card" : "inner-card"}`}>
+    <Card className={`mt-2 mb-0 ms-0 me-0 ${highlighted ? "highlighted-card" : "inner-card"}`}>
       <Card.Body>
         <Card.Title className="d-flex align-items-center">
           <img src={actorVars.img_src} className="card-title-img me-2" />
           <strong>{actorId}</strong>
         </Card.Title>
   
+        <div className="monospace-font mb-1">
+          <strong>Current Costume: </strong><span style={{ color: "blue" }}>{actorVars.costume_index}</span>
+        </div>
         {!isStage && (
-          <div className="monospace-font mb-1">
-            {actorVars.position?.toString()}
+          <div className="monospace-font mb-2">
+             <strong>Position: </strong><span style={{ color: "blue" }}>{actorVars.position.toString()}</span>
           </div>
         )}
-        <div className="monospace-font mb-2">
-          Costume Index: {actorVars.costume_index}
-        </div>
   
-        <hr className="my-2" />
-  
+        {actorVars.has_variables("local") && <hr className="my-2" />}
         <VariableList variables={actorVars.display_variables("local")} />
       </Card.Body>
     </Card>
@@ -188,7 +187,7 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
             <FormattedValue
               k={key}
               value={String(value)}
-              maxStringWidth={29}
+              maxStringWidth={maxStringWidth}
             />
           ))}
       </div>
@@ -211,28 +210,30 @@ export const UnclonedActorCard: React.FC<{
       </Card.Title>
 
       <div>
-      {!classVars.is_stage && (
-        <div className="mt-3 monospace-font">
-          {actorVars.position?.toString()}
+        {!classVars.is_stage && (
+          <div className="mt-3 monospace-font">
+            {actorVars.position?.toString()}
+          </div>
+        )}
+        
+        <div className="monospace-font">
+          <strong>{classVars.is_stage ? "Current Backdrop" : "Current Costume"}: </strong>
+          <span style={{ color: "blue" }}>{actorVars.costume_index}</span>
         </div>
-      )}
-
-      {/* <div className="monospace-font">{classVars.display_costumes()}</div> */}
-      <VariableList variables={classVars.display_costumes_and_sounds()} />
-      
-      <div className="monospace-font">
-        {classVars.is_stage
-          ? `Backdrop Index: ${actorVars.costume_index}`
-          : `Costume Index: ${actorVars.costume_index}`}
-      </div>
+        <VariableList variables={classVars.display_costumes_and_sounds()} />
+        <hr className="my-2" />
         {/* Static variables */}
         <div className="monospace-font flex-fill">
-          {/* // todo use dynamic formatting here too */}
           {Object.entries(classVars.static)
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([key, value], index) => (
-              <div key={`static-${index}`} style={{ color: "blue" }}>
-                {`${key}: ${value}`}
+              <div key={`static-${index}`}>
+          <span style={{ fontWeight: "bold", color: "black" }}>{key}: </span>
+          <FormattedValue
+            k={key}
+            value={typeof value === "object" && value !== null && "v" in value ? value.v : value}
+            maxStringWidth={maxStringWidth}
+          />
               </div>
             ))}
         </div>
