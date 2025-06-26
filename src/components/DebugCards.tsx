@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
 import Collapse from "react-bootstrap/Collapse";
 
 const maxStringWidth = 35;
@@ -58,12 +57,15 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   }
 
   if (type === "array") {
+    const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down"
     return (
       <span>
         <span
           style={{ color: "purple", cursor: "pointer" }}
           onClick={toggle}
-        >[Array({value.length})] {isExpanded ? "▲" : "▼"}
+        >
+          [Array({value.length})]
+          <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
         </span>
         {isExpanded && (
           <div style={{ paddingLeft: "1rem" }}>
@@ -85,13 +87,15 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
 
   if (type === "object" && value !== null) {
     const keys = Object.keys(value);
+    const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down"
     return (
       <div>
         <span
           style={{ color: "brown", cursor: "pointer" }}
           onClick={toggle}
         >
-          {"{"}Object({keys.length}){isExpanded ? " ▲" : " ▼"}{"}"}
+          {"{"}Object({keys.length})
+          <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
         </span>
         {isExpanded && (
           <div style={{ paddingLeft: "1rem" }}>
@@ -177,7 +181,7 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
   <Card>
     <Card.Body>
       <Card.Title>
-        <FontAwesomeIcon icon={faEarthEurope} className="card-title-icon" />
+        <FontAwesomeIcon icon="earth-europe" className="card-title-icon" />
         Global Variables
       </Card.Title>
       <div className="monospace-font">
@@ -268,13 +272,15 @@ export const ActorClassCard: React.FC<{
     );
   }
 
+  const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down"
   return (
     <Card>
       <Card.Body>
       <Card.Title className="d-flex justify-content-between align-items-center">
         {name}
         <span className="badge bg-secondary ms-2" style={{ fontSize: "0.7em", cursor: "pointer" }} onClick={() => setIsExpanded(!isExpanded)}>
-            {actorEntries.length} instances   {isExpanded ? "▲" : "▼"}
+            {actorEntries.length} instances
+            <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
         </span>
       </Card.Title>
 
