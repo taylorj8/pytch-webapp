@@ -26,8 +26,6 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   const isExpanded = expandedStrings[k] ?? false;
   const type = Array.isArray(value) ? "array" : typeof value;
 
-  // console.log(k)
-
   if (type === "string") {
     const shouldTruncate = value.length + k.length > maxStringWidth;
     const displayStr =
@@ -39,7 +37,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
       <span
         style={{ color: "green", cursor: shouldTruncate ? "pointer" : "default" }}
         onClick={shouldTruncate ? toggle : undefined}
-        title={shouldTruncate ? "Click to expand/collapse" : undefined}
+        title={!shouldTruncate ? "string" : isExpanded ? "Click to collapse string" : "Click to expand string"}
       >
         "{displayStr}"
       </span>
@@ -49,11 +47,17 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   if (type === "number") {
     const num = Number(value);
     const display = Number.isInteger(num) ? num : num.toFixed(3);
-    return <span style={{ color: "blue" }}>{display}</span>;
+    return <span 
+      style={{ color: "blue", cursor: "default"}} 
+      title="number">{display}
+    </span>;
   }
 
   if (type === "boolean") {
-    return <span style={{ color: "darkorange" }}>{value ? "True" : "False"}</span>;
+    return <span 
+      style={{ color: "darkorange", cursor: "default"}} 
+      title="boolean">{value ? "True" : "False"}
+    </span>;
   }
 
   if (type === "array") {
@@ -62,6 +66,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
       <span>
         <span
           style={{ color: "purple", cursor: "pointer" }}
+          title="array"
           onClick={toggle}
         >
           [Array({value.length})]
@@ -71,7 +76,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
           <div style={{ paddingLeft: "1rem" }}>
             {value.map((elem: any, idx: number) => (
               <div key={`${k}-${idx}`}>
-                <span style={{ fontWeight: "bold", color: "gray" }}>{idx}: </span>
+                <span className="variable-name">{idx}: </span>
                 <FormattedValue
                   k={idx.toString()}
                   value={elem && typeof elem === "object" && "v" in elem ? elem.v : elem}
@@ -92,6 +97,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
       <div>
         <span
           style={{ color: "brown", cursor: "pointer" }}
+          title="object"
           onClick={toggle}
         >
           {"{"}Object({keys.length})
@@ -100,8 +106,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
         <Collapse in={isExpanded}>
           <div style={{ paddingLeft: "1rem" }}>
             {keys.map((k) => (
-              <div key={`${k}-${k}`}>
-                <span style={{ fontWeight: "bold", color: "black" }}>{k}: </span>
+              <div key={k}>
                 <FormattedValue
                   k={k}
                   value={value[k].v}
@@ -128,7 +133,7 @@ const VariableList: React.FC<VariableListProps> = ({variables}) => {
       {variables.map((variable, index) => {
         return (
           <div key={variable.key}>
-            <span style={{ fontWeight: "bold", color: "black" }}>{variable.key}: </span>
+            <span className="variable-name">{variable.key}: </span>
             <FormattedValue
               k={variable.key}
               value={variable.val}
@@ -162,11 +167,11 @@ export const ActorInstance: React.FC<ActorInstanceProps> = ({
         </Card.Title>
   
         <div className="monospace-font mb-1">
-          <strong>Current Costume: </strong><span style={{ color: "blue" }}>{actorVars.costume_index}</span>
+          <span className="variable-name">Current Costume: </span><span style={{ color: "blue" }}>{actorVars.costume_index}</span>
         </div>
         {!isStage && (
           <div className="monospace-font mb-2">
-             <strong>Position: </strong>{actorVars.position.toString()}
+             <span className="variable-name">Position: </span>{actorVars.position.toString()}
           </div>
         )}
   
@@ -221,7 +226,7 @@ export const UnclonedActorCard: React.FC<{
         )}
         
         <div className="monospace-font">
-          <strong>{classVars.is_stage ? "Current Backdrop" : "Current Costume"}: </strong>
+          <span className="variable-name">{classVars.is_stage ? "Current Backdrop" : "Current Costume"}: </span>
           <span style={{ color: "blue" }}>{actorVars.costume_index}</span>
         </div>
         <VariableList variables={classVars.display_costumes_and_sounds()} />
@@ -232,7 +237,7 @@ export const UnclonedActorCard: React.FC<{
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([key, value], index) => (
               <div key={`static-${index}`}>
-          <span style={{ fontWeight: "bold", color: "black" }}>{key}: </span>
+          <span className="variable-name">{key}: </span>
           <FormattedValue
             k={key}
             value={typeof value === "object" && value !== null && "v" in value ? value.v : value}

@@ -586,6 +586,12 @@ $speech-bubble-max-height: 180px;
     top: 1px;
     margin-left: 0.25rem;
   }
+
+  .variable-name {
+    font-weight: bold;
+    color: black;
+    cursor: default;
+  }
 }
 
 .DebugButtons {
