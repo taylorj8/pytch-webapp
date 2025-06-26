@@ -8,6 +8,113 @@ import Collapse from "react-bootstrap/Collapse";
 
 type Variable = { key: string; val: any; type: string };
 
+interface FormattedValueProps {
+  value: any;
+  keyPath: string;
+  expandedStrings: Record<string, boolean>;
+  setExpandedStrings: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+}
+
+const FormattedValue: React.FC<FormattedValueProps> = ({
+  value,
+  keyPath,
+  expandedStrings,
+  setExpandedStrings,
+}) => {
+  const toggle = () =>
+    setExpandedStrings((prev) => ({ ...prev, [keyPath]: !prev[keyPath] }));
+
+  const isExpanded = expandedStrings[keyPath] ?? false;
+  const type = Array.isArray(value) ? "array" : typeof value;
+
+  if (type === "string") {
+    const fullWidth = 29;
+    const shouldTruncate = value.length > fullWidth;
+    const displayStr =
+      shouldTruncate && !isExpanded
+        ? value.slice(0, fullWidth - 3) + "[…]"
+        : value;
+
+    return (
+      <span
+        style={{ color: "green", cursor: shouldTruncate ? "pointer" : "default" }}
+        onClick={shouldTruncate ? toggle : undefined}
+        title={shouldTruncate ? "Click to expand/collapse" : undefined}
+      >
+        "{displayStr}"
+      </span>
+    );
+  }
+
+  if (type === "number") {
+    return <span style={{ color: "blue" }}>{Number(value).toFixed(3)}</span>;
+  }
+
+  if (type === "boolean") {
+    return <span style={{ color: "orange" }}>{String(value)}</span>;
+  }
+
+  if (type === "array") {
+    return (
+      <span>
+        <span
+          style={{ color: "purple", cursor: "pointer" }}
+          onClick={toggle}
+        >[Array({value.length})] {isExpanded ? "▲" : "▼"}
+        </span>
+        {isExpanded && (
+          <div style={{ paddingLeft: "1rem" }}>
+            {value.map((elem: any, idx: number) => (
+              <div key={`${keyPath}-${idx}`}>
+                <span style={{ fontWeight: "bold", color: "gray" }}>{idx}: </span>
+                <FormattedValue
+                  value={elem.v}
+                  keyPath={`${keyPath}-${idx}`}
+                  expandedStrings={expandedStrings}
+                  setExpandedStrings={setExpandedStrings}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </span>
+    );
+  }
+
+  if (type === "object" && value !== null) {
+    const keys = Object.keys(value);
+    return (
+      <div>
+        <span
+          style={{ color: "brown", cursor: "pointer" }}
+          onClick={toggle}
+        >
+          {"{"}Object({keys.length}){isExpanded ? " ▲" : " ▼"}{"}"}
+        </span>
+        {isExpanded && (
+          <div style={{ paddingLeft: "1rem" }}>
+            {keys.map((k) => (
+              <div key={`${keyPath}-${k}`}>
+                <span style={{ fontWeight: "bold", color: "black" }}>{k}: </span>
+                <FormattedValue
+                  value={value[k].v}
+                  keyPath={`${keyPath}-${k}`}
+                  expandedStrings={expandedStrings}
+                  setExpandedStrings={setExpandedStrings}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return <span>{String(value)}</span>;
+};
+
+
+
 interface VariableListProps {
   variables: Variable[];
   actorId: string;
@@ -18,46 +125,20 @@ interface VariableListProps {
 const VariableList: React.FC<VariableListProps> = ({ variables, actorId, prefix = "local" }) => {
   const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
 
-  const toggleString = (key: string) => {
-    setExpandedStrings((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
-
   return (
     <div className="monospace-font">
       {variables.map((variable, index) => {
         const key = `${prefix}-${actorId}-${variable.key}`;
-        const valueStr = String(variable.val);
 
         return (
           <div key={key}>
             <span style={{ fontWeight: "bold", color: "black" }}>{variable.key}: </span>
-
-            {variable.type === "string" ? (() => {
-              console.log
-              const fullWidth = 29;
-              const isExpanded = expandedStrings[key] ?? false;
-              const shouldTruncate = variable.key.length + valueStr.length > fullWidth;
-              const displayStr = shouldTruncate && !isExpanded
-                ? valueStr.slice(0, fullWidth - variable.key.length - 3) + "[…]"
-                : valueStr;
-
-              return (
-                <span
-                  style={{ color: "green", cursor: shouldTruncate ? "pointer" : "default" }}
-                  onClick={() => shouldTruncate && toggleString(key)}
-                  title={shouldTruncate ? "Click to expand/collapse" : undefined}
-                >
-                  "{displayStr}"
-                </span>
-              );
-            })() : variable.type === "number" ? (
-              <span style={{ color: "blue" }}>{Number(variable.val).toFixed(3)}</span>
-            ) : (
-              <span>{valueStr}</span>
-            )}
+            <FormattedValue
+              value={variable.val}
+              keyPath={key}
+              expandedStrings={expandedStrings}
+              setExpandedStrings={setExpandedStrings}
+            />
           </div>
         );
       })}
@@ -152,6 +233,7 @@ export const UnclonedActorCard: React.FC<{
       </div>
         {/* Static variables */}
         <div className="monospace-font flex-fill">
+          {/* // todo use dynamic formatting here too */}
           {Object.entries(classVars.static)
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([key, value], index) => (
