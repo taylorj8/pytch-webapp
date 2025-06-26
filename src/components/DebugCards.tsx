@@ -6,33 +6,33 @@ import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
 import Collapse from "react-bootstrap/Collapse";
 
 
-type Variable = { key: string; val: any; type: string };
+type Variable = { key: string; val: any; };
 
 interface FormattedValueProps {
+  k: string;
   value: any;
-  keyPath: string;
-  expandedStrings: Record<string, boolean>;
-  setExpandedStrings: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  maxStringWidth: number;
 }
 
 const FormattedValue: React.FC<FormattedValueProps> = ({
+  k,
   value,
-  keyPath,
-  expandedStrings,
-  setExpandedStrings,
+  maxStringWidth
 }) => {
+  const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
   const toggle = () =>
-    setExpandedStrings((prev) => ({ ...prev, [keyPath]: !prev[keyPath] }));
+    setExpandedStrings((prev) => ({ ...prev, [k]: !prev[k] }));
 
-  const isExpanded = expandedStrings[keyPath] ?? false;
+  const isExpanded = expandedStrings[k] ?? false;
   const type = Array.isArray(value) ? "array" : typeof value;
 
+  console.log(k)
+
   if (type === "string") {
-    const fullWidth = 29;
-    const shouldTruncate = value.length > fullWidth;
+    const shouldTruncate = value.length + k.length > maxStringWidth;
     const displayStr =
       shouldTruncate && !isExpanded
-        ? value.slice(0, fullWidth - 3) + "[…]"
+        ? value.slice(0, maxStringWidth - k.length - 3) + "[…]"
         : value;
 
     return (
@@ -47,7 +47,9 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   }
 
   if (type === "number") {
-    return <span style={{ color: "blue" }}>{Number(value).toFixed(3)}</span>;
+    const num = Number(value);
+    const display = Number.isInteger(num) ? num : num.toFixed(3);
+    return <span style={{ color: "blue" }}>{display}</span>;
   }
 
   if (type === "boolean") {
@@ -65,13 +67,12 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
         {isExpanded && (
           <div style={{ paddingLeft: "1rem" }}>
             {value.map((elem: any, idx: number) => (
-              <div key={`${keyPath}-${idx}`}>
+              <div key={`${k}-${idx}`}>
                 <span style={{ fontWeight: "bold", color: "gray" }}>{idx}: </span>
                 <FormattedValue
+                  k={idx.toString()}
                   value={elem.v}
-                  keyPath={`${keyPath}-${idx}`}
-                  expandedStrings={expandedStrings}
-                  setExpandedStrings={setExpandedStrings}
+                  maxStringWidth={maxStringWidth - 2}
                 />
               </div>
             ))}
@@ -94,13 +95,12 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
         {isExpanded && (
           <div style={{ paddingLeft: "1rem" }}>
             {keys.map((k) => (
-              <div key={`${keyPath}-${k}`}>
+              <div key={`${k}-${k}`}>
                 <span style={{ fontWeight: "bold", color: "black" }}>{k}: </span>
                 <FormattedValue
+                  k={k}
                   value={value[k].v}
-                  keyPath={`${keyPath}-${k}`}
-                  expandedStrings={expandedStrings}
-                  setExpandedStrings={setExpandedStrings}
+                  maxStringWidth={maxStringWidth - 2}
                 />
               </div>
             ))}
@@ -118,26 +118,22 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
 interface VariableListProps {
   variables: Variable[];
   actorId: string;
-  prefix?: string; // Optional, for unique keys if needed
 }
 
 
-const VariableList: React.FC<VariableListProps> = ({ variables, actorId, prefix = "local" }) => {
-  const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
-
+const VariableList: React.FC<VariableListProps> = ({ variables, actorId }) => {
   return (
     <div className="monospace-font">
       {variables.map((variable, index) => {
-        const key = `${prefix}-${actorId}-${variable.key}`;
+        const key = `${actorId}-${variable.key}`;
 
         return (
           <div key={key}>
             <span style={{ fontWeight: "bold", color: "black" }}>{variable.key}: </span>
             <FormattedValue
+              k={variable.key}
               value={variable.val}
-              keyPath={key}
-              expandedStrings={expandedStrings}
-              setExpandedStrings={setExpandedStrings}
+              maxStringWidth={29}
             />
           </div>
         );
