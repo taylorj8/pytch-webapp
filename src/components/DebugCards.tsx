@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
 import Collapse from "react-bootstrap/Collapse";
 
-const maxStringWidth = 29;
+const maxStringWidth = 35;
 
 type Variable = { key: string; val: any; };
 

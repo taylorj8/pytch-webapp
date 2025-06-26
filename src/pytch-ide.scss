@@ -504,7 +504,7 @@ $speech-bubble-max-height: 180px;
   
     .monospace-font {
       font-family: "Courier New", Courier, monospace;
-      font-size: 0.95rem;
+      font-size: 90%;
     }
     
     .card-title-img {
@@ -522,15 +522,10 @@ $speech-bubble-max-height: 180px;
       margin-right: 0.5rem;
       vertical-align: middle;
     }
-
-    .monospace-font {
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.95rem;
-    }
   }
 }
 
-.DebugSidebar {
+.DebugSidebar { // todo remove duplication
   width: 26rem;
 
   .card,
@@ -568,8 +563,8 @@ $speech-bubble-max-height: 180px;
   }
 
   .monospace-font {
-    font-family: "Courier New", Courier, monospace;
-    font-size: 0.95rem;
+    font-family: $monospace-fonts;
+    font-size: 90%;
   }
 
   .card-title-img {
