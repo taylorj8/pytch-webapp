@@ -57,7 +57,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   }
 
   if (type === "array") {
-    const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down"
+    const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
     return (
       <span>
         <span
@@ -67,7 +67,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
           [Array({value.length})]
           <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
         </span>
-        {isExpanded && (
+        <Collapse in={isExpanded}>
           <div style={{ paddingLeft: "1rem" }}>
             {value.map((elem: any, idx: number) => (
               <div key={`${k}-${idx}`}>
@@ -80,14 +80,14 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
               </div>
             ))}
           </div>
-        )}
+        </Collapse>
       </span>
     );
   }
 
   if (type === "object" && value !== null) {
     const keys = Object.keys(value);
-    const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down"
+    const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
     return (
       <div>
         <span
@@ -97,7 +97,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
           {"{"}Object({keys.length})
           <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
         </span>
-        {isExpanded && (
+        <Collapse in={isExpanded}>
           <div style={{ paddingLeft: "1rem" }}>
             {keys.map((k) => (
               <div key={`${k}-${k}`}>
@@ -110,7 +110,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
               </div>
             ))}
           </div>
-        )}
+        </Collapse>
       </div>
     );
   }
