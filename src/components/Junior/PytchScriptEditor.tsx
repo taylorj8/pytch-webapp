@@ -35,9 +35,7 @@ import { scrollCursorRowIntoView } from "./PytchScriptEditor-scroller";
 import { failIfNull } from "../../utils";
 
 import { Debugger } from "../../skulpt-connection/drive-project";
-
-
-const MAIN_FILE = "<stdin>.py";
+import { userFile } from "../../constants";
 
 // Adapted from https://stackoverflow.com/a/71952718
 const insertElectricFullStop = (editor: AceEditorT) => {
@@ -182,13 +180,13 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
         ace.editor.session.clearBreakpoint(row);
         removeBreakpoint(breakpointKey);
         if (globalLineNo !== null) {
-          Debugger.clear_breakpoint("<stdin>.py", globalLineNo, 0, false);
+          Debugger.clear_breakpoint(userFile, globalLineNo, 0, false);
         }
       } else {
         ace.editor.session.setBreakpoint(row, "ace_breakpoint");
         addBreakpoint(breakpointKey);
         if (globalLineNo !== null) {
-          Debugger.add_breakpoint("<stdin>.py", globalLineNo, 0);
+          Debugger.add_breakpoint(userFile, globalLineNo, 0);
         }
       }
 

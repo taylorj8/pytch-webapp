@@ -13,8 +13,7 @@ import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
 import { SingleTab } from "./SingleTab";
 import { Debugger } from "../skulpt-connection/drive-project";
-
-const MAIN_FILE = "<stdin>.py";
+import { userFile } from "../constants";
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -93,11 +92,11 @@ const CodeAceEditor = () => {
 
       let row = e.getDocumentPosition().row + 1;
 
-      if (Debugger.check_breakpoints(MAIN_FILE, row, 0)) {
-        Debugger.clear_breakpoint(MAIN_FILE, row, 0, false);
+      if (Debugger.check_breakpoints(userFile, row, 0)) {
+        Debugger.clear_breakpoint(userFile, row, 0, false);
         ace.editor.session.clearBreakpoint(row - 1);
       } else {
-        Debugger.add_breakpoint(MAIN_FILE, row, 0, false);
+        Debugger.add_breakpoint(userFile, row, 0, false);
         ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
       }
 
@@ -167,7 +166,7 @@ const CodeAceEditor = () => {
         ace.editor.session.clearBreakpoints();
 
         updatedBreakpoints.forEach((breakpoint) => {
-          Debugger.add_breakpoint(MAIN_FILE, breakpoint, 0, false);
+          Debugger.add_breakpoint(userFile, breakpoint, 0, false);
           ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint")
         });
       }

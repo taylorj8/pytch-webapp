@@ -6,6 +6,7 @@ import { ProjectContent } from "../model/project-core";
 import { AssetPresentation } from "../model/asset";
 import { Debugger } from "../skulpt-connection/drive-project";
 import store from "../store";
+import { userFile } from "../constants";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -101,7 +102,7 @@ export const build = async (
           lineWithinHandler: parseInt(key[2])
         };
         const globalLineNumber = liveSourceMap.globalFromLocal(loc);
-        Debugger.add_breakpoint("<stdin>.py", globalLineNumber, 0, false);
+        Debugger.add_breakpoint(userFile, globalLineNumber, 0, false);
         console.log(Debugger.get_breakpoints_list());
       });
     }

@@ -7,6 +7,7 @@ import {
   stageHalfWidth,
   stageHeight,
   stageHalfHeight,
+  userFile,
 } from "../constants";
 import { failIfNull } from "../utils";
 import {
@@ -24,7 +25,7 @@ declare let Sk: any;
 //
 // TODO: Is this the best place to put this?
 Sk.configure({});
-export let Debugger = new Sk.Debugger("<stdin>.py", null);
+export let Debugger = new Sk.Debugger(userFile, null);
 
 let peId = 1000;
 
