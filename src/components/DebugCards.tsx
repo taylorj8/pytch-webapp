@@ -5,6 +5,33 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
 import Collapse from "react-bootstrap/Collapse";
 
+
+type Variable = { key: string; val: any; type: string };
+
+interface VariableListProps {
+  variables: Variable[];
+  actorId: string;
+  prefix?: string; // Optional, for unique keys if needed
+}
+
+export const VariableList: React.FC<VariableListProps> = ({ variables, actorId, prefix = "local" }) => (
+  <div className="monospace-font">
+    {variables.map((variable, index) => (
+      <div key={`${prefix}-${actorId}-${index}`}>
+        <span style={{ fontWeight: "bold", color: "black" }}>{variable.key}: </span>
+        {variable.type === "string" ? (
+          <span style={{ color: "green" }}>"{variable.val}"</span>
+        ) : variable.type === "number" ? (
+          <span style={{ color: "blue" }}>{variable.val}</span>
+        ) : (
+          <span>{String(variable.val)}</span>
+        )}
+      </div>
+    ))}
+  </div>
+);
+
+
 interface ActorInstanceProps {
   actorId: string;
   actorVars: any;
@@ -36,14 +63,7 @@ export const ActorInstance: React.FC<ActorInstanceProps> = ({
   
         <hr className="my-2" />
   
-        <div className="monospace-font">
-          {actorVars
-            .display_variables("local")
-            .sort()
-            .map((variable: string, index: number) => (
-              <div key={`local-${actorId}-${index}`}>{variable}</div>
-            ))}
-        </div>
+        <VariableList variables={actorVars.display_variables("local")} actorId={actorId} />
       </Card.Body>
     </Card>
   );
@@ -110,14 +130,7 @@ export const UnclonedActorCard: React.FC<{
         {actorVars.has_variables("local") && <hr className="my-2" />}
 
         {/* Local variables */}
-        <div className="monospace-font flex-fill">
-          {actorVars
-            .display_variables("local")
-            .sort()
-            .map((variable: string, index: number) => (
-              <div key={`local-${actorId}-${index}`}>{variable}</div>
-            ))}
-        </div>
+        <VariableList variables={actorVars.display_variables("local")} actorId={actorId} />
       </div>
     </Card.Body>
   </Card>

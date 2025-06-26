@@ -44,9 +44,9 @@ export const DebugPane: React.FC<EmptyProps> = () => {
 
   if (!inDebugMode) {
     return (
-      <div>
-        Debug mode is off. Please enable debug mode to see the details.
-      </div>
+      <h5 style={{ padding: "1rem" }}>
+        The variables of your sprites will show here while debugging.
+      </h5>
     );
   }
 

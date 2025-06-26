@@ -39,25 +39,28 @@ export const DebugSidebar: React.FC<EmptyProps> = () => {
 
   if (!inDebugMode) {
     return (
-      <div>
-        Debug mode is off. Please enable debug mode to see the details.
-      </div>
+      <h6 style={{ padding: "1.25rem" }}>
+        The variables of your sprites will show here while debugging.
+      </h6>
     );
   }
 
   return (
     <div className="DebugSidebar">
       <div className="card-container">
-          {localVars && Object.entries(localVars)
-        .filter(([_, classVars]) => (classVars as any).is_stage)
-        .map(([name, classVars]) => (
-          <ActorClassCard
-            key={name}
-            name={name}
-            classVars={classVars}
-            highlightedInstance={highlightedCard}
-          />
-        ))}
+        {globalVars && Object.keys(globalVars).length > 0 && (
+          <GlobalVariablesCard globalVars={globalVars} />
+        )}
+        {localVars && Object.entries(localVars)
+          .filter(([_, classVars]) => (classVars as any).is_stage)
+          .map(([name, classVars]) => (
+            <ActorClassCard
+              key={name}
+              name={name}
+              classVars={classVars}
+              highlightedInstance={highlightedCard}
+            />
+          ))}
         {localVars &&
           Object.entries(localVars)
           .filter(([_, classVars]) => !(classVars as any).is_stage)
