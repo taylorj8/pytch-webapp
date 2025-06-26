@@ -54,7 +54,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   }
 
   if (type === "boolean") {
-    return <span style={{ color: "orange" }}>{String(value)}</span>;
+    return <span style={{ color: "darkorange" }}>{value ? "True" : "False"}</span>;
   }
 
   if (type === "array") {
@@ -162,7 +162,7 @@ export const ActorInstance: React.FC<ActorInstanceProps> = ({
         </div>
         {!isStage && (
           <div className="monospace-font mb-2">
-             <strong>Position: </strong><span style={{ color: "blue" }}>{actorVars.position.toString()}</span>
+             <strong>Position: </strong>{actorVars.position.toString()}
           </div>
         )}
   
