@@ -26,7 +26,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   const isExpanded = expandedStrings[k] ?? false;
   const type = Array.isArray(value) ? "array" : typeof value;
 
-  console.log(k)
+  // console.log(k)
 
   if (type === "string") {
     const shouldTruncate = value.length + k.length > maxStringWidth;
@@ -71,7 +71,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
                 <span style={{ fontWeight: "bold", color: "gray" }}>{idx}: </span>
                 <FormattedValue
                   k={idx.toString()}
-                  value={elem.v}
+                  value={elem && typeof elem === "object" && "v" in elem ? elem.v : elem}
                   maxStringWidth={maxStringWidth - 2}
                 />
               </div>
@@ -114,21 +114,16 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
 };
 
 
-
 interface VariableListProps {
   variables: Variable[];
-  actorId: string;
 }
 
-
-const VariableList: React.FC<VariableListProps> = ({ variables, actorId }) => {
+const VariableList: React.FC<VariableListProps> = ({variables}) => {
   return (
     <div className="monospace-font">
       {variables.map((variable, index) => {
-        const key = `${actorId}-${variable.key}`;
-
         return (
-          <div key={key}>
+          <div key={variable.key}>
             <span style={{ fontWeight: "bold", color: "black" }}>{variable.key}: </span>
             <FormattedValue
               k={variable.key}
@@ -141,7 +136,6 @@ const VariableList: React.FC<VariableListProps> = ({ variables, actorId }) => {
     </div>
   );
 };
-
 
 interface ActorInstanceProps {
   actorId: string;
@@ -174,7 +168,7 @@ export const ActorInstance: React.FC<ActorInstanceProps> = ({
   
         <hr className="my-2" />
   
-        <VariableList variables={actorVars.display_variables("local")} actorId={actorId} />
+        <VariableList variables={actorVars.display_variables("local")} />
       </Card.Body>
     </Card>
   );
@@ -191,9 +185,11 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
         {Object.entries(globalVars)
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([key, value]) => (
-            <div key={key}>
-              {key}: {String(value)}
-            </div>
+            <FormattedValue
+              k={key}
+              value={String(value)}
+              maxStringWidth={29}
+            />
           ))}
       </div>
     </Card.Body>
@@ -221,7 +217,9 @@ export const UnclonedActorCard: React.FC<{
         </div>
       )}
 
-      <div className="monospace-font">{classVars.display_costumes()}</div>
+      {/* <div className="monospace-font">{classVars.display_costumes()}</div> */}
+      <VariableList variables={classVars.display_costumes_and_sounds()} />
+      
       <div className="monospace-font">
         {classVars.is_stage
           ? `Backdrop Index: ${actorVars.costume_index}`
@@ -242,7 +240,7 @@ export const UnclonedActorCard: React.FC<{
         {actorVars.has_variables("local") && <hr className="my-2" />}
 
         {/* Local variables */}
-        <VariableList variables={actorVars.display_variables("local")} actorId={actorId} />
+        <VariableList variables={actorVars.display_variables("local")} />
       </div>
     </Card.Body>
   </Card>
@@ -280,7 +278,7 @@ export const ActorClassCard: React.FC<{
       </Card.Title>
 
         {/* Static variables */}
-        <div className="monospace-font">{classVars.display_costumes()}</div>
+        <VariableList variables={classVars.display_costumes_and_sounds()} />
         <div className="monospace-font">
           {Object.entries(classVars.static)
             .sort(([a], [b]) => a.localeCompare(b))
