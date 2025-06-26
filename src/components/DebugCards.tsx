@@ -14,22 +14,54 @@ interface VariableListProps {
   prefix?: string; // Optional, for unique keys if needed
 }
 
-export const VariableList: React.FC<VariableListProps> = ({ variables, actorId, prefix = "local" }) => (
-  <div className="monospace-font">
-    {variables.map((variable, index) => (
-      <div key={`${prefix}-${actorId}-${index}`}>
-        <span style={{ fontWeight: "bold", color: "black" }}>{variable.key}: </span>
-        {variable.type === "string" ? (
-          <span style={{ color: "green" }}>"{variable.val}"</span>
-        ) : variable.type === "number" ? (
-          <span style={{ color: "blue" }}>{variable.val}</span>
-        ) : (
-          <span>{String(variable.val)}</span>
-        )}
-      </div>
-    ))}
-  </div>
-);
+
+export const VariableList: React.FC<VariableListProps> = ({ variables, actorId, prefix = "local" }) => {
+  const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
+
+  const toggleString = (key: string) => {
+    setExpandedStrings((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  return (
+    <div className="monospace-font">
+      {variables.map((variable, index) => {
+        const key = `${prefix}-${actorId}-${variable.key}`;
+        const valueStr = String(variable.val);
+
+        return (
+          <div key={key}>
+            <span style={{ fontWeight: "bold", color: "black" }}>{variable.key}: </span>
+
+            {variable.type === "string" ? (() => {
+              const isExpanded = expandedStrings[key] ?? false;
+              const shouldTruncate = valueStr.length > 25;
+              const displayStr = shouldTruncate && !isExpanded
+                ? valueStr.slice(0, 22) + "[…]"
+                : valueStr;
+
+              return (
+                <span
+                  style={{ color: "green", cursor: shouldTruncate ? "pointer" : "default" }}
+                  onClick={() => shouldTruncate && toggleString(key)}
+                  title={shouldTruncate ? "Click to expand/collapse" : undefined}
+                >
+                  "{displayStr}"
+                </span>
+              );
+            })() : variable.type === "number" ? (
+              <span style={{ color: "blue" }}>{Number(variable.val).toFixed(3)}</span>
+            ) : (
+              <span>{valueStr}</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 
 interface ActorInstanceProps {
