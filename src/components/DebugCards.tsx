@@ -79,8 +79,8 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
                 <span className="variable-name">{idx}: </span>
                 <FormattedValue
                   k={idx.toString()}
-                  value={elem && typeof elem === "object" && "v" in elem ? elem.v : elem}
-                  maxStringWidth={maxStringWidth - 2}
+                  value={elem && typeof elem === "object" && "v" in elem ? elem.v : elem.entries}
+                  maxStringWidth={maxStringWidth - 3}
                 />
               </div>
             ))}
@@ -94,29 +94,30 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
     const keys = Object.keys(value);
     const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
     return (
-      <div>
+      <span>
         <span
           style={{ color: "brown", cursor: "pointer" }}
           title="object"
           onClick={toggle}
         >
-          {"{"}Object({keys.length})
+          {"{"}Object({keys.length}){"}"}
           <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
         </span>
         <Collapse in={isExpanded}>
           <div style={{ paddingLeft: "1rem" }}>
             {keys.map((k) => (
-              <div key={k}>
+                <div key={k}>
+                <span className="variable-name">{k}: </span>
                 <FormattedValue
                   k={k}
-                  value={value[k].v}
-                  maxStringWidth={maxStringWidth - 2}
+                  value={"v" in value[k][1] ? value[k][1].v : value[k][1].entries}
+                  maxStringWidth={maxStringWidth - 3}
                 />
-              </div>
+                </div>
             ))}
           </div>
         </Collapse>
-      </div>
+      </span>
     );
   }
 
@@ -153,7 +154,7 @@ interface ActorInstanceProps {
   isStage: boolean;
 }
 
-export const ActorInstance: React.FC<ActorInstanceProps> = ({
+export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
     actorId,
     actorVars,
     highlighted,
@@ -167,11 +168,11 @@ export const ActorInstance: React.FC<ActorInstanceProps> = ({
         </Card.Title>
   
         <div className="monospace-font mb-1">
-          <span className="variable-name">Current Costume: </span><span style={{ color: "blue" }}>{actorVars.costume_index}</span>
+          <span className="variable-name">Current Costume: </span><span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
         </div>
         {!isStage && (
           <div className="monospace-font mb-2">
-             <span className="variable-name">Position: </span>{actorVars.position.toString()}
+             <span className="variable-name">Position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
           </div>
         )}
   
@@ -227,7 +228,7 @@ export const UnclonedActorCard: React.FC<{
         
         <div className="monospace-font">
           <span className="variable-name">{classVars.is_stage ? "Current Backdrop" : "Current Costume"}: </span>
-          <span style={{ color: "blue" }}>{actorVars.costume_index}</span>
+          <span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
         </div>
         <VariableList variables={classVars.display_costumes_and_sounds()} />
         <hr className="my-2" />
@@ -240,7 +241,7 @@ export const UnclonedActorCard: React.FC<{
           <span className="variable-name">{key}: </span>
           <FormattedValue
             k={key}
-            value={typeof value === "object" && value !== null && "v" in value ? value.v : value}
+            value={value && typeof value === "object" && "v" in value ? value.v : (value as any).entries}
             maxStringWidth={maxStringWidth}
           />
               </div>
@@ -305,7 +306,7 @@ export const ActorClassCard: React.FC<{
         <Collapse in={isExpanded}>
           <div className="clone-container">
             {actorEntries.map(([actorId, actorVars]: [string, any]) => (
-              <ActorInstance
+              <ActorInstanceCard
                 key={actorId}
                 actorId={actorId}
                 actorVars={actorVars}
