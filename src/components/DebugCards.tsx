@@ -90,7 +90,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
     );
   }
 
-  if (type === "object" && value !== null) {
+  if (type === "object") {
     const keys = Object.keys(value);
     const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
     return (
@@ -107,7 +107,8 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
           <div style={{ paddingLeft: "1rem" }}>
             {keys.map((k) => (
                 <div key={k}>
-                <span className="variable-name">{k}: </span>
+                  {/* // todo - handle non-string keys better */}
+                <span className="variable-name">{`"${k}"`}: </span>
                 <FormattedValue
                   k={k}
                   value={extractValue(value[k][1])}
@@ -163,8 +164,8 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
     <Card className={`mt-2 mb-0 ms-0 me-0 ${highlighted ? "highlighted-card" : "inner-card"}`}>
       <Card.Body>
         <Card.Title className="d-flex align-items-center">
-          <img src={actorVars.img_src} className="card-title-img me-2" />
-          <strong>{actorId}</strong>
+          <img src={actorVars.img_src} className="card-title-img" style={{filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))"}} />
+            <strong style={{ fontSize: "95%" }}>{actorId}</strong>
         </Card.Title>
   
         <div className="monospace-font mb-1">
@@ -215,8 +216,8 @@ export const UnclonedActorCard: React.FC<{
   <Card className={`mb-2 ms-0 me-0 ${highlighted ? "highlighted-card" : ""}`}>
     <Card.Body>
       <Card.Title className="d-flex align-items-center">
-        <img src={actorVars.img_src} className="card-title-img me-2" />
-        {name}
+        <img src={actorVars.img_src} className="card-title-img" style={{filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))"}}/>
+        <strong>{name}</strong>
       </Card.Title>
 
       <div>
@@ -283,7 +284,19 @@ export const ActorClassCard: React.FC<{
     <Card>
       <Card.Body>
       <Card.Title className="d-flex justify-content-between align-items-center">
-        {name}
+        <span>
+          <span className="actor-classcard-img-stack">
+            <img
+              src={(actorEntries[0][1] as any).img_src}
+              className="actor-classcard-img-top"
+            />
+            <img
+              src={(actorEntries[1][1] as any).img_src}
+              className="actor-classcard-img-bottom"
+            />
+          </span>
+          <strong>{name}</strong>
+        </span>
         <span className="badge bg-secondary ms-2" style={{ fontSize: "0.7em", cursor: "pointer" }} onClick={() => setIsExpanded(!isExpanded)}>
             {actorEntries.length} instances
             <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
