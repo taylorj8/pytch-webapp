@@ -592,6 +592,35 @@ $speech-bubble-max-height: 180px;
     color: black;
     cursor: default;
   }
+
+  .actor-classcard-img-stack {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+
+  .actor-classcard-img-top {
+    position: absolute;
+    left: 0;
+    top: -4px;
+    width: 26px;
+    height: 26px;
+    z-index: 2;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+  }
+
+  .actor-classcard-img-bottom {
+    position: absolute;
+    left: 12px;
+    top: 4px;
+    width: 26px;
+    height: 26px;
+    z-index: 1;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+  }
+}
 }
 
 .DebugButtons {
