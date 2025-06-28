@@ -79,7 +79,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
                 <span className="variable-name">{idx}: </span>
                 <FormattedValue
                   k={idx.toString()}
-                  value={elem && typeof elem === "object" && "v" in elem ? elem.v : elem.entries}
+                  value={extractValue(elem)}
                   maxStringWidth={maxStringWidth - 3}
                 />
               </div>
@@ -110,7 +110,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
                 <span className="variable-name">{k}: </span>
                 <FormattedValue
                   k={k}
-                  value={"v" in value[k][1] ? value[k][1].v : value[k][1].entries}
+                  value={extractValue(value[k][1])}
                   maxStringWidth={maxStringWidth - 3}
                 />
                 </div>
@@ -133,7 +133,7 @@ const VariableList: React.FC<VariableListProps> = ({variables}) => {
     <div className="monospace-font">
       {variables.map((variable, index) => {
         return (
-          <div key={variable.key}>
+          <div key={`${index}-${variable.key}`}>
             <span className="variable-name">{variable.key}: </span>
             <FormattedValue
               k={variable.key}
@@ -241,7 +241,7 @@ export const UnclonedActorCard: React.FC<{
           <span className="variable-name">{key}: </span>
           <FormattedValue
             k={key}
-            value={value && typeof value === "object" && "v" in value ? value.v : (value as any).entries}
+            value={extractValue(value)}
             maxStringWidth={maxStringWidth}
           />
               </div>
@@ -320,3 +320,11 @@ export const ActorClassCard: React.FC<{
     </Card>
   );
 };
+
+function extractValue(elem: unknown): unknown {
+  if (elem && typeof elem === "object") {
+    if ("v" in elem) return (elem as any).v;
+    if ("entries" in elem) return (elem as any).entries;
+  }
+  return elem;
+}
