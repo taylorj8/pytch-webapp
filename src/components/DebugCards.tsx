@@ -182,8 +182,8 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
           </div>
         )}
   
-        {actorVars.has_variables("local") && <hr className="my-2" />}
-        <VariableList variables={actorVars.display_variables("local")} />
+        {actorVars.has_local_variables() && <hr className="my-2" />}
+        <VariableList variables={actorVars.display_local_variables()} />
       </Card.Body>
     </Card>
   );
@@ -200,7 +200,7 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
         {Object.entries(globalVars)
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([key, value]) => (
-            <div>
+            <div key={key}>
               <FormattedValue
                 var_name={key}
                 value={extractValue(value)}
@@ -216,10 +216,9 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
 export const UnclonedActorCard: React.FC<{
   name: string;
   classVars: any;
-  actorId: string;
   actorVars: any;
   highlighted: boolean;
-}> = ({ name, classVars, actorId, actorVars, highlighted }) => (
+}> = ({ name, classVars, actorVars, highlighted }) => (
   <Card className={`mb-2 ms-0 me-0 ${highlighted ? "highlighted-card" : ""}`}>
     <Card.Body>
       <Card.Title className="d-flex align-items-center">
@@ -242,10 +241,10 @@ export const UnclonedActorCard: React.FC<{
         <hr className="my-2" />
         {/* Static variables */}
         <div className="monospace-font flex-fill">
-          {Object.entries(classVars.static)
+          {Object.entries(classVars.display_static_variables())
             .sort(([a], [b]) => a.localeCompare(b))
-            .map(([key, value], index) => (
-              <div key={`static-${index}`}>
+            .map(([key, value]) => (
+              <div key={key}>
                 <FormattedValue
                   var_name={key}
                   value={extractValue(value)}
@@ -255,10 +254,10 @@ export const UnclonedActorCard: React.FC<{
             ))}
         </div>
 
-        {actorVars.has_variables("local") && <hr className="my-2" />}
+        {actorVars.has_local_variables() && <hr className="my-2" />}
 
         {/* Local variables */}
-        <VariableList variables={actorVars.display_variables("local")} />
+        <VariableList variables={actorVars.display_local_variables()} />
       </div>
     </Card.Body>
   </Card>
@@ -273,12 +272,11 @@ export const ActorClassCard: React.FC<{
   const actorEntries = Object.entries(classVars.actors);
 
   if (!classVars.has_clones()) {
-    const [actorId, actorVars] = actorEntries[0];
+    const actorVars = actorEntries[0][1];
     return (
       <UnclonedActorCard
         name={name}
         classVars={classVars}
-        actorId={actorId}
         actorVars={actorVars}
         highlighted={name === highlightedInstance.split("-")[0]}
       />
@@ -311,15 +309,7 @@ export const ActorClassCard: React.FC<{
 
         {/* Static variables */}
         <VariableList variables={classVars.display_costumes_and_sounds()} />
-        <div className="monospace-font">
-          {Object.entries(classVars.static)
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([key, value], index) => (
-              <div key={`static-${index}`} style={{ color: "blue" }}>
-                {`${key}: ${value}`}
-              </div>
-            ))}
-        </div>
+        <VariableList variables={classVars.display_static_variables()} />
 
         {/* Cloned actor instances */}
         <Collapse in={isExpanded}>
