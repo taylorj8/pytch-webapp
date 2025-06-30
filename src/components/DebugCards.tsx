@@ -9,31 +9,34 @@ const maxStringWidth = 35;
 type Variable = { key: string; val: any; };
 
 interface FormattedValueProps {
-  k: string;
+  var_name: string;
   value: any;
   maxStringWidth: number;
 }
 
 const FormattedValue: React.FC<FormattedValueProps> = ({
-  k,
+  var_name,
   value,
   maxStringWidth
 }) => {
   const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
   const toggle = () =>
-    setExpandedStrings((prev) => ({ ...prev, [k]: !prev[k] }));
+    setExpandedStrings((prev) => ({ ...prev, [var_name]: !prev[var_name] }));
 
-  const isExpanded = expandedStrings[k] ?? false;
+  const isExpanded = expandedStrings[var_name] ?? false;
   const type = Array.isArray(value) ? "array" : typeof value;
 
+  const variable_name = <span className="variable-name">{var_name}: </span>;
+
   if (type === "string") {
-    const shouldTruncate = value.length + k.length > maxStringWidth;
+    const shouldTruncate = value.length + var_name.length > maxStringWidth;
     const displayStr =
       shouldTruncate && !isExpanded
-        ? value.slice(0, maxStringWidth - k.length - 3) + "[…]"
+        ? value.slice(0, maxStringWidth - var_name.length - 3) + "[…]"
         : value;
 
-    return (
+    return <span>
+      {variable_name}
       <span
         style={{ color: "green", cursor: shouldTruncate ? "pointer" : "default" }}
         onClick={shouldTruncate ? toggle : undefined}
@@ -41,88 +44,91 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
       >
         "{displayStr}"
       </span>
-    );
+    </span>
   }
 
   if (type === "number") {
     const num = Number(value);
     const display = Number.isInteger(num) ? num : num.toFixed(3);
-    return <span 
-      style={{ color: "blue", cursor: "default"}} 
-      title="number">{display}
-    </span>;
+    return <span>
+      {variable_name}
+      <span 
+        style={{ color: "blue", cursor: "default"}} 
+        title="number">{display}
+      </span>
+    </span>
   }
 
   if (type === "boolean") {
-    return <span 
-      style={{ color: "darkorange", cursor: "default"}} 
-      title="boolean">{value ? "True" : "False"}
-    </span>;
+    return <span>
+      {variable_name}
+      <span 
+        style={{ color: "darkorange", cursor: "default"}} 
+        title="boolean">{value ? "True" : "False"}
+      </span>
+    </span>
   }
 
   if (type === "array") {
     const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
-    return (
-      <span>
-        <span
-          style={{ color: "purple", cursor: "pointer" }}
-          title="array"
-          onClick={toggle}
-        >
-          [Array({value.length})]
-          <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
-        </span>
-        <Collapse in={isExpanded}>
-          <div style={{ paddingLeft: "1rem" }}>
-            {value.map((elem: any, idx: number) => (
-              <div key={`${k}-${idx}`}>
-                <span className="variable-name">{idx}: </span>
-                <FormattedValue
-                  k={idx.toString()}
-                  value={extractValue(elem)}
-                  maxStringWidth={maxStringWidth - 3}
-                />
-              </div>
-            ))}
-          </div>
-        </Collapse>
+    return <span>
+      {variable_name}
+      <span
+        style={{ color: "purple", cursor: "pointer" }}
+        title="array"
+        onClick={toggle}
+      >
+        [Array({value.length})]
+        <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
       </span>
-    );
+      <Collapse in={isExpanded}>
+        <div style={{ paddingLeft: "1rem" }}>
+          {value.map((elem: any, idx: number) => (
+            <div key={`${var_name}-${idx}`}>
+              <FormattedValue
+                var_name={idx.toString()}
+                value={extractValue(elem)}
+                maxStringWidth={maxStringWidth - 3}
+              />
+            </div>
+          ))}
+        </div>
+      </Collapse>
+    </span>
   }
 
   if (type === "object") {
     const keys = Object.keys(value);
     const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
-    return (
-      <span>
-        <span
-          style={{ color: "brown", cursor: "pointer" }}
-          title="object"
-          onClick={toggle}
-        >
-          {"{"}Object({keys.length}){"}"}
-          <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
-        </span>
-        <Collapse in={isExpanded}>
-          <div style={{ paddingLeft: "1rem" }}>
-            {keys.map((k) => (
-                <div key={k}>
-                  {/* // todo - handle non-string keys better */}
+    return <span>
+      {variable_name}
+      <span
+        style={{ color: "brown", cursor: "pointer" }}
+        title="object"
+        onClick={toggle}
+      >
+        {"{"}Object({keys.length}){"}"}
+        <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
+      </span>
+      <Collapse in={isExpanded}>
+        <div style={{ paddingLeft: "1rem" }}>
+          {keys.map((k) => (
+              <div key={k}>
+                // todo - handle non-string keys better
                 <span className="variable-name">{`"${k}"`}: </span>
                 <FormattedValue
-                  k={k}
+                  var_name={k}
                   value={extractValue(value[k][1])}
                   maxStringWidth={maxStringWidth - 3}
                 />
-                </div>
-            ))}
-          </div>
-        </Collapse>
-      </span>
-    );
+              </div>
+          ))}
+        </div>
+      </Collapse>
+    </span>
   }
 
-  return <span>{String(value)}</span>;
+  return <span>{variable_name}{String(value)}</span>
 };
 
 interface VariableListProps {
@@ -135,9 +141,8 @@ const VariableList: React.FC<VariableListProps> = ({variables}) => {
       {variables.map((variable, index) => {
         return (
           <div key={`${index}-${variable.key}`}>
-            <span className="variable-name">{variable.key}: </span>
             <FormattedValue
-              k={variable.key}
+              var_name={variable.key}
               value={variable.val}
               maxStringWidth={maxStringWidth}
             />
@@ -195,11 +200,13 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
         {Object.entries(globalVars)
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([key, value]) => (
-            <FormattedValue
-              k={key}
-              value={String(value)}
-              maxStringWidth={maxStringWidth}
-            />
+            <div>
+              <FormattedValue
+                var_name={key}
+                value={extractValue(value)}
+                maxStringWidth={maxStringWidth}
+              />
+            </div>
           ))}
       </div>
     </Card.Body>
@@ -239,12 +246,11 @@ export const UnclonedActorCard: React.FC<{
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([key, value], index) => (
               <div key={`static-${index}`}>
-          <span className="variable-name">{key}: </span>
-          <FormattedValue
-            k={key}
-            value={extractValue(value)}
-            maxStringWidth={maxStringWidth}
-          />
+                <FormattedValue
+                  var_name={key}
+                  value={extractValue(value)}
+                  maxStringWidth={maxStringWidth}
+                />
               </div>
             ))}
         </div>
