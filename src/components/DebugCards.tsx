@@ -114,7 +114,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
         <div style={{ paddingLeft: "1rem" }}>
           {keys.map((k) => (
               <div key={k}>
-                // todo - handle non-string keys better
+                {/* // todo - handle non-string keys better */}
                 <span className="variable-name">{`"${k}"`}: </span>
                 <FormattedValue
                   var_name={k}
@@ -166,7 +166,7 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
     highlighted,
     isStage,
   }) => (
-    <Card className={`mt-2 mb-0 ms-0 me-0 ${highlighted ? "highlighted-card" : "inner-card"}`}>
+    <Card className={`mt-2 mb-0 ${highlighted ? "highlighted-card" : "inner-card"}`}>
       <Card.Body>
         <Card.Title className="d-flex align-items-center">
           <img src={actorVars.img_src} className="card-title-img" style={{filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))"}} />
@@ -190,7 +190,7 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
   
 
 export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars }) => (
-  <Card>
+  <Card className="mt-0 mb-2">
     <Card.Body>
       <Card.Title>
         <FontAwesomeIcon icon="earth-europe" className="card-title-icon" />
@@ -237,22 +237,10 @@ export const UnclonedActorCard: React.FC<{
           <span className="variable-name">{classVars.is_stage ? "Current Backdrop" : "Current Costume"}: </span>
           <span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
         </div>
-        <VariableList variables={classVars.display_costumes_and_sounds()} />
-        <hr className="my-2" />
         {/* Static variables */}
-        <div className="monospace-font flex-fill">
-          {Object.entries(classVars.display_static_variables())
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([key, value]) => (
-              <div key={key}>
-                <FormattedValue
-                  var_name={key}
-                  value={extractValue(value)}
-                  maxStringWidth={maxStringWidth}
-                />
-              </div>
-            ))}
-        </div>
+        <VariableList variables={classVars.display_costumes_and_sounds()} />
+        {classVars.has_static_variables() && <hr className="my-2" />}
+        <VariableList variables={classVars.display_static_variables()} />
 
         {actorVars.has_local_variables() && <hr className="my-2" />}
 
