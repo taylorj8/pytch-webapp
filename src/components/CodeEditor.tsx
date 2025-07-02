@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AceEditor from "react-ace";
 import { Ace, Range } from "ace-builds";
 import { useStoreState, useStoreActions } from "../store";
@@ -61,6 +61,7 @@ const CodeAceEditor = () => {
   useStoreState((state) => state.ideLayout.stageDisplaySize, eqDisplaySize);
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
+  const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -87,7 +88,7 @@ const CodeAceEditor = () => {
 
     // toggleable breakpoints
     ace.editor.on("guttermousedown", (e) => {
-      if (!debugFeaturesEnabled || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
+      if (!debugFeaturesEnabledRef.current || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
 
       let row = e.getDocumentPosition().row + 1;
@@ -114,6 +115,10 @@ const CodeAceEditor = () => {
       ace.editor.session.getUndoManager().reset();
     }
   });
+
+  useEffect(() => {
+    debugFeaturesEnabledRef.current = debugFeaturesEnabled;
+  }, [debugFeaturesEnabled])
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");

@@ -18,7 +18,7 @@ const uiDetailsFromTabKeyLut = new Map<ActivityBarTabKey, TabKeyUiDetails>([
   ["lesson", { icon: "book", tooltip: "Lesson content" }],
   ["tutorial", { icon: "book", tooltip: "Tutorial content" }],
   ["specimen", { icon: "book", tooltip: "Lesson information" }],
-  ["debugpanel", {icon: "bug", tooltip: "Debug"}],
+  ["debugsidebar", { icon: "bug", tooltip: "Debug" }],
 ]);
 
 function uiDetailsFromTabKey(tab: ActivityBarTabKey): TabKeyUiDetails {
@@ -64,20 +64,20 @@ export const ActivityBar: React.FC<EmptyProps> = () => {
   const hasLinkedTutorial = useStoreState(
     (state) => state.activeProject.project?.trackedTutorial != null
   );
-  const inDebugMode = useStoreState(
-    (state) => state.activeProject.inDebugMode
+  const debugFeaturesEnabled = useStoreState(
+    (state) => state.ideLayout.debugFeaturesEnabled
   );
 
   const tabs: Array<ActivityBarTabKey> = hasLinkedLesson
     ? ["helpsidebar", "lesson"]
     : hasLinkedSpecimen
-    ? ["helpsidebar", "specimen"]
-    : hasLinkedTutorial
-    ? ["helpsidebar", "tutorial"]
-    : ["helpsidebar"];
+      ? ["helpsidebar", "specimen"]
+      : hasLinkedTutorial
+        ? ["helpsidebar", "tutorial"]
+        : ["helpsidebar"];
 
-  if (inDebugMode) {
-    tabs.push("debugpanel");
+  if (debugFeaturesEnabled) {
+    tabs.push("debugsidebar");
   }
 
   const syncClasses = classNames("sync-indicator", { pendingActionsExist });

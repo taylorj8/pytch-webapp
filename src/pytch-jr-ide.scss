@@ -57,7 +57,7 @@
     );
   }
 
-  &.activity-content-expanded-debugpanel,
+  &.activity-content-expanded-debugsidebar,
   &.activity-content-expanded-specimen,
   &.activity-content-expanded-helpsidebar {
     @include grid-hstack-four(
@@ -729,6 +729,7 @@
   }
   
   .ace_gutter-cell {
+    cursor: pointer;
     &:hover::before {
       @include breakpoint-dot(rgba(212, 24, 24, 0.4));
     }

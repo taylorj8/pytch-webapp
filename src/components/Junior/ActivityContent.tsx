@@ -45,7 +45,7 @@ export const ActivityContent: React.FC<EmptyProps> = () => {
         return <MaybeLessonContent />;
       case "tutorial":
         return <Tutorial />;
-      case "debugpanel":
+      case "debugsidebar":
         return <DebugSidebar />
       default:
         return assertNever(s.tab);

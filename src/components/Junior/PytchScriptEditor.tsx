@@ -152,12 +152,13 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
   // todo remove duplication with CodeEditor.tsx
   const breakpointStoreRef = useRef(breakpointStore);
+  const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "PytchScriptEditor effect: aceRef is null");
 
     // toggleable breakpoints
     ace.editor.on("guttermousedown", (e) => {
-      if (!debugFeaturesEnabled || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
+      if (!debugFeaturesEnabledRef.current || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
 
       const row = e.getDocumentPosition().row;
@@ -255,8 +256,12 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   useEffect(() => {
     breakpointStoreRef.current = breakpointStore;
   }, [breakpointStore]);
+  useEffect(() => {
+    debugFeaturesEnabledRef.current = debugFeaturesEnabled;
+  }, [debugFeaturesEnabled]);
 
   useEffect(() => {
+    // if (debugFeaturesEnabled) return;
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
     ace.editor.session.removeMarker(prevMarker);
     if (debugLine === -1) return;
@@ -270,6 +275,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
   // replaces breakpoints when switching between actors
   useEffect(() => {
+    // if (debugFeaturesEnabled) return;
     const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
     ace.editor.session.clearBreakpoints();
 

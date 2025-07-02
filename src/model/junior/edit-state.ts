@@ -26,7 +26,7 @@ export type ActivityBarTabKey =
   | "lesson"
   | "specimen"
   | "tutorial"
-  | "debugpanel";
+  | "debugsidebar";
 
 export type ActivityContentState =
   | { kind: "collapsed" }
@@ -162,7 +162,7 @@ export const editState: EditState = {
     if (actorId !== focusedActorId) {
       throw new Error(
         `trying to delete actor ${actorId}` +
-          ` but actor ${focusedActorId} is focused`
+        ` but actor ${focusedActorId} is focused`
       );
     }
 
@@ -203,7 +203,7 @@ export const editState: EditState = {
           // Warn but proceed anyway with tracking tutorial.
           console.log(
             `unexpected linked content "${linkedContentKind}"` +
-              " for isTrackingTutorial"
+            " for isTrackingTutorial"
           );
         }
         actions.expandActivityContent("tutorial");
