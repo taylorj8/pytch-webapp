@@ -225,9 +225,7 @@ export function goToEditorLocation(
       lineNo: contextualLoc.lineWithinHandler,
       colNo: localColNo,
     });
-    if (shouldFocus) {
-      store.getActions().jrEditState.setFocusedActor(contextualLoc.actorId);
-      store.getActions().jrEditState.setActorPropertiesActiveTab("code");
-    }
+    store.getActions().jrEditState.setFocusedActor(contextualLoc.actorId);
+    store.getActions().jrEditState.setActorPropertiesActiveTab("code");
   }
 }
