@@ -14,6 +14,7 @@ import { eqDisplaySize } from "../model/ui";
 import { SingleTab } from "./SingleTab";
 import { Debugger } from "../skulpt-connection/drive-project";
 import { userFile } from "../constants";
+import { resetDebugging } from "./StageControls";
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -177,6 +178,14 @@ const CodeAceEditor = () => {
       }
     });
   }, [])
+
+  // clean-up when leaving the page - clears breakpoints and debugline
+  useEffect(() => {
+    return () => {
+      Debugger.clear_all_breakpoints();
+      resetDebugging(false);
+    };
+  }, []);
 
   const { build, setCodeText } = useStoreActions(
     (actions) => actions.activeProject

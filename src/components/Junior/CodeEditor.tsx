@@ -19,6 +19,9 @@ import { aceControllerMap } from "../../skulpt-connection/code-editor";
 import { useNotableChanges } from "../hooks/notable-changes";
 import { ConjoinedResizeObserver } from "../../model/junior/conjoined-resize-observer";
 
+import { Debugger } from "../../skulpt-connection/drive-project";
+import { resetDebugging } from "../StageControls";
+
 const AddHandlerButton: React.FC<EmptyProps> = () => {
   const focusedActorId = useJrEditState((s) => s.focusedActor);
   const launchUpsertAction = useJrEditActions((a) => a.upsertHatBlockFlow.run);
@@ -143,6 +146,10 @@ export const CodeEditor = () => {
   const actorId = useJrEditState((s) => s.focusedActor);
   const [dropProps, dropRef] = useHelpHatBlockDrop(actorId);
 
+  const setDebugLine = useStoreActions((actions) => actions.activeProject.setDebugLine);
+  const setBreakpoints = useStoreActions((actions) => actions.activeProject.setBreakpoints);
+
+
   // Normally we'd let the <Tabs> component worry about whether a
   // particular <Tab> is shown or hidden.  But we want the
   // aceControllerMap to accurately represent whether a particular
@@ -157,6 +164,15 @@ export const CodeEditor = () => {
   }
 
   const classes = classNames("Junior-CodeEditor", "abs-0000-oflow", dropProps);
+
+// clean-up when leaving the page - clears breakpoints and debugline
+  useEffect(() => {
+    return () => {
+      setBreakpoints(new Set());
+      Debugger.clear_all_breakpoints();
+      resetDebugging(false);
+    };
+  }, []);
 
   return (
     <div ref={dropRef} className={classes}>

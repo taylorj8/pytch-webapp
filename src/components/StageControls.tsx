@@ -20,7 +20,7 @@ export const focusStage = () => {
   document.getElementById("pytch-speech-bubbles")?.focus();
 };
 
-const resetDebugging = (inDebugMode: boolean) => {
+export const resetDebugging = (inDebugMode: boolean) => {
   store.getActions().activeProject.setDebugMode(inDebugMode);
   store.getActions().activeProject.setDebugLine(-1);
   Debugger.disable_step_mode();
