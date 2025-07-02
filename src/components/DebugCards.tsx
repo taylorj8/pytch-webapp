@@ -157,14 +157,13 @@ interface ActorInstanceProps {
   actorId: string;
   actorVars: any;
   highlighted: boolean;
-  isStage: boolean;
 }
 
+// Card that shows instances of a cloned actor within the Actor Class Card
 export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
     actorId,
     actorVars,
     highlighted,
-    isStage,
   }) => (
     <Card className={`mt-2 mb-0 ${highlighted ? "highlighted-card" : "inner-card"}`}>
       <Card.Body>
@@ -176,11 +175,9 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
         <div className="monospace-font mb-1">
           <span className="variable-name">Current Costume: </span><span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
         </div>
-        {!isStage && (
-          <div className="monospace-font mb-2">
-             <span className="variable-name">Position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
-          </div>
-        )}
+        <div className="monospace-font mb-2">
+           <span className="variable-name">Position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
+        </div>
   
         {actorVars.has_local_variables() && <hr className="my-2" />}
         <VariableList variables={actorVars.display_local_variables()} />
@@ -189,6 +186,7 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
   );
   
 
+// Card that shows global variables if any exist
 export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars }) => (
   <Card className="mt-0 mb-2">
     <Card.Body>
@@ -213,6 +211,8 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
   </Card>
 );
 
+
+// Card that shows any actors that do not have clones - includes the Stage
 export const UnclonedActorCard: React.FC<{
   name: string;
   classVars: any;
@@ -229,7 +229,7 @@ export const UnclonedActorCard: React.FC<{
       <div>
         {!classVars.is_stage && (
           <div className="mt-3 monospace-font">
-            {actorVars.position?.toString()}
+            <span className="variable-name">Position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
           </div>
         )}
         
@@ -251,6 +251,7 @@ export const UnclonedActorCard: React.FC<{
   </Card>
 );
 
+// Contains a list of ActorInstanceCards and static variables
 export const ActorClassCard: React.FC<{
   name: string;
   classVars: any;
@@ -308,7 +309,6 @@ export const ActorClassCard: React.FC<{
                 actorId={actorId}
                 actorVars={actorVars}
                 highlighted={actorId === highlightedInstance}
-                isStage={classVars.is_stage}
               />
             ))}
           </div>
