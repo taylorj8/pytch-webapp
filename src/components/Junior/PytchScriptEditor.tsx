@@ -143,7 +143,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
       }
 
       controller.scrollIntoView(maybeWarpTarget.lineNo);
-      controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo);
+      controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo, true);
       controller.focus();
     });
 

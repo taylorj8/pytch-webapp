@@ -2,6 +2,7 @@ import Button from "react-bootstrap/Button";
 import { useStoreActions } from "../store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Debugger } from "../skulpt-connection/drive-project";
+import { focusStage } from "./StageControls";
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,11 +15,13 @@ export const DebugButtons = () => {
     setDebugLine(-1);
     Debugger.disable_step_mode();
     Sk.pytch.current_live_project.continue_on_breakpoint();
+    focusStage();
   }
 
   const stepCallback = () => {
     Debugger.enable_step_mode();
     Sk.pytch.current_live_project.pause_threads(false);
+    focusStage();
   }
 
   return (
