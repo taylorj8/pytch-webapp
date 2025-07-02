@@ -173,10 +173,10 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
         </Card.Title>
   
         <div className="monospace-font mb-1">
-          <span className="variable-name">Current Costume: </span><span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
+          <span className="variable-name">costume_number: </span><span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
         </div>
         <div className="monospace-font mb-2">
-           <span className="variable-name">Position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
+           <span className="variable-name">position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
         </div>
   
         {actorVars.has_local_variables() && <hr className="my-2" />}
@@ -229,12 +229,12 @@ export const UnclonedActorCard: React.FC<{
       <div>
         {!classVars.is_stage && (
           <div className="mt-3 monospace-font">
-            <span className="variable-name">Position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
+            <span className="variable-name">position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
           </div>
         )}
         
         <div className="monospace-font">
-          <span className="variable-name">{classVars.is_stage ? "Current Backdrop" : "Current Costume"}: </span>
+          <span className="variable-name">{classVars.is_stage ? "backdrop_number" : "costume_number"}: </span>
           <span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
         </div>
         {/* Static variables */}
