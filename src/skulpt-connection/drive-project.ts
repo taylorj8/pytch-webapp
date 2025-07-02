@@ -327,12 +327,15 @@ export class ProjectEngine {
 
     const currentDebugLine = store.getState().activeProject.debugLine;
     const setDebugLine = store.getActions().activeProject.setDebugLine;
+    const pytchProgram = store.getState().activeProject.project.program;
     if (project.threads_are_paused()) {
       const globalLineNo = project.get_debug_line();
       if (globalLineNo !== -1 && globalLineNo !== currentDebugLine) {
-        const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
         setDebugLine(globalLineNo);
-        goToEditorLocation(contextualLoc, null);
+        if (pytchProgram.kind === "per-method") {
+          const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
+          goToEditorLocation(contextualLoc, null);
+        }
       }
     } 
     else {
