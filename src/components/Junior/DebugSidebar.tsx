@@ -2,6 +2,7 @@ import { EmptyProps } from "../../utils";
 import { useStoreState } from "../../store";
 import React, { useEffect, useState } from "react";
 import { ActorClassCard, GlobalVariablesCard } from "../DebugCards"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 declare let Sk: any;
 
@@ -38,11 +39,17 @@ export const DebugSidebar: React.FC<EmptyProps> = () => {
   }, []);
 
   if (!inDebugMode) {
-    return (
-      <h6 style={{ padding: "1.25rem" }}>
-        The variables of your sprites will show here while debugging.
+    return <div style={{ padding: "1.5rem", height: "100%"}}>
+      <h4>Debug Panel</h4>
+      <h6>
+        Click the yellow debug button above the stage to start the program in <em>Debug Mode</em>.
+        <br/><br/>While debugging your program's variables will show here.
       </h6>
-    );
+      <div className="emptyDebugSidebarIcon">
+        <FontAwesomeIcon icon="bug" size="10x" style={{ opacity: 0.075 }} />
+      </div>
+    </div>
+      
   }
 
   return (

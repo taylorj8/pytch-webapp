@@ -118,7 +118,7 @@ const CodeAceEditor = () => {
 
   useEffect(() => {
     debugFeaturesEnabledRef.current = debugFeaturesEnabled;
-  }, [debugFeaturesEnabled])
+  }, [debugFeaturesEnabled]);
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");

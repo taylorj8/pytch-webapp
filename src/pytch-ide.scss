@@ -518,6 +518,13 @@ $speech-bubble-max-height: 180px;
   }
 }
 
+.emptyDebugSidebarIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70%;
+}
+
 .DebugButtons {
   position: absolute;
   top: 1px;
