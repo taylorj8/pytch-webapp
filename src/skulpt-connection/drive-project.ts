@@ -334,7 +334,7 @@ export class ProjectEngine {
         setDebugLine(globalLineNo);
         if (pytchProgram.kind === "per-method") {
           const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
-          goToEditorLocation(contextualLoc, null);
+          goToEditorLocation(contextualLoc, null, false);
         }
       }
     } 
