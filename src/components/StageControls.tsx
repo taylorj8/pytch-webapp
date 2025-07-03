@@ -5,7 +5,6 @@ import { useStoreActions, useStoreState } from "../store";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBug } from '@fortawesome/free-solid-svg-icons';
 import { EmptyProps } from "../utils";
 import { filenameFormatSpecifier } from "../model/format-spec-for-linked-content";
 import { pathWithinApp } from "../env-utils";
@@ -21,7 +20,7 @@ export const focusStage = () => {
   document.getElementById("pytch-speech-bubbles")?.focus();
 };
 
-const resetDebugging = (inDebugMode: boolean) => {
+export const resetDebugging = (inDebugMode: boolean) => {
   store.getActions().activeProject.setDebugMode(inDebugMode);
   store.getActions().activeProject.setDebugLine(-1);
   Debugger.disable_step_mode();
@@ -78,8 +77,8 @@ const GreenFlag = () => {
 
 const YellowDebug = () => {
   const build = useStoreActions((actions) => actions.activeProject.build);
-  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
-  if (!showDebugFeatures) {
+  const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
+  if (!debugFeaturesEnabled) {
     return null;
   }
 
@@ -93,7 +92,7 @@ const YellowDebug = () => {
         className="StageControlPseudoButton YellowDebug"
         onClick={handleClick}
       >
-        <FontAwesomeIcon icon={faBug} />
+        <FontAwesomeIcon icon="bug" />
       </Button>
     </div>
   );
@@ -156,7 +155,7 @@ const LaunchCoordsChooserDropdownItem: React.FC<EmptyProps> = () => {
 };
 
 const DebugFeaturesDropdownItem: React.FC<EmptyProps> = () => {
-  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures)
+  const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled)
   const toggleDebugFeatures = useStoreActions(
     (actions) => actions.ideLayout.toggleDebugFeatures
   );
@@ -164,7 +163,7 @@ const DebugFeaturesDropdownItem: React.FC<EmptyProps> = () => {
 
   return (
     <Dropdown.Item onClick={toggleFeatures}>
-      {showDebugFeatures ? "Disable Debug Features" : "Enable Debug Features"}
+      {debugFeaturesEnabled ? "Disable Debug Features" : "Enable Debug Features"}
     </Dropdown.Item>
   );
 };

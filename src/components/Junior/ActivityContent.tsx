@@ -6,6 +6,7 @@ import { aceControllerMap } from "../../skulpt-connection/code-editor";
 import { WidthMonitor } from "./WidthMonitor";
 import { HelpSidebar } from "../HelpSidebar";
 import Tutorial from "../Tutorial";
+import { DebugSidebar } from "./DebugSidebar";
 
 export const ActivityContent: React.FC<EmptyProps> = () => {
   const s = useJrEditState((s) => s.activityContentState);
@@ -44,6 +45,8 @@ export const ActivityContent: React.FC<EmptyProps> = () => {
         return <MaybeLessonContent />;
       case "tutorial":
         return <Tutorial />;
+      case "debugsidebar":
+        return <DebugSidebar />
       default:
         return assertNever(s.tab);
     }

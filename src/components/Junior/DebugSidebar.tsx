@@ -1,16 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { EmptyProps } from "../utils";
-import { useStoreState } from "../store";
+import { EmptyProps } from "../../utils";
+import { useStoreState } from "../../store";
 import React, { useEffect, useState } from "react";
-import {
-  ActorClassCard,
-  GlobalVariablesCard,
-} from "./DebugCards"
+import { ActorClassCard, GlobalVariablesCard } from "../DebugCards"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 declare let Sk: any;
 
-export const DebugPane: React.FC<EmptyProps> = () => {
+export const DebugSidebar: React.FC<EmptyProps> = () => {
   const inDebugMode = useStoreState(
     (state) => state.activeProject.inDebugMode
   );
@@ -43,30 +39,35 @@ export const DebugPane: React.FC<EmptyProps> = () => {
   }, []);
 
   if (!inDebugMode) {
-    return (
-      <div>
-        Debug mode is off. Please enable debug mode to see the details.
+    return <div style={{ padding: "1.5rem", height: "100%"}}>
+      <h4>Debug Panel</h4>
+      <h6>
+        Click the yellow debug button above the stage to start the program in <em>Debug Mode</em>.
+        <br/><br/>While debugging your program's variables will show here.
+      </h6>
+      <div className="emptyDebugSidebarIcon">
+        <FontAwesomeIcon icon="bug" size="10x" style={{ opacity: 0.075 }} />
       </div>
-    );
+    </div>
+      
   }
 
   return (
-    <div className="DebugPane">
-      <h5 style={{ padding: "8px" }}>Shows your program’s variables and lets you step through its execution.</h5>
+    <div className="DebugSidebar">
       <div className="card-container">
-        <div>
-          {globalVars && <GlobalVariablesCard globalVars={globalVars} />}
-          {localVars && Object.entries(localVars)
-        .filter(([_, classVars]) => (classVars as any).is_stage)
-        .map(([name, classVars]) => (
-          <ActorClassCard
-            key={name}
-            name={name}
-            classVars={classVars}
-            highlightedInstance={highlightedCard}
-          />
-        ))}
-        </div>
+        {globalVars && Object.keys(globalVars).length > 0 && (
+          <GlobalVariablesCard globalVars={globalVars} />
+        )}
+        {localVars && Object.entries(localVars)
+          .filter(([_, classVars]) => (classVars as any).is_stage)
+          .map(([name, classVars]) => (
+            <ActorClassCard
+              key={name}
+              name={name}
+              classVars={classVars}
+              highlightedInstance={highlightedCard}
+            />
+          ))}
         {localVars &&
           Object.entries(localVars)
           .filter(([_, classVars]) => !(classVars as any).is_stage)

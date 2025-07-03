@@ -10,6 +10,7 @@ import {
   AddSomethingButton,
   AddSomethingButtonStrip,
 } from "./Junior/AddSomethingButton";
+import { DebugButtons } from "./DebugButtons";
 
 type AssetCardProps = {
   asset: AssetPresentation;
@@ -34,6 +35,7 @@ export const ProjectAssetList = () => {
     (state) => state.activeProject.syncState.loadState
   );
   const assets = useStoreState((state) => state.activeProject.project.assets);
+  const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode);
 
   const runAddAssets = useRunFlow((f) => f.addAssetsFlow);
   const operationContextKey = "flat/any" as const;
@@ -94,6 +96,7 @@ export const ProjectAssetList = () => {
           </AddSomethingButtonStrip>
         </div>
       </SingleTab>
+      {inDebugMode && <DebugButtons/>}
     </div>
   );
 };

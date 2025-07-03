@@ -7,6 +7,7 @@ import {
   stageHalfWidth,
   stageHeight,
   stageHalfHeight,
+  userFile,
 } from "../constants";
 import { failIfNull } from "../utils";
 import {
@@ -24,7 +25,7 @@ declare let Sk: any;
 //
 // TODO: Is this the best place to put this?
 Sk.configure({});
-export let Debugger = new Sk.Debugger("<stdin>.py", null);
+export let Debugger = new Sk.Debugger(userFile, null);
 
 let peId = 1000;
 
@@ -326,12 +327,15 @@ export class ProjectEngine {
 
     const currentDebugLine = store.getState().activeProject.debugLine;
     const setDebugLine = store.getActions().activeProject.setDebugLine;
+    const pytchProgram = store.getState().activeProject.project.program;
     if (project.threads_are_paused()) {
       const globalLineNo = project.get_debug_line();
       if (globalLineNo !== -1 && globalLineNo !== currentDebugLine) {
-        const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
         setDebugLine(globalLineNo);
-        goToEditorLocation(contextualLoc, null);
+        if (globalLineNo && pytchProgram.kind === "per-method") {
+          const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
+          goToEditorLocation(contextualLoc, null, false);
+        }
       }
     } 
     else {
@@ -353,25 +357,20 @@ export class ProjectEngine {
       }
         
       Sk.pytch.sound_manager.one_frame();
+      const projectState = project.one_frame();
 
-      if (stepping_thread != null && stepping_thread.state === "running") {
-        stepping_thread.one_frame();
+      if (projectState.exception_was_raised) {
+        this.webAppAPI.ensureNotFullScreen();
+      }
+    
+      const question = projectState.maybe_live_question;
+      if (question == null) {
+        this.webAppAPI.clearUserQuestion();
       } else {
-        const projectState = project.one_frame();
-
-        if (projectState.exception_was_raised) {
-          this.webAppAPI.ensureNotFullScreen();
-        }
-      
-        const question = projectState.maybe_live_question;
-        if (question == null) {
-          this.webAppAPI.clearUserQuestion();
-        } else {
-          this.webAppAPI.askUserQuestion({
-            id: question.id,
-            prompt: question.prompt,
-          });
-        }
+        this.webAppAPI.askUserQuestion({
+          id: question.id,
+          prompt: question.prompt,
+        });
       }
     }
 

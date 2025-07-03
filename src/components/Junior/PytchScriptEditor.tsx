@@ -35,9 +35,7 @@ import { scrollCursorRowIntoView } from "./PytchScriptEditor-scroller";
 import { failIfNull } from "../../utils";
 
 import { Debugger } from "../../skulpt-connection/drive-project";
-
-
-const MAIN_FILE = "<stdin>.py";
+import { userFile } from "../../constants";
 
 // Adapted from https://stackoverflow.com/a/71952718
 const insertElectricFullStop = (editor: AceEditorT) => {
@@ -86,7 +84,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     setHandlerPythonCode({ actorId, handlerId, code });
   };
 
-  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
+  const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
   const debugLine = useStoreState((state) => state.activeProject.debugLine);
 
   const breakpointStore = useStoreState((state) => state.activeProject.breakpointStore);
@@ -145,7 +143,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
       }
 
       controller.scrollIntoView(maybeWarpTarget.lineNo);
-      controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo);
+      controller.gotoLocation(maybeWarpTarget.lineNo, maybeWarpTarget.colNo, true);
       controller.focus();
     });
 
@@ -154,12 +152,13 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
   // todo remove duplication with CodeEditor.tsx
   const breakpointStoreRef = useRef(breakpointStore);
+  const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "PytchScriptEditor effect: aceRef is null");
 
     // toggleable breakpoints
     ace.editor.on("guttermousedown", (e) => {
-      if (!showDebugFeatures || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
+      if (!debugFeaturesEnabledRef.current || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
 
       const row = e.getDocumentPosition().row;
@@ -182,19 +181,19 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
         ace.editor.session.clearBreakpoint(row);
         removeBreakpoint(breakpointKey);
         if (globalLineNo !== null) {
-          Debugger.clear_breakpoint("<stdin>.py", globalLineNo, 0, false);
+          Debugger.clear_breakpoint(userFile, globalLineNo, 0, false);
         }
       } else {
         ace.editor.session.setBreakpoint(row, "ace_breakpoint");
         addBreakpoint(breakpointKey);
         if (globalLineNo !== null) {
-          Debugger.add_breakpoint("<stdin>.py", globalLineNo, 0);
+          Debugger.add_breakpoint(userFile, globalLineNo, 0);
         }
       }
-      
+
       e.stop();
     });
-    
+
 
     // ensures the breakpoint tracks the code rather than the line number
     (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
@@ -212,7 +211,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
         }
 
         const row = parseInt(key[2]);
-        
+
         if (delta.start.row >= row) {
           updatedBreakpoints.add(row);
         } else if (delta.action === "insert") {
@@ -233,7 +232,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
           }
         }
       });
-      
+
       if (breakpointMoved) {
         updatedBreakpoints.forEach((breakpointLine) => {
           const breakpointKey = `${actorId}:${handlerId}:${breakpointLine}`;
@@ -257,12 +256,16 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   useEffect(() => {
     breakpointStoreRef.current = breakpointStore;
   }, [breakpointStore]);
+  useEffect(() => {
+    debugFeaturesEnabledRef.current = debugFeaturesEnabled;
+  }, [debugFeaturesEnabled]);
 
   useEffect(() => {
+    // if (debugFeaturesEnabled) return;
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
     ace.editor.session.removeMarker(prevMarker);
     if (debugLine === -1) return;
-    
+
     const debugLineLoc = liveSourceMap.localFromGlobal(debugLine);
     if (debugLineLoc.actorId === actorId && debugLineLoc.handlerId === handlerId) {
       const marker = ace.editor.session.addMarker(new Range(debugLineLoc.lineWithinHandler - 1, 0, debugLineLoc.lineWithinHandler - 1, 1), "debugLine", "fullLine");
@@ -272,6 +275,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
   // replaces breakpoints when switching between actors
   useEffect(() => {
+    // if (debugFeaturesEnabled) return;
     const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
     ace.editor.session.clearBreakpoints();
 

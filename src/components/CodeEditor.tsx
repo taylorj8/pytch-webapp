@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AceEditor from "react-ace";
 import { Ace, Range } from "ace-builds";
 import { useStoreState, useStoreActions } from "../store";
@@ -13,8 +13,8 @@ import { useFlatCodeText } from "./hooks/code-text";
 import { eqDisplaySize } from "../model/ui";
 import { SingleTab } from "./SingleTab";
 import { Debugger } from "../skulpt-connection/drive-project";
-
-const MAIN_FILE = "<stdin>.py";
+import { userFile } from "../constants";
+import { resetDebugging } from "./StageControls";
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -54,7 +54,7 @@ const CodeAceEditor = () => {
   const lastSyncFromStorageSeqNum = useStoreState(
     (state) => state.activeProject.lastSyncFromStorageSeqNum
   );
-  const showDebugFeatures = useStoreState((state) => state.ideLayout.showDebugFeatures);
+  const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
 
   // We don't care about the actual value of the stage display size, but
   // we do need to know when it changes, so we can resize the editor in
@@ -62,6 +62,7 @@ const CodeAceEditor = () => {
   useStoreState((state) => state.ideLayout.stageDisplaySize, eqDisplaySize);
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
+  const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -88,19 +89,19 @@ const CodeAceEditor = () => {
 
     // toggleable breakpoints
     ace.editor.on("guttermousedown", (e) => {
-      if (!showDebugFeatures || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
+      if (!debugFeaturesEnabledRef.current || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
 
       let row = e.getDocumentPosition().row + 1;
 
-      if (Debugger.check_breakpoints(MAIN_FILE, row, 0)) {
-        Debugger.clear_breakpoint(MAIN_FILE, row, 0, false);
+      if (Debugger.check_breakpoints(userFile, row, 0)) {
+        Debugger.clear_breakpoint(userFile, row, 0, false);
         ace.editor.session.clearBreakpoint(row - 1);
       } else {
-        Debugger.add_breakpoint(MAIN_FILE, row, 0, false);
+        Debugger.add_breakpoint(userFile, row, 0, false);
         ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
       }
-      
+
       e.stop();
     });
 
@@ -117,12 +118,16 @@ const CodeAceEditor = () => {
   });
 
   useEffect(() => {
+    debugFeaturesEnabledRef.current = debugFeaturesEnabled;
+  }, [debugFeaturesEnabled]);
+
+  useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
     if (prevMarker !== null)
       ace.editor.session.removeMarker(prevMarker);
 
     if (debugLine !== null) {
-      const marker = ace.editor.session.addMarker(new Range(debugLine-1, 0, debugLine-1, 1), "debugLine", "fullLine");
+      const marker = ace.editor.session.addMarker(new Range(debugLine - 1, 0, debugLine - 1, 1), "debugLine", "fullLine");
       setPrevMarker(marker);
     }
   }, [debugLine]);
@@ -139,7 +144,7 @@ const CodeAceEditor = () => {
       let breakpointMoved = false;
       Object.values(breakpoints).forEach((breakpoint: any) => {
         const row = breakpoint.lineno;
-        
+
         if (delta.start.row >= row) {
           updatedBreakpoints.add(row);
         } else if (delta.action === "insert") {
@@ -161,18 +166,26 @@ const CodeAceEditor = () => {
 
         }
       });
-      
+
       if (breakpointMoved) {
         Debugger.clear_all_breakpoints();
         ace.editor.session.clearBreakpoints();
 
         updatedBreakpoints.forEach((breakpoint) => {
-          Debugger.add_breakpoint(MAIN_FILE, breakpoint, 0, false);
+          Debugger.add_breakpoint(userFile, breakpoint, 0, false);
           ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint")
         });
       }
     });
   }, [])
+
+  // clean-up when leaving the page - clears breakpoints and debugline
+  useEffect(() => {
+    return () => {
+      Debugger.clear_all_breakpoints();
+      resetDebugging(false);
+    };
+  }, []);
 
   const { build, setCodeText } = useStoreActions(
     (actions) => actions.activeProject

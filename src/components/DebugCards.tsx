@@ -2,58 +2,196 @@
 import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEarthEurope } from "@fortawesome/free-solid-svg-icons";
 import Collapse from "react-bootstrap/Collapse";
+
+const maxStringWidth = 35;
+
+type Variable = { key: string; val: any; };
+
+interface FormattedValueProps {
+  var_name: string;
+  value: any;
+  maxStringWidth: number;
+}
+
+const FormattedValue: React.FC<FormattedValueProps> = ({
+  var_name,
+  value,
+  maxStringWidth
+}) => {
+  const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
+  const toggle = () =>
+    setExpandedStrings((prev) => ({ ...prev, [var_name]: !prev[var_name] }));
+
+  const isExpanded = expandedStrings[var_name] ?? false;
+  const type = Array.isArray(value) ? "array" : typeof value;
+
+  const variable_name = <span className="variable-name">{var_name}: </span>;
+
+  if (type === "string") {
+    const shouldTruncate = value.length + var_name.length > maxStringWidth;
+    const displayStr =
+      shouldTruncate && !isExpanded
+        ? value.slice(0, maxStringWidth - var_name.length - 3) + "[…]"
+        : value;
+
+    return <span>
+      {variable_name}
+      <span
+        style={{ color: "green", cursor: shouldTruncate ? "pointer" : "default" }}
+        onClick={shouldTruncate ? toggle : undefined}
+        title={!shouldTruncate ? "string" : isExpanded ? "Click to collapse string" : "Click to expand string"}
+      >
+        "{displayStr}"
+      </span>
+    </span>
+  }
+
+  if (type === "number") {
+    const num = Number(value);
+    const display = Number.isInteger(num) ? num : num.toFixed(3);
+    return <span>
+      {variable_name}
+      <span 
+        style={{ color: "blue", cursor: "default"}} 
+        title="number">{display}
+      </span>
+    </span>
+  }
+
+  if (type === "boolean") {
+    return <span>
+      {variable_name}
+      <span 
+        style={{ color: "darkorange", cursor: "default"}} 
+        title="boolean">{value ? "True" : "False"}
+      </span>
+    </span>
+  }
+
+  if (type === "array") {
+    const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
+    return <span>
+      {variable_name}
+      <span
+        style={{ color: "purple", cursor: "pointer" }}
+        title="array"
+        onClick={toggle}
+      >
+        [Array({value.length})]
+        <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
+      </span>
+      <Collapse in={isExpanded}>
+        <div style={{ paddingLeft: "1rem" }}>
+          {value.map((elem: any, idx: number) => (
+            <div key={`${var_name}-${idx}`}>
+              <FormattedValue
+                var_name={idx.toString()}
+                value={extractValue(elem)}
+                maxStringWidth={maxStringWidth - 3}
+              />
+            </div>
+          ))}
+        </div>
+      </Collapse>
+    </span>
+  }
+
+  if (type === "object") {
+    const keys = Object.keys(value);
+    const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
+    return <span>
+      {variable_name}
+      <span
+        style={{ color: "brown", cursor: "pointer" }}
+        title="object"
+        onClick={toggle}
+      >
+        {"{"}Object({keys.length}){"}"}
+        <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
+      </span>
+      <Collapse in={isExpanded}>
+        <div style={{ paddingLeft: "1rem" }}>
+          {keys.map((k) => (
+              <div key={k}>
+                {/* // todo - handle non-string keys better */}
+                <span className="variable-name">{`"${k}"`}: </span>
+                <FormattedValue
+                  var_name={k}
+                  value={extractValue(value[k][1])}
+                  maxStringWidth={maxStringWidth - 3}
+                />
+              </div>
+          ))}
+        </div>
+      </Collapse>
+    </span>
+  }
+
+  return <span>{variable_name}{String(value)}</span>
+};
+
+interface VariableListProps {
+  variables: Variable[];
+}
+
+const VariableList: React.FC<VariableListProps> = ({variables}) => {
+  return (
+    <div className="monospace-font">
+      {variables.map((variable, index) => {
+        return (
+          <div key={`${index}-${variable.key}`}>
+            <FormattedValue
+              var_name={variable.key}
+              value={variable.val}
+              maxStringWidth={maxStringWidth}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 interface ActorInstanceProps {
   actorId: string;
   actorVars: any;
   highlighted: boolean;
-  isStage: boolean;
 }
 
-export const ActorInstance: React.FC<ActorInstanceProps> = ({
+// Card that shows instances of a cloned actor within the Actor Class Card
+export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
     actorId,
     actorVars,
     highlighted,
-    isStage,
   }) => (
-    <Card className={`mb-2 ms-0 me-0 ${highlighted ? "highlighted-card" : "inner-card"}`}>
+    <Card className={`mt-2 mb-0 ${highlighted ? "highlighted-card" : "inner-card"}`}>
       <Card.Body>
         <Card.Title className="d-flex align-items-center">
-          <img src={actorVars.img_src} className="card-title-img me-2" />
-          <strong>{actorId}</strong>
+          <img src={actorVars.img_src} className="card-title-img" style={{filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))"}} />
+            <strong style={{ fontSize: "95%" }}>{actorId}</strong>
         </Card.Title>
   
-        {!isStage && (
-          <div className="monospace-font mb-1">
-            {actorVars.position?.toString()}
-          </div>
-        )}
+        <div className="monospace-font mb-1">
+          <span className="variable-name">costume_number: </span><span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
+        </div>
         <div className="monospace-font mb-2">
-          Costume Index: {actorVars.costume_index}
+           <span className="variable-name">position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
         </div>
   
-        <hr className="my-2" />
-  
-        <div className="monospace-font">
-          {actorVars
-            .show_variables("local")
-            .sort()
-            .map((variable: string, index: number) => (
-              <div key={`local-${actorId}-${index}`}>{variable}</div>
-            ))}
-        </div>
+        {actorVars.has_local_variables() && <hr className="my-2" />}
+        <VariableList variables={actorVars.display_local_variables()} />
       </Card.Body>
     </Card>
   );
   
 
+// Card that shows global variables if any exist
 export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars }) => (
-  <Card>
+  <Card className="mt-0 mb-2">
     <Card.Body>
       <Card.Title>
-        <FontAwesomeIcon icon={faEarthEurope} className="card-title-icon" />
+        <FontAwesomeIcon icon="earth-europe" className="card-title-icon" />
         Global Variables
       </Card.Title>
       <div className="monospace-font">
@@ -61,7 +199,11 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([key, value]) => (
             <div key={key}>
-              {key}: {String(value)}
+              <FormattedValue
+                var_name={key}
+                value={extractValue(value)}
+                maxStringWidth={maxStringWidth}
+              />
             </div>
           ))}
       </div>
@@ -69,60 +211,47 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
   </Card>
 );
 
+
+// Card that shows any actors that do not have clones - includes the Stage
 export const UnclonedActorCard: React.FC<{
   name: string;
   classVars: any;
-  actorId: string;
   actorVars: any;
   highlighted: boolean;
-}> = ({ name, classVars, actorId, actorVars, highlighted }) => (
+}> = ({ name, classVars, actorVars, highlighted }) => (
   <Card className={`mb-2 ms-0 me-0 ${highlighted ? "highlighted-card" : ""}`}>
     <Card.Body>
       <Card.Title className="d-flex align-items-center">
-        <img src={actorVars.img_src} className="card-title-img me-2" />
-        {name}
+        <img src={actorVars.img_src} className="card-title-img" style={{filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))"}}/>
+        <strong>{name}</strong>
       </Card.Title>
 
       <div>
-      {!classVars.is_stage && (
-        <div className="mt-3 monospace-font">
-          {actorVars.position?.toString()}
+        {!classVars.is_stage && (
+          <div className="mt-3 monospace-font">
+            <span className="variable-name">position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
+          </div>
+        )}
+        
+        <div className="monospace-font">
+          <span className="variable-name">{classVars.is_stage ? "backdrop_number" : "costume_number"}: </span>
+          <span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
         </div>
-      )}
-
-      <div className="monospace-font">{classVars.show_costumes()}</div>
-      <div className="monospace-font">
-        {classVars.is_stage
-          ? `Backdrop Index: ${actorVars.costume_index}`
-          : `Costume Index: ${actorVars.costume_index}`}
-      </div>
         {/* Static variables */}
-        <div className="monospace-font flex-fill">
-          {Object.entries(classVars.static)
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([key, value], index) => (
-              <div key={`static-${index}`} style={{ color: "blue" }}>
-                {`${key}: ${value}`}
-              </div>
-            ))}
-        </div>
+        <VariableList variables={classVars.display_costumes_and_sounds()} />
+        {classVars.has_static_variables() && <hr className="my-2" />}
+        <VariableList variables={classVars.display_static_variables()} />
 
-        {actorVars.has_variables("local") && <hr className="my-2" />}
+        {actorVars.has_local_variables() && <hr className="my-2" />}
 
         {/* Local variables */}
-        <div className="monospace-font flex-fill">
-          {actorVars
-            .show_variables("local")
-            .sort()
-            .map((variable: string, index: number) => (
-              <div key={`local-${actorId}-${index}`}>{variable}</div>
-            ))}
-        </div>
+        <VariableList variables={actorVars.display_local_variables()} />
       </div>
     </Card.Body>
   </Card>
 );
 
+// Contains a list of ActorInstanceCards and static variables
 export const ActorClassCard: React.FC<{
   name: string;
   classVars: any;
@@ -132,50 +261,54 @@ export const ActorClassCard: React.FC<{
   const actorEntries = Object.entries(classVars.actors);
 
   if (!classVars.has_clones()) {
-    const [actorId, actorVars] = actorEntries[0];
+    const actorVars = actorEntries[0][1];
     return (
       <UnclonedActorCard
         name={name}
         classVars={classVars}
-        actorId={actorId}
         actorVars={actorVars}
         highlighted={name === highlightedInstance.split("-")[0]}
       />
     );
   }
 
+  const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down"
   return (
     <Card>
       <Card.Body>
       <Card.Title className="d-flex justify-content-between align-items-center">
-        {name}
+        <span>
+          <span className="actor-classcard-img-stack">
+            <img
+              src={(actorEntries[0][1] as any).img_src}
+              className="actor-classcard-img-top"
+            />
+            <img
+              src={(actorEntries[1][1] as any).img_src}
+              className="actor-classcard-img-bottom"
+            />
+          </span>
+          <strong>{name}</strong>
+        </span>
         <span className="badge bg-secondary ms-2" style={{ fontSize: "0.7em", cursor: "pointer" }} onClick={() => setIsExpanded(!isExpanded)}>
-            {actorEntries.length} instances   {isExpanded ? "▲" : "▼"}
+            {actorEntries.length} instances
+            <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
         </span>
       </Card.Title>
 
         {/* Static variables */}
-        <div className="monospace-font">{classVars.show_costumes()}</div>
-        <div className="monospace-font">
-          {Object.entries(classVars.static)
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([key, value], index) => (
-              <div key={`static-${index}`} style={{ color: "blue" }}>
-                {`${key}: ${value}`}
-              </div>
-            ))}
-        </div>
+        <VariableList variables={classVars.display_costumes_and_sounds()} />
+        <VariableList variables={classVars.display_static_variables()} />
 
         {/* Cloned actor instances */}
         <Collapse in={isExpanded}>
           <div className="clone-container">
             {actorEntries.map(([actorId, actorVars]: [string, any]) => (
-              <ActorInstance
+              <ActorInstanceCard
                 key={actorId}
                 actorId={actorId}
                 actorVars={actorVars}
                 highlighted={actorId === highlightedInstance}
-                isStage={classVars.is_stage}
               />
             ))}
           </div>
@@ -184,3 +317,11 @@ export const ActorClassCard: React.FC<{
     </Card>
   );
 };
+
+function extractValue(elem: unknown): unknown {
+  if (elem && typeof elem === "object") {
+    if ("v" in elem) return (elem as any).v;
+    if ("entries" in elem) return (elem as any).entries;
+  }
+  return elem;
+}

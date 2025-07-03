@@ -6,6 +6,7 @@ import Alert from "react-bootstrap/Alert";
 import { IErrorReport } from "../model/ui";
 import { getFlatAceController } from "../skulpt-connection/code-editor";
 import { EmptyProps, failIfNull } from "../utils";
+import { userFile } from "../constants";
 
 type UserCodeErrorLocationProps = {
   lineNo: number;
@@ -141,7 +142,7 @@ const simpleExceptionString = (err: any) => {
 };
 
 const frameSummary = (frame: any, index: number) => {
-  const isUserCode = frame.filename === "<stdin>.py";
+  const isUserCode = frame.filename === userFile;
 
   const leadIn = index === 0 ? "" : index === 1 ? "called " : "which called ";
   return (

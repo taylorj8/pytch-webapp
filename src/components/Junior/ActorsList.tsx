@@ -19,6 +19,7 @@ import {
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { ActorPropertiesTabKey } from "../../model/junior/edit-state";
 import { SingleTab } from "../SingleTab";
+import { DebugButtons } from "../DebugButtons";
 
 type ActorThumbnailProps = { id: Uuid };
 const ActorThumbnail: React.FC<ActorThumbnailProps> = ({ id }) => {
@@ -167,6 +168,8 @@ export const ActorsList = () => {
   const runUpsertFlow = useJrEditActions((a) => a.upsertSpriteFlow.run);
   const existingNames = StructuredProgramOps.spriteNames(program);
 
+  const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode);
+
   const launchAddSpriteModal = () => {
     runUpsertFlow({
       upsertionAction: { kind: "insert" },
@@ -199,6 +202,7 @@ export const ActorsList = () => {
           />
         </div>
       </SingleTab>
+      {inDebugMode && <DebugButtons/>}
     </div>
   );
 };

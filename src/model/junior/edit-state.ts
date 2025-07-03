@@ -17,7 +17,7 @@ import {
 import { scrollTopFromPageKey } from "./jr-tutorial";
 
 export type ActorPropertiesTabKey = "code" | "appearances" | "sounds";
-export type InfoPanelTabKey = "output" | "errors" | "debug";
+export type InfoPanelTabKey = "output" | "errors";
 
 export type InfoPanelState = "collapsed" | "expanded";
 
@@ -25,7 +25,8 @@ export type ActivityBarTabKey =
   | "helpsidebar"
   | "lesson"
   | "specimen"
-  | "tutorial";
+  | "tutorial"
+  | "debugsidebar";
 
 export type ActivityContentState =
   | { kind: "collapsed" }
@@ -161,7 +162,7 @@ export const editState: EditState = {
     if (actorId !== focusedActorId) {
       throw new Error(
         `trying to delete actor ${actorId}` +
-          ` but actor ${focusedActorId} is focused`
+        ` but actor ${focusedActorId} is focused`
       );
     }
 
@@ -202,7 +203,7 @@ export const editState: EditState = {
           // Warn but proceed anyway with tracking tutorial.
           console.log(
             `unexpected linked content "${linkedContentKind}"` +
-              " for isTrackingTutorial"
+            " for isTrackingTutorial"
           );
         }
         actions.expandActivityContent("tutorial");

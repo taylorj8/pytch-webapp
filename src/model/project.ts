@@ -1330,5 +1330,4 @@ export const activeProject: IActiveProject = {
   removeBreakpoint: action((state, breakpointLoc) => {
     state.breakpointStore.delete(breakpointLoc);
   }),
-
 };

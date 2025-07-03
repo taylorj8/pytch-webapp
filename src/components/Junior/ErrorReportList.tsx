@@ -1,11 +1,8 @@
 import React from "react";
 
 import { assertNever, EmptyProps } from "../../utils";
-import { useJrEditActions } from "./hooks";
 import {
   liveSourceMap,
-  aceControllerMap,
-  pendingCursorWarp,
   goToEditorLocation,
 } from "../../skulpt-connection/code-editor";
 import {
@@ -30,7 +27,7 @@ const UserCodeErrorLocation: UserCodeErrorLocationComponent = ({
 
   const gotoLine = () => {
     console.log("go to line", lineNo, colNo, contextualLoc);
-    goToEditorLocation(contextualLoc, localColNo);
+    goToEditorLocation(contextualLoc, localColNo, true);
   };
 
   const lineText = isFirst ? "Line" : "line";

@@ -9,9 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import { Button } from "react-bootstrap";
 
-import { DebugPane } from "../DebugPane";
-import { DebugButtons } from "../DebugButtons";
-
 
 const StandardOutput = () => {
   // TODO: Remove duplication between this and non-jr component.
@@ -55,8 +52,6 @@ export const InfoPanel = () => {
   const setActiveTab = useJrEditActions((a) => a.expandAndSetActive);
   const toggleStateAction = useJrEditActions((a) => a.toggleInfoPanelState);
 
-  const inDebugMode = useStoreState((state) => state.activeProject.inDebugMode);
-
   const toggleState = () => toggleStateAction();
   const collapseOrExpandIcon = isCollapsed ? "angle-up" : "angle-down";
 
@@ -75,7 +70,6 @@ export const InfoPanel = () => {
         >
         <FontAwesomeIcon icon={collapseOrExpandIcon} />
       </Button>
-      {inDebugMode && <DebugButtons/>}
       <Tabs
         className="Junior-InfoPanel"
         transition={false}
@@ -88,12 +82,6 @@ export const InfoPanel = () => {
         <Tab eventKey="errors" title="Errors">
           <Errors />
         </Tab>
-        {inDebugMode ? (
-          <Tab eventKey="debug" title={<span style={{ color: "#B20000" }}>Debug</span>}>
-            <DebugPane />
-          </Tab>
-        ) : null}
-
       </Tabs>
     </div>
   );

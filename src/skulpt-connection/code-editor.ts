@@ -23,22 +23,26 @@ const kFlatEditorId = "flat";
 class AceController {
   constructor(readonly editor: AceEditorT) {}
 
-  gotoLocation(lineNo: number, colNo: number | null) {
+  gotoLocation(lineNo: number, colNo: number | null, shouldFocus: boolean) {
     if (colNo == null) {
-      this.gotoLine(lineNo);
+      this.gotoLine(lineNo, shouldFocus);
     } else {
-      this.gotoLineAndColumn(lineNo, colNo);
+      this.gotoLineAndColumn(lineNo, colNo, shouldFocus);
     }
   }
 
-  gotoLine(lineNo: number) {
+  gotoLine(lineNo: number, shouldFocus: boolean) {
     this.editor.gotoLine(lineNo, 0, true);
-    this.focus();
+    if (shouldFocus) {
+      this.focus();
+    }
   }
 
-  gotoLineAndColumn(lineNo: number, colNo: number) {
+  gotoLineAndColumn(lineNo: number, colNo: number, shouldFocus: boolean) {
     this.editor.gotoLine(lineNo, colNo, true);
-    this.focus();
+    if (shouldFocus) {
+      this.focus();
+    }
   }
 
   focus() {
@@ -200,7 +204,8 @@ export let pendingCursorWarp = new PendingCursorWarp();
 // function to move the user to a location in the program
 export function goToEditorLocation(
   contextualLoc: LocationWithinHandler,
-  localColNo: number | null
+  localColNo: number | null,
+  shouldFocus: boolean
 ) {
   const maybeController = aceControllerMap.get(contextualLoc.handlerId);
 
@@ -209,8 +214,10 @@ export function goToEditorLocation(
     // correct actor and property-tab --- this also covers the case that
     // the correct actor is active but not the Code tab.
   if (maybeController != null) {
-    maybeController.gotoLocation(contextualLoc.lineWithinHandler, localColNo);
-    maybeController.focus();
+    maybeController.gotoLocation(contextualLoc.lineWithinHandler, localColNo, shouldFocus);
+    if (shouldFocus) {
+      maybeController.focus();
+    }
     maybeController.scrollIntoView(contextualLoc.lineWithinHandler);
   } else {
     pendingCursorWarp.set({
@@ -218,7 +225,6 @@ export function goToEditorLocation(
       lineNo: contextualLoc.lineWithinHandler,
       colNo: localColNo,
     });
-
     store.getActions().jrEditState.setFocusedActor(contextualLoc.actorId);
     store.getActions().jrEditState.setActorPropertiesActiveTab("code");
   }

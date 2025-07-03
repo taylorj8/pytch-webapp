@@ -317,10 +317,11 @@ $speech-bubble-max-height: 180px;
     height: 12px;
     background-color: $color;
     border-radius: 50%;
-    display: var(--show-debug-features, "block") // todo change back to none
+    display: var(--show-debug-features, "block"); // todo change back to none
   }
   
   .ace_gutter-cell {
+    cursor: pointer;
     &:hover::before {
       @include breakpoint-dot(rgba(212, 24, 24, 0.4));
     }
@@ -419,126 +420,120 @@ $speech-bubble-max-height: 180px;
   }
 }
 
-.DebugPane { // todo move styling from debug files into here
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  overflow-x: auto;
+.DebugSidebar {
+  width: 26rem;
 
-  // todo: fix scroll bar
-  &::after {
-    content: "";
-    display: block;
-    flex-grow: 1;
+  .card,
+  .inner-card,
+  .highlighted-card {
+    min-width: 0;
+    margin-bottom: 20px;
+    border-radius: 4px;
   }
 
-  .card-container {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
+  .highlighted-card {
+    box-shadow: 0 0 10px 2px red;
+    border: 2px solid red;
+  }
 
-    .card {
-      flex: 0 0 300px;
-      min-width: 330px;
-      margin-bottom: 20px;
+  .actor-instance {
+    &.highlighted-clone {
+      background-color: rgba(255, 0, 0, 0.1);
+      border-left: 4px solid red;
+      // padding-left: 1rem;
     }
 
-    .inner-card {
-      min-width: 200px;
-      flex: 1 1 auto;
-    }
-
-    .highlighted-card {
-      min-width: 200px;
-      flex: 1 1 auto;
-      box-shadow: 0 0 10px 2px red;
-      border: 2px solid red;
-    }
-
-    .actor-instance {
-      margin-top: 0.75rem;
-      padding-left: 0.5rem;
-    
-      &.highlighted-clone {
-        background-color: rgba(255, 0, 0, 0.1);
-        border-left: 4px solid red;
-        padding-left: 1rem;
-      }
-    
-      strong {
-        display: block;
-        margin-bottom: 0.25rem;
-      }
-    
-      .list-group-item {
-        font-family: "Courier New", Courier, monospace;
-        font-size: 0.9rem;
-        padding: 0.25rem 0.5rem;
-      }
-    }
-
-    .clone-header {
-      display: flex;
-      align-items: center;
+    strong {
+      display: block;
       margin-bottom: 0.25rem;
-    
-      img.card-title-img {
-        margin-right: 0.5rem;
-      }
     }
+  }
 
-    .clone-container {
-      width: 100%;
-      // display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
+  .clone-header {
+    margin-bottom: 0.25rem;
+
+    img.card-title-img {
+      margin-right: 0.5rem;
     }
-    
-    .actor-instance {
-      width: 100%;
+  }
+
+  .monospace-font {
+    font-family: $monospace-fonts;
+    font-size: 90%;
+  }
+
+  .card-title-img {
+    max-width: 32px;
+    max-height: 32px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
+  .card-title-icon {
+    max-width: 24px;
+    max-height: 24px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
+  .collapse-or-expand-icon {
+    position: relative;
+    top: 1px;
+    margin-left: 0.25rem;
+  }
+
+  .variable-name {
+    font-weight: bold;
+    color: black;
+    cursor: default;
+  }
+
+  .actor-classcard-img-stack {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 26px;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+
+    .actor-classcard-img-top {
+      position: absolute;
+      left: 0;
+      top: -4px;
+      max-width: 26px;
+      max-height: 26px;
+      z-index: 2;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
     }
   
-    .monospace-font {
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.95rem;
-    }
-    
-    .card-title-img {
-      max-width: 32px;
-      max-height: 32px;
-      margin-right: 0.5rem;
-      vertical-align: middle;
-    }
-    
-    .card-title-icon {
-      max-width: 24px;
-      max-height: 24px;
-      width: auto;
-      height: auto;
-      margin-right: 0.5rem;
-      vertical-align: middle;
-    }
-
-    .monospace-font {
-      font-family: "Courier New", Courier, monospace;
-      font-size: 0.95rem;
+    .actor-classcard-img-bottom {
+      position: absolute;
+      left: 12px;
+      top: 4px;
+      max-width: 26px;
+      max-height: 26px;
+      z-index: 1;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
     }
   }
+}
+
+.emptyDebugSidebarIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70%;
 }
 
 .DebugButtons {
   position: absolute;
   top: 1px;
-  right: 28px;
-  padding: 0px 8px;
+  right: 2px;
   display: flex;
   flex-direction: row;
   .DebugButton {
     height: 21px;
+    border-radius: 4px;
     margin-right: 0.5rem;
     display: flex;
     flex-direction: row;
