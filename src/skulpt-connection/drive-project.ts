@@ -332,7 +332,7 @@ export class ProjectEngine {
       const globalLineNo = project.get_debug_line();
       if (globalLineNo !== -1 && globalLineNo !== currentDebugLine) {
         setDebugLine(globalLineNo);
-        if (pytchProgram.kind === "per-method") {
+        if (globalLineNo && pytchProgram.kind === "per-method") {
           const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
           goToEditorLocation(contextualLoc, null, false);
         }
@@ -357,25 +357,20 @@ export class ProjectEngine {
       }
         
       Sk.pytch.sound_manager.one_frame();
+      const projectState = project.one_frame();
 
-      if (stepping_thread != null && stepping_thread.state === "running") {
-        stepping_thread.one_frame();
+      if (projectState.exception_was_raised) {
+        this.webAppAPI.ensureNotFullScreen();
+      }
+    
+      const question = projectState.maybe_live_question;
+      if (question == null) {
+        this.webAppAPI.clearUserQuestion();
       } else {
-        const projectState = project.one_frame();
-
-        if (projectState.exception_was_raised) {
-          this.webAppAPI.ensureNotFullScreen();
-        }
-      
-        const question = projectState.maybe_live_question;
-        if (question == null) {
-          this.webAppAPI.clearUserQuestion();
-        } else {
-          this.webAppAPI.askUserQuestion({
-            id: question.id,
-            prompt: question.prompt,
-          });
-        }
+        this.webAppAPI.askUserQuestion({
+          id: question.id,
+          prompt: question.prompt,
+        });
       }
     }
 
