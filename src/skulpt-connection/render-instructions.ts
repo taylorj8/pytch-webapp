@@ -7,6 +7,7 @@ export interface ImageRenderInstruction {
   image: HTMLImageElement;
   image_cx: number;
   image_cy: number;
+  instance_id: number;
 }
 
 export interface SpeechBubbleRenderInstruction {

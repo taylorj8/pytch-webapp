@@ -279,6 +279,20 @@ export class ProjectEngine {
             -instr.image_cx,
             -instr.image_cy
           );
+
+          // draws a red outline around the sprite that is currently being debugged
+          if (project.stepping_thread && 
+            project.stepping_thread.actor_instance.numeric_id === instr.instance_id) {
+            this.canvasContext.strokeStyle = "red";
+            this.canvasContext.lineWidth = 8;
+            this.canvasContext.strokeRect(
+              -instr.image_cx,
+              -instr.image_cy,
+              instr.image.width,
+              instr.image.height
+          );
+          }
+
           this.canvasContext.restore();
           break;
 
