@@ -102,6 +102,8 @@ const CodeAceEditor = () => {
         ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
       }
 
+      console.log(Debugger.get_breakpoints_list())
+
       e.stop();
     });
 

@@ -290,7 +290,7 @@ export class ProjectEngine {
               -instr.image_cy,
               instr.image.width,
               instr.image.height
-          );
+            );
           }
 
           this.canvasContext.restore();

@@ -165,10 +165,10 @@ export const CodeEditor = () => {
 
   const classes = classNames("Junior-CodeEditor", "abs-0000-oflow", dropProps);
 
-// clean-up when leaving the page - clears breakpoints and debugline
+  // clean-up when leaving the page - clears breakpoints and debugline
   useEffect(() => {
     return () => {
-      setBreakpoints(new Set());
+      setBreakpoints({});
       Debugger.clear_all_breakpoints();
       resetDebugging(false);
     };

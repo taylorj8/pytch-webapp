@@ -262,6 +262,14 @@ type NoteChangeAugArgs = {
 
 type LoadPhase = "booting" | "booted";
 
+export type BreakpointStore = Record<string, Record<string, number[]>>;
+
+export type BreakpointRecord = {
+  actorId: string;
+  handlerId: string;
+  lineNo: number;
+}
+
 export interface IActiveProject {
   changesManager: NotableChangesManager;
   _noteChange: Action<IActiveProject, NoteChangeAugArgs>;
@@ -422,10 +430,10 @@ export interface IActiveProject {
   debugLine: number;	
   setDebugLine: Action<IActiveProject, number>;
 
-  breakpointStore: Set<string>;
-  setBreakpoints: Action<IActiveProject, Set<string>>;
-  addBreakpoint: Action<IActiveProject, string>;
-  removeBreakpoint: Action<IActiveProject, string>;
+  breakpointStore: BreakpointStore;
+  setBreakpoints: Action<IActiveProject, BreakpointStore>;
+  addBreakpoint: Action<IActiveProject, BreakpointRecord>;
+  removeBreakpoint: Action<IActiveProject, BreakpointRecord>;
 }
 
 const dummyPytchProgram = PytchProgramOps.fromPythonCode(
@@ -1320,14 +1328,35 @@ export const activeProject: IActiveProject = {
     state.debugLine = line;
   }),
 
-  breakpointStore: new Set(),
-  setBreakpoints: action((state, newSet) => {
-    state.breakpointStore = newSet;
+  breakpointStore: {},
+  setBreakpoints: action((state, newStore) => {
+    state.breakpointStore = newStore;
   }),
-  addBreakpoint: action((state, breakpointLoc) => {
-    state.breakpointStore.add(breakpointLoc);
+  addBreakpoint: action((state, { actorId, handlerId, lineNo }) => {
+    if (!state.breakpointStore[actorId]) {
+      state.breakpointStore[actorId] = {};
+    }
+    if (!state.breakpointStore[actorId][handlerId]) {
+      state.breakpointStore[actorId][handlerId] = [];
+    }
+    if (!state.breakpointStore[actorId][handlerId].includes(lineNo)) {
+      state.breakpointStore[actorId][handlerId].push(lineNo);
+    }
   }),
-  removeBreakpoint: action((state, breakpointLoc) => {
-    state.breakpointStore.delete(breakpointLoc);
+  removeBreakpoint: action((state, { actorId, handlerId, lineNo }) => {
+    const actorStore = state.breakpointStore[actorId];
+    if (!actorStore) return;
+    const handlerLines = actorStore[handlerId];
+    if (!handlerLines) return;
+    const index = handlerLines.indexOf(lineNo);
+    if (index !== -1) {
+      handlerLines.splice(index, 1);
+    }
+    if (handlerLines.length === 0) {
+      delete actorStore[handlerId];
+    }
+    if (Object.keys(actorStore).length === 0) {
+      delete state.breakpointStore[actorId];
+    }
   }),
 };

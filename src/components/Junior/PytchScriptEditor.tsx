@@ -36,6 +36,7 @@ import { failIfNull } from "../../utils";
 
 import { Debugger } from "../../skulpt-connection/drive-project";
 import { userFile } from "../../constants";
+import { BreakpointRecord, BreakpointStore } from "../../model/project";
 
 // Adapted from https://stackoverflow.com/a/71952718
 const insertElectricFullStop = (editor: AceEditorT) => {
@@ -51,6 +52,7 @@ type PytchScriptEditorProps = {
   nextHandlerId: Uuid | null;
   conjoinedResizeObserver: ConjoinedResizeObserver;
 };
+
 export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   actorKind,
   actorId,
@@ -150,6 +152,13 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     return disconnectObserver;
   }, [aceParentRef, conjoinedResizeObserver]);
 
+  function hasBreakpoint(breakpointStore: BreakpointStore, breakpoint: BreakpointRecord) {
+  return (
+    breakpointStore[breakpoint.actorId] && breakpointStore[breakpoint.actorId][breakpoint.handlerId] &&
+    breakpointStore[breakpoint.actorId][breakpoint.handlerId].includes(breakpoint.lineNo)
+  );
+}
+
   // todo remove duplication with CodeEditor.tsx
   const breakpointStoreRef = useRef(breakpointStore);
   const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
@@ -162,7 +171,8 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
         return;
 
       const row = e.getDocumentPosition().row;
-      const breakpointKey = `${actorId}:${handlerId}:${row + 1}`;
+      const breakpointRecord = { actorId: actorId, handlerId: handlerId, lineNo: row + 1};
+
       let globalLineNo: number | null = null;
       try {
         globalLineNo = liveSourceMap.globalFromLocal({
@@ -177,15 +187,15 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
       // breakpoints are added to a separate store and set in the debugger on build
       // they are also set directly to the debugger to handle the case when a
       // breakpoint is added while the program is running
-      if (breakpointStoreRef.current.has(breakpointKey)) {
+      if (hasBreakpoint(breakpointStoreRef.current, breakpointRecord)) {
         ace.editor.session.clearBreakpoint(row);
-        removeBreakpoint(breakpointKey);
+        removeBreakpoint(breakpointRecord);
         if (globalLineNo !== null) {
           Debugger.clear_breakpoint(userFile, globalLineNo, 0, false);
         }
       } else {
         ace.editor.session.setBreakpoint(row, "ace_breakpoint");
-        addBreakpoint(breakpointKey);
+        addBreakpoint(breakpointRecord);
         if (globalLineNo !== null) {
           Debugger.add_breakpoint(userFile, globalLineNo, 0);
         }
@@ -194,60 +204,47 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
       e.stop();
     });
 
-
     // ensures the breakpoint tracks the code rather than the line number
     (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
       if (delta.end.row == delta.start.row) return;
-      const updatedBreakpoints = new Set<number>();
+      const updatedBreakpoints: number[] = [];
 
       let breakpointMoved = false;
-      const updatedSet = new Set<string>();
-      breakpointStoreRef.current.forEach((breakpointKey: string) => {
-        const key = breakpointKey.split(":");
-        // if breakpoint under another actor/handler then add straight to updated set
-        if (key[0] !== actorId || key[1] !== handlerId) {
-          updatedSet.add(breakpointKey);
-          return;
-        }
+      const tempStore = breakpointStoreRef.current;
+      if (tempStore[actorId] && tempStore[actorId][handlerId]) {
+        tempStore[actorId][handlerId].forEach((lineNo: number) => {
+          if (delta.start.row >= lineNo) {
+            updatedBreakpoints.push(lineNo);
+          } else if (delta.action === "insert") {
 
-        const row = parseInt(key[2]);
-
-        if (delta.start.row >= row) {
-          updatedBreakpoints.add(row);
-        } else if (delta.action === "insert") {
-
-          const linesAdded = delta.end.row - delta.start.row;
-          updatedBreakpoints.add(row + linesAdded)
-          breakpointMoved = true;
-
-        } else if (delta.action === "remove") {
-
-          const linesRemoved = delta.end.row - delta.start.row;
-          const newRow = row - linesRemoved;
-          if (newRow >= delta.start.row) {
-            updatedBreakpoints.add(newRow);
+            const linesAdded = delta.end.row - delta.start.row;
+            updatedBreakpoints.push(lineNo + linesAdded)
             breakpointMoved = true;
+
+          } else if (delta.action === "remove") {
+
+            const linesRemoved = delta.end.row - delta.start.row;
+            const newRow = lineNo - linesRemoved;
+            if (newRow >= delta.start.row) {
+              updatedBreakpoints.push(newRow);
+              breakpointMoved = true;
+            } else {
+              updatedBreakpoints.push(lineNo);
+            }
           } else {
-            updatedBreakpoints.add(row);
+            updatedBreakpoints.push(lineNo);
           }
-        }
-      });
+        });
+      }
 
       if (breakpointMoved) {
-        updatedBreakpoints.forEach((breakpointLine) => {
-          const breakpointKey = `${actorId}:${handlerId}:${breakpointLine}`;
-          updatedSet.add(breakpointKey);
-          ace.editor.session.setBreakpoint(breakpointLine - 1, "ace_breakpoint");
-        });
-        setBreakpoints(updatedSet);
+        tempStore[actorId][handlerId] = updatedBreakpoints;
+        
+        setBreakpoints(tempStore);
         ace.editor.session.clearBreakpoints();
         // re-add breakpoints after clearing
-        updatedSet.forEach(breakpointKey => {
-          const key = breakpointKey.split(":");
-          const row = parseInt(key[2]);
-          if (key[0] === actorId && key[1] === handlerId && !isNaN(row)) {
-            ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
-          }
+        updatedBreakpoints.forEach((lineNo) => {
+          ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint");
         });
       }
     });
@@ -279,14 +276,11 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
     ace.editor.session.clearBreakpoints();
 
-    // Get all breakpoints for this handler from the local breakpointStore
-    breakpointStore.forEach((breakpointKey) => {
-      const key = breakpointKey.split(":");
-      const row = parseInt(key[2]);
-      if (key[0] === actorId && key[1] === handlerId && !isNaN(row)) {
-        ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
-      }
-    });
+    if (breakpointStore[actorId] && breakpointStore[actorId][handlerId]) {
+      breakpointStore[actorId][handlerId].forEach((lineNo) => {
+        ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint");
+      });
+    }
   }, [actorId]);
 
   /** Once the editor has loaded, there are a few things we have to do:

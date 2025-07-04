@@ -94,18 +94,21 @@ export const build = async (
     if (inDebugMode && project.program.kind === "per-method") {
       Debugger.clear_all_breakpoints();
       const breakpointStore = store.getState().activeProject.breakpointStore;
-      breakpointStore.forEach((breakpointKey) => {
-        const key = breakpointKey.split(":");
-        const loc = {
-          actorId: key[0],
-          handlerId: key[1],
-          lineWithinHandler: parseInt(key[2])
-        };
-        const globalLineNumber = liveSourceMap.globalFromLocal(loc);
-        Debugger.add_breakpoint(userFile, globalLineNumber, 0, false);
-        console.log(Debugger.get_breakpoints_list());
-      });
+        
+      for (const actorId in breakpointStore) {
+        const handlers = breakpointStore[actorId];
+        for (const handlerId in handlers) {
+          const breakpoints = handlers[handlerId];
+          breakpoints.forEach((lineWithinHandler) => {
+            const loc = { actorId, handlerId, lineWithinHandler };
+            const globalLineNumber = liveSourceMap.globalFromLocal(loc);
+            Debugger.add_breakpoint(userFile, globalLineNumber, 0, false);
+            console.log(Debugger.get_breakpoints_list());
+          });
+        }
+      }
     }
+
 
     await Sk.pytchsupport.import_with_auto_configure(codeText);
     Sk.pytch.current_live_project.on_green_flag_clicked();
