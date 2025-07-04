@@ -109,7 +109,6 @@ export const build = async (
       }
     }
 
-
     await Sk.pytchsupport.import_with_auto_configure(codeText);
     Sk.pytch.current_live_project.on_green_flag_clicked();
     return { kind: BuildOutcomeKind.Success };

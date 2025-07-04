@@ -94,6 +94,26 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
   const [prevMarker, setPrevMarker] = useState<number>(-1);
 
+  const previousBreakpoints = useStoreState(
+    (state) =>
+      state.activeProject.project.program.kind === "per-method"
+        ? state.activeProject.project.program.breakpoints
+        : {}
+  );
+  // load breakpoints from previous session
+  useEffect(() => {
+    Debugger.clear_all_breakpoints();
+    for (const actorId in previousBreakpoints) {
+      for (const handlerId in previousBreakpoints[actorId]) {
+        previousBreakpoints[actorId][handlerId].forEach((lineWithinHandler) => {
+          const loc = { actorId, handlerId, lineWithinHandler };
+          const globalLineNumber = liveSourceMap.globalFromLocal(loc);
+          Debugger.add_breakpoint(userFile, globalLineNumber, 0, false);
+        });
+      }
+    }
+  }, [previousBreakpoints]);
+
   useEffect(() => {
     const scroll = () => scrollCursorRowIntoView(handlerId);
     scroll();

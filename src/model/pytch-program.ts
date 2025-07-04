@@ -11,6 +11,7 @@ import {
   StructuredProgram,
   StructuredProgramOps,
 } from "./junior/structured-program/program";
+import { BreakpointStore } from "./project";
 
 // To regenerate the JavaScript after updating the schema file
 // "pytch-program-schema.json", be in the same directory as
@@ -24,8 +25,8 @@ import { validate as _untypedValidate } from "./pytch-program-json-validation";
 const validatePytchProgramJson = _untypedValidate as any;
 
 export type PytchProgram =
-  | { kind: "flat"; text: string }
-  | { kind: "per-method"; program: StructuredProgram };
+  | { kind: "flat"; text: string; breakpoints: number[] }
+  | { kind: "per-method"; program: StructuredProgram; breakpoints: BreakpointStore };
 
 export type PytchProgramKind = PytchProgram["kind"];
 
@@ -43,18 +44,18 @@ export class PytchProgramOps {
   /** Return a new `PytchProgram` instance of kind `"flat"` and with the
    * given `text`. */
   static fromPythonCode(text: string): PytchProgram {
-    return { kind: "flat", text };
+    return { kind: "flat", text, breakpoints: [] };
   }
 
   static newEmpty(kind: "flat"): PytchProgramOfKind<"flat">;
   static newEmpty(kind: "per-method"): PytchProgramOfKind<"per-method">;
-  static newEmpty(kind: PytchProgramKind) {
+  static newEmpty(kind: PytchProgramKind): PytchProgram {
     switch (kind) {
       case "flat":
         // TODO: Extract this to a constant somewhere.
-        return { kind, text: "import pytch\n\n" };
+        return { kind, text: "import pytch\n\n", breakpoints: [] };
       case "per-method":
-        return { kind, program: StructuredProgramOps.newEmpty() };
+        return { kind, program: StructuredProgramOps.newEmpty(), breakpoints: {} };
       default:
         return assertNever(kind);
     }
@@ -63,7 +64,7 @@ export class PytchProgramOps {
   /** Return a new `PytchProgram` instance of kind `"per-method"` and
    * with the given structured `program`. */
   static fromStructuredProgram(program: StructuredProgram): PytchProgram {
-    return { kind: "per-method", program };
+    return { kind: "per-method", program, breakpoints: {} };
   }
 
   /** Return a flat-text Python equivalent of the given `program` having

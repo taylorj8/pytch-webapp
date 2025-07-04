@@ -64,6 +64,24 @@ const CodeAceEditor = () => {
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
   const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
 
+  const previousBreakpoints = useStoreState((state) =>
+    state.activeProject.project.program.kind === "flat"
+      ? state.activeProject.project.program.breakpoints
+      : []
+  );
+  // load breakpoints from previous session
+  useEffect(() => {
+    const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
+    // Clear all breakpoints first
+    Debugger.clear_all_breakpoints();
+    // Add breakpoints from the loaded project
+    if (previousBreakpoints === undefined) return;
+    previousBreakpoints.forEach((lineNo) => {
+      Debugger.add_breakpoint(userFile, lineNo, 0, false);
+      ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint")
+    });
+  }, [previousBreakpoints]);
+
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
 
