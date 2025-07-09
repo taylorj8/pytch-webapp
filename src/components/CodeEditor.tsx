@@ -63,8 +63,6 @@ const CodeAceEditor = () => {
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
   const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
-  const codeTextRef = useRef(codeText);
-
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -100,9 +98,9 @@ const CodeAceEditor = () => {
         Debugger.clear_breakpoint(userFile, row, 0, false);
         ace.editor.session.clearBreakpoint(row - 1);
       } else {
-        const codeList = codeTextRef.current.split("\n");
+        const lines = ace.editor.session.getDocument().getAllLines();
         // if a line is empty don't let a breakpoint be set there
-        if (codeList[row - 1].trim() !== "") {
+        if (lines[row - 1].trim() !== "") {
           Debugger.add_breakpoint(userFile, row, 0, false);
           ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
         }
@@ -123,13 +121,31 @@ const CodeAceEditor = () => {
     }
   });
 
+  // assign a different class to empty lines so breakpoint hover can be hidden 
+  useEffect(() => {
+    const ace = aceRef.current?.editor;
+    if (!ace) return;
+
+    const updateEmptyDecorations = () => {
+      const lines = ace.session.getDocument().getAllLines();
+
+      lines.forEach((line, row) => {
+        if (line.trim() === "") {
+          ace.session.addGutterDecoration(row, "ace_gutter_empty");
+        } else {
+          ace.session.removeGutterDecoration(row, "ace_gutter_empty");
+        }
+      });
+    };
+
+    updateEmptyDecorations();
+    ace.getSession().on("change", updateEmptyDecorations);
+    return () => ace.getSession().off("change", updateEmptyDecorations);
+  }, []);
+
   useEffect(() => {
     debugFeaturesEnabledRef.current = debugFeaturesEnabled;
   }, [debugFeaturesEnabled]);
-
-  useEffect(() => {
-    codeTextRef.current = codeText;
-  }, [codeText]);
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");

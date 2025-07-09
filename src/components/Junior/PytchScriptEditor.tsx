@@ -152,7 +152,6 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
   const breakpointStoreRef = useRef(breakpointStore);
   const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
-  const handlerCodeRef = useRef(handler.pythonCode);
   
   // todo remove duplication with CodeEditor.tsx
   useEffect(() => {
@@ -186,10 +185,9 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
           Debugger.clear_breakpoint(userFile, globalLineNo, 0, false);
         }
       } else {
-        const codeLines = handlerCodeRef.current.split("\n");
-        console.log(handlerCodeRef.current)
+        const lines = ace.editor.session.getDocument().getAllLines();
         // if a line is empty don't let a breakpoint be set there
-        if (codeLines[row].trim() !== "") {
+        if (lines[row].trim() !== "") {
           ace.editor.session.setBreakpoint(row, "ace_breakpoint");
           addBreakpoint(breakpointKey);
           if (globalLineNo !== null) {
@@ -260,6 +258,28 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     });
   }, []);
 
+  // assign a different class to empty lines so breakpoint hover can be hidden 
+  useEffect(() => {
+    const ace = aceRef.current?.editor;
+    if (!ace) return;
+
+    const updateEmptyDecorations = () => {
+      const lines = ace.session.getDocument().getAllLines();
+
+      lines.forEach((line, row) => {
+        if (line.trim() === "") {
+          ace.session.addGutterDecoration(row, "ace_gutter_empty");
+        } else {
+          ace.session.removeGutterDecoration(row, "ace_gutter_empty");
+        }
+      });
+    };
+
+    updateEmptyDecorations();
+    ace.getSession().on("change", updateEmptyDecorations);
+    return () => ace.getSession().off("change", updateEmptyDecorations);
+  }, []);
+
   useEffect(() => {
     breakpointStoreRef.current = breakpointStore;
   }, [breakpointStore]);
@@ -267,10 +287,6 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   useEffect(() => {
     debugFeaturesEnabledRef.current = debugFeaturesEnabled;
   }, [debugFeaturesEnabled]);
-
-  useEffect(() => {
-    handlerCodeRef.current = handler.pythonCode;
-  }, [handler.pythonCode]);
 
   useEffect(() => {
     // if (debugFeaturesEnabled) return;
