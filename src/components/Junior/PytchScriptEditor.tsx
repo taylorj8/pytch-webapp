@@ -265,10 +265,16 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
     const updateEmptyDecorations = () => {
       const lines = ace.session.getDocument().getAllLines();
-
+      
       lines.forEach((line, row) => {
         if (line.trim() === "") {
           ace.session.addGutterDecoration(row, "ace_gutter_empty");
+        
+          // remove breakpoint if the line is now empty
+          if (Debugger.check_breakpoints(userFile, row + 1, 0)) {
+            Debugger.clear_breakpoint(userFile, row + 1, 0, false);
+            ace.session.clearBreakpoint(row);
+          }
         } else {
           ace.session.removeGutterDecoration(row, "ace_gutter_empty");
         }
