@@ -150,9 +150,11 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     return disconnectObserver;
   }, [aceParentRef, conjoinedResizeObserver]);
 
-  // todo remove duplication with CodeEditor.tsx
   const breakpointStoreRef = useRef(breakpointStore);
   const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
+  const handlerCodeRef = useRef(handler.pythonCode);
+  
+  // todo remove duplication with CodeEditor.tsx
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "PytchScriptEditor effect: aceRef is null");
 
@@ -184,10 +186,15 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
           Debugger.clear_breakpoint(userFile, globalLineNo, 0, false);
         }
       } else {
-        ace.editor.session.setBreakpoint(row, "ace_breakpoint");
-        addBreakpoint(breakpointKey);
-        if (globalLineNo !== null) {
-          Debugger.add_breakpoint(userFile, globalLineNo, 0);
+        const codeLines = handlerCodeRef.current.split("\n");
+        console.log(handlerCodeRef.current)
+        // if a line is empty don't let a breakpoint be set there
+        if (codeLines[row].trim() !== "") {
+          ace.editor.session.setBreakpoint(row, "ace_breakpoint");
+          addBreakpoint(breakpointKey);
+          if (globalLineNo !== null) {
+            Debugger.add_breakpoint(userFile, globalLineNo, 0);
+          }
         }
       }
 
@@ -256,9 +263,14 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   useEffect(() => {
     breakpointStoreRef.current = breakpointStore;
   }, [breakpointStore]);
+
   useEffect(() => {
     debugFeaturesEnabledRef.current = debugFeaturesEnabled;
   }, [debugFeaturesEnabled]);
+
+  useEffect(() => {
+    handlerCodeRef.current = handler.pythonCode;
+  }, [handler.pythonCode]);
 
   useEffect(() => {
     // if (debugFeaturesEnabled) return;

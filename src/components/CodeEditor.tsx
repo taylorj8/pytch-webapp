@@ -63,6 +63,8 @@ const CodeAceEditor = () => {
 
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
   const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
+  const codeTextRef = useRef(codeText);
+
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -92,14 +94,18 @@ const CodeAceEditor = () => {
       if (!debugFeaturesEnabledRef.current || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
 
-      let row = e.getDocumentPosition().row + 1;
+      const row = e.getDocumentPosition().row + 1;
 
       if (Debugger.check_breakpoints(userFile, row, 0)) {
         Debugger.clear_breakpoint(userFile, row, 0, false);
         ace.editor.session.clearBreakpoint(row - 1);
       } else {
-        Debugger.add_breakpoint(userFile, row, 0, false);
-        ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
+        const codeList = codeTextRef.current.split("\n");
+        // if a line is empty don't let a breakpoint be set there
+        if (codeList[row - 1].trim() !== "") {
+          Debugger.add_breakpoint(userFile, row, 0, false);
+          ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
+        }
       }
 
       e.stop();
@@ -120,6 +126,10 @@ const CodeAceEditor = () => {
   useEffect(() => {
     debugFeaturesEnabledRef.current = debugFeaturesEnabled;
   }, [debugFeaturesEnabled]);
+
+  useEffect(() => {
+    codeTextRef.current = codeText;
+  }, [codeText]);
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
