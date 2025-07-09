@@ -18,8 +18,8 @@ export const DebugSidebar: React.FC<EmptyProps> = () => {
     const updateCards = () => {
       const project = Sk.pytch.current_live_project;
       if (project && project !== Sk.default_pytch_environment.current_live_project) {
-        setLocalVars(project.get_all_local_variables());
-        setGlobalVars(project.get_global_variables());
+        setLocalVars(project.extract_local_variables());
+        setGlobalVars(project.extract_global_variables());
 
         const suspendedThread = project.get_stepping_thread();
         const suspension = suspendedThread ? suspendedThread.skulpt_susp : null;
