@@ -8,7 +8,7 @@ import {
   ITutorialTrackingUpdate,
   ITrackedTutorialRef,
 } from "../model/projects";
-import { StoredProjectDescriptor } from "../model/project";
+import { BreakpointStore, StoredProjectDescriptor } from "../model/project";
 import {
   IAssetInProject,
   AssetId,
@@ -16,7 +16,7 @@ import {
   AssetTransform,
   AssetTransformOps,
 } from "../model/asset";
-import { delaySeconds, failIfNull, hexSHA256, PYTCH_CYPRESS } from "../utils";
+import { assertNever, delaySeconds, failIfNull, hexSHA256, PYTCH_CYPRESS } from "../utils";
 import { PytchProgram, PytchProgramOps } from "../model/pytch-program";
 import { AddAssetDescriptorOps } from "../storage/zipfile";
 import {
@@ -885,6 +885,58 @@ export class DexieStorage extends Dexie {
     await this._updateProjectMtime(projectId);
   }
 
+  async userPreference(preferenceKey: string): Promise<any> {
+    const maybePreference = await this.userPreferences.get(preferenceKey);
+    const preference = failIfNull(
+      maybePreference,
+      `could not find preference for key ${preferenceKey}`
+    );
+    return preference;
+  }
+
+  async updateUserPreference(
+    preferenceKey: string,
+    newValue: any,
+  ): Promise<void> {
+    await this.transaction("rw", this.userPreferences, async () => {
+      const oldPreference = await this.userPreferences.get(preferenceKey);
+      if (oldPreference !== undefined && typeof oldPreference.value !== typeof newValue) {
+        throw new Error(
+          `Type mismatch for preference "${preferenceKey}": ` +
+          `was "${typeof oldPreference.value}", now "${typeof newValue}"`
+        );
+      }
+      await this.userPreferences.put({ key: preferenceKey, value: newValue });
+    });
+  }
+
+  async breakpoints(projectId: ProjectId): Promise<number[] | BreakpointStore> {
+    const record = await this.projectPytchPrograms.get(projectId);
+    if (!record) {
+      throw new Error(
+        `Something went wrong fetching breakpoints for project ${projectId}`
+      )
+    }
+    return record.program.breakpoints;
+  }
+
+  async updateBreakpointsInProject(
+    projectId: ProjectId,
+    updatedBreakpoints: number[] | BreakpointStore,
+  ) {
+    console.log(`ProjectId: ${projectId}`)
+    console.log(updatedBreakpoints)
+    await this.transaction("rw", this.projectPytchPrograms, async () => {
+      await this.projectPytchPrograms.where("projectId").equals(projectId).modify((record: ProjectPytchProgramRecord) => {
+        try {
+          record.program.breakpoints = updatedBreakpoints;
+        } catch {
+          throw new Error(`Type mismatch: Expected ${typeof record.program.breakpoints}, given ${typeof updatedBreakpoints}`)
+        }
+      });
+    });
+  }
+
   enqueueSyncTask(task: KeyedSyncTask) {
     let oldIndex = this.queuedSyncTasks.findIndex(
       (existingTask) => existingTask.key === task.key
@@ -926,31 +978,6 @@ export class DexieStorage extends Dexie {
 
     this.processingQueuedSyncTasks = false;
   }
-
-  async userPreference(preferenceKey: string): Promise<any> {
-    const maybePreference = await this.userPreferences.get(preferenceKey);
-    const preference = failIfNull(
-      maybePreference,
-      `could not find preference for key ${preferenceKey}`
-    );
-    return preference;
-  }
-
-  async updateUserPreference(
-    preferenceKey: string,
-    newValue: any,
-  ): Promise<void> {
-    await this.transaction("rw", this.userPreferences, async () => {
-      const oldPreference = await this.userPreferences.get(preferenceKey);
-      if (oldPreference !== undefined && typeof oldPreference.value !== typeof newValue) {
-        throw new Error(
-          `Type mismatch for preference "${preferenceKey}": ` +
-          `was "${typeof oldPreference.value}", now "${typeof newValue}"`
-        );
-      }
-      await this.userPreferences.put({ key: preferenceKey, value: newValue });
-    });
-  }
 }
 
 const _db = new DexieStorage();
@@ -979,3 +1006,5 @@ export const updateAssetTransform = _db.updateAssetTransform.bind(_db);
 export const enqueueSyncTask = _db.enqueueSyncTask.bind(_db);
 export const userPreference = _db.userPreference.bind(_db);
 export const updateUserPreference = _db.updateUserPreference.bind(_db);
+export const breakpoints = _db.breakpoints.bind(_db);
+export const updateBreakpointsInProject = _db.updateBreakpointsInProject.bind(_db);

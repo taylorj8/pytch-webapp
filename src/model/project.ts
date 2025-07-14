@@ -35,7 +35,8 @@ import {
   reorderAssetsInProject,
   updateLinkedContentRef,
   enqueueSyncTask,
-  userPreference,
+  updateBreakpointsInProject,
+  breakpoints,
 } from "../database/indexed-db";
 
 import { AssetTransform } from "./asset";
@@ -89,9 +90,6 @@ import {
   NotableChangesManager,
   NotableChangesManagerOps,
 } from "./notable-changes";
-
-import { enableMapSet } from "immer";
-enableMapSet();
 
 const ensureKind = PytchProgramOps.ensureKind;
 
@@ -432,9 +430,9 @@ export interface IActiveProject {
   setDebugLine: Action<IActiveProject, number>;
 
   breakpointStore: BreakpointStore;
-  setBreakpoints: Action<IActiveProject, BreakpointStore>;
-  addBreakpoint: Action<IActiveProject, BreakpointRecord>;
-  removeBreakpoint: Action<IActiveProject, BreakpointRecord>;
+  setBreakpoints: Thunk<IActiveProject, BreakpointStore>;
+  addBreakpoint: Thunk<IActiveProject, BreakpointRecord>;
+  removeBreakpoint: Thunk<IActiveProject, BreakpointRecord>;
 }
 
 const dummyPytchProgram = PytchProgramOps.fromPythonCode(
@@ -893,6 +891,12 @@ export const activeProject: IActiveProject = {
         );
       }
 
+      // initialise the breakpoints
+      const initialStore = await breakpoints(projectId);
+      if (!Array.isArray(initialStore)) {
+        actions.setBreakpoints(initialStore);
+      }
+
       storeActions.ideLayout.helpSidebar.hideAllContent();
 
       const programKind = content.program.kind;
@@ -1330,34 +1334,48 @@ export const activeProject: IActiveProject = {
   }),
 
   breakpointStore: {},
-  setBreakpoints: action((state, newStore) => {
-    state.breakpointStore = newStore;
+  setBreakpoints: thunk((actions, newStore, helpers) => {
+    helpers.getState().breakpointStore = newStore;
+    updateBreakpointsInProject(helpers.getState().project.id, newStore);
   }),
-  addBreakpoint: action((state, { actorId, handlerId, lineNo }) => {
-    if (!state.breakpointStore[actorId]) {
-      state.breakpointStore[actorId] = {};
+  addBreakpoint: thunk(async (actions, { actorId, handlerId, lineNo }, helpers) => {
+    const newBreakpointStore = JSON.parse(JSON.stringify(helpers.getState().breakpointStore));
+    if (!newBreakpointStore[actorId]) {
+      newBreakpointStore[actorId] = {};
     }
-    if (!state.breakpointStore[actorId][handlerId]) {
-      state.breakpointStore[actorId][handlerId] = [];
+    if (!newBreakpointStore[actorId][handlerId]) {
+      newBreakpointStore[actorId][handlerId] = [];
     }
-    if (!state.breakpointStore[actorId][handlerId].includes(lineNo)) {
-      state.breakpointStore[actorId][handlerId].push(lineNo);
+    if (!newBreakpointStore[actorId][handlerId].includes(lineNo)) {
+      newBreakpointStore[actorId][handlerId].push(lineNo);
+      actions.setBreakpoints(newBreakpointStore);
     }
   }),
-  removeBreakpoint: action((state, { actorId, handlerId, lineNo }) => {
-    const actorStore = state.breakpointStore[actorId];
+  removeBreakpoint: thunk(async (actions, { actorId, handlerId, lineNo }, helpers) => {
+    const newBreakpointStore = JSON.parse(JSON.stringify(helpers.getState().breakpointStore));
+    const actorStore = newBreakpointStore[actorId];
     if (!actorStore) return;
+
     const handlerLines = actorStore[handlerId];
     if (!handlerLines) return;
+
     const index = handlerLines.indexOf(lineNo);
+    let updated = false;
+
     if (index !== -1) {
       handlerLines.splice(index, 1);
+      updated = true;
     }
+
     if (handlerLines.length === 0) {
       delete actorStore[handlerId];
     }
     if (Object.keys(actorStore).length === 0) {
-      delete state.breakpointStore[actorId];
+      delete newBreakpointStore[actorId];
+    }
+
+    if (updated) {
+      actions.setBreakpoints(newBreakpointStore);
     }
   }),
 };
