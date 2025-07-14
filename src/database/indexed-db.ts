@@ -135,6 +135,11 @@ interface AssetRecord {
   data: ArrayBuffer;
 }
 
+interface UserPreference {
+  key: string;
+  value: any;
+}
+
 export interface AssetNameAndType {
   name: string;
   mimeType: string;
@@ -209,6 +214,34 @@ async function dbUpgrade_V6_from_V5(txn: Transaction) {
   console.log(`upgraded ${nModified} records to DBv6`);
 }
 
+/** V7 adds userPreferences table and adds breakpoints to all PytchProgram objects */
+async function dbUpgrade_V7_from_V6(txn: Transaction) {
+  console.log("upgrading to DBv7");
+
+  const preferencesTable = txn.table("userPreferences");
+  await preferencesTable.add({ key: "debugFeaturesEnabled", value: false });
+  await preferencesTable.add({ key: "helpSidebarShown", value: true });
+  console.log("'userPreferences' table created and defaults set.");
+
+  const nModified = await txn
+    .table("projectPytchPrograms")
+    .toCollection()
+    .modify((projectPytchProgram: ProjectPytchProgramRecord) => {
+      if (projectPytchProgram.program.breakpoints == null) {
+        switch (projectPytchProgram.program.kind) {
+          case "flat":
+              projectPytchProgram.program.breakpoints = [];
+              break;
+          case "per-method":
+              projectPytchProgram.program.breakpoints = {};
+              break;
+        }
+      }
+    });
+
+  console.log(`upgraded ${nModified} records to DBv7`);
+}
+
 type KeyedSyncTask = {
   key: string;
   action: () => Promise<void>;
@@ -220,6 +253,7 @@ export class DexieStorage extends Dexie {
   projectPytchPrograms: Dexie.Table<ProjectPytchProgramRecord, number>;
   projectAssets: Dexie.Table<ProjectAssetRecord, number>;
   assets: Dexie.Table<AssetRecord, AssetId>;
+  userPreferences: Dexie.Table<UserPreference, string>;
 
   queuedSyncTasks: Array<KeyedSyncTask>;
   processingQueuedSyncTasks: boolean;
@@ -246,10 +280,17 @@ export class DexieStorage extends Dexie {
     this.version(5).upgrade(dbUpgrade_V5_from_V4);
     this.version(6).upgrade(dbUpgrade_V6_from_V5);
 
+    this.version(7)
+      .stores({
+        userPreferences: "&key", // debugFeaturesEnabled, helpSidebarShown
+      })
+      .upgrade(dbUpgrade_V7_from_V6)
+
     this.projectSummaries = this.table("projectSummaries");
     this.projectPytchPrograms = this.table("projectPytchPrograms");
     this.projectAssets = this.table("projectAssets");
     this.assets = this.table("assets");
+    this.userPreferences = this.table("userPreferences");
 
     this.queuedSyncTasks = [];
     this.processingQueuedSyncTasks = false;
@@ -263,6 +304,7 @@ export class DexieStorage extends Dexie {
     await this.projectPytchPrograms.clear();
     await this.projectAssets.clear();
     await this.assets.clear();
+    await this.userPreferences.clear();
   }
 
   async projectContentHash(id: ProjectId): Promise<SpecimenContentHash> {
