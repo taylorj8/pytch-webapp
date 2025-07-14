@@ -220,7 +220,6 @@ async function dbUpgrade_V7_from_V6(txn: Transaction) {
 
   const preferencesTable = txn.table("userPreferences");
   await preferencesTable.add({ key: "debugFeaturesEnabled", value: false });
-  await preferencesTable.add({ key: "helpSidebarShown", value: true });
   console.log("'userPreferences' table created and defaults set.");
 
   const nModified = await txn
@@ -282,7 +281,7 @@ export class DexieStorage extends Dexie {
 
     this.version(7)
       .stores({
-        userPreferences: "&key", // debugFeaturesEnabled, helpSidebarShown
+        userPreferences: "&key", // debugFeaturesEnabled
       })
       .upgrade(dbUpgrade_V7_from_V6)
 
@@ -927,6 +926,31 @@ export class DexieStorage extends Dexie {
 
     this.processingQueuedSyncTasks = false;
   }
+
+  async userPreference(preferenceKey: string): Promise<any> {
+    const maybePreference = await this.userPreferences.get(preferenceKey);
+    const preference = failIfNull(
+      maybePreference,
+      `could not find preference for key ${preferenceKey}`
+    );
+    return preference;
+  }
+
+  async updateUserPreference(
+    preferenceKey: string,
+    newValue: any,
+  ): Promise<void> {
+    await this.transaction("rw", this.userPreferences, async () => {
+      const oldPreference = await this.userPreferences.get(preferenceKey);
+      if (oldPreference !== undefined && typeof oldPreference.value !== typeof newValue) {
+        throw new Error(
+          `Type mismatch for preference "${preferenceKey}": ` +
+          `was "${typeof oldPreference.value}", now "${typeof newValue}"`
+        );
+      }
+      await this.userPreferences.put({ key: preferenceKey, value: newValue });
+    });
+  }
 }
 
 const _db = new DexieStorage();
@@ -953,3 +977,5 @@ export const deleteManyProjects = _db.deleteManyProjects.bind(_db);
 export const renameProject = _db.renameProject.bind(_db);
 export const updateAssetTransform = _db.updateAssetTransform.bind(_db);
 export const enqueueSyncTask = _db.enqueueSyncTask.bind(_db);
+export const userPreference = _db.userPreference.bind(_db);
+export const updateUserPreference = _db.updateUserPreference.bind(_db);

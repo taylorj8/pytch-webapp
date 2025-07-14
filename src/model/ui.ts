@@ -71,6 +71,8 @@ import {
   DeleteManyProjectsFlow,
   deleteManyProjectsFlow,
 } from "./user-interactions/delete-many-projects";
+import { updateUserPreference, userPreference } from "../database/indexed-db";
+import { failIfNull } from "../utils";
 
 export interface IStageDisplaySize {
   width: number;
@@ -124,7 +126,9 @@ export interface IIDELayout {
   initiateButtonTour: Action<IIDELayout>;
   maybeAdvanceTour: Action<IIDELayout, ButtonTourStage>;
   debugFeaturesEnabled: boolean;
-  toggleDebugFeatures: Action<IIDELayout>;
+  toggleDebugFeatures: Thunk<IIDELayout>;
+  _setDebugFeaturesEnabled: Action<IIDELayout, boolean>;
+  initialiseUserPreferences: Thunk<IIDELayout>;
 }
 
 export const fullScreenStageDisplaySize = (controlsHeight = 36) => {
@@ -280,12 +284,19 @@ export const ideLayout: IIDELayout = {
   }),
 
   helpSidebar,
-  debugFeaturesEnabled: true, // todo switch back to false
-  toggleDebugFeatures: action((state) => {
-    state.debugFeaturesEnabled = !state.debugFeaturesEnabled;
-    document.documentElement.style.setProperty(
-      "--show-debug-features", state.debugFeaturesEnabled ? "block" : "none"
-    )
+  debugFeaturesEnabled: false,
+  toggleDebugFeatures: thunk(async (actions, _payload, helpers) => {
+    const current = helpers.getState().debugFeaturesEnabled;
+    const newValue = !current;
+    actions._setDebugFeaturesEnabled(newValue);
+    await updateUserPreference("debugFeaturesEnabled", newValue);
+  }),
+  _setDebugFeaturesEnabled: action((state, value) => {
+    state.debugFeaturesEnabled = value;
+  }),
+  initialiseUserPreferences: thunk(async (actions) => {
+    const initialValue: boolean = (await userPreference("debugFeaturesEnabled")).value;
+    actions._setDebugFeaturesEnabled(initialValue);
   }),
 };
 

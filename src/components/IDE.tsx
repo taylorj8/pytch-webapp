@@ -68,6 +68,9 @@ const IDE: React.FC<EmptyProps> = () => {
   const { ensureSyncFromStorage } = useStoreActions(
     (actions) => actions.activeProject
   );
+  const { initialiseUserPreferences } = useStoreActions(
+    (actions) => actions.ideLayout
+  );
 
   if (projectIdString == null) {
     throw Error("missing projectId for IDE");
@@ -84,6 +87,7 @@ const IDE: React.FC<EmptyProps> = () => {
       Sk.default_pytch_environment.current_live_project;
 
     ensureSyncFromStorage(projectId);
+    initialiseUserPreferences();
 
     return () => {
       Sk.pytch.sound_manager.reset();

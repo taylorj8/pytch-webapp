@@ -35,6 +35,7 @@ import {
   reorderAssetsInProject,
   updateLinkedContentRef,
   enqueueSyncTask,
+  userPreference,
 } from "../database/indexed-db";
 
 import { AssetTransform } from "./asset";

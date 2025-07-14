@@ -725,7 +725,7 @@
     height: 12px;
     background-color: $color;
     border-radius: 50%;
-    display: var(--show-debug-features, "block") // todo change back to none
+    display: var(--show-debug-features, "none")
   }
   
   .ace_gutter-cell {
