@@ -35,7 +35,6 @@ import {
   reorderAssetsInProject,
   updateLinkedContentRef,
   enqueueSyncTask,
-  updateBreakpointsInProject,
   breakpoints,
 } from "../database/indexed-db";
 
@@ -429,7 +428,7 @@ export interface IActiveProject {
   debugLine: number;	
   setDebugLine: Action<IActiveProject, number>;
 
-  breakpointStore: BreakpointStore;
+  initialiseBreakpointStore: Thunk<IActiveProject, ProjectId>;
   setBreakpoints: Thunk<IActiveProject, BreakpointStore>;
   addBreakpoint: Thunk<IActiveProject, BreakpointRecord>;
   removeBreakpoint: Thunk<IActiveProject, BreakpointRecord>;
@@ -891,12 +890,6 @@ export const activeProject: IActiveProject = {
         );
       }
 
-      // initialise the breakpoints
-      const initialStore = await breakpoints(projectId);
-      if (!Array.isArray(initialStore)) {
-        actions.setBreakpoints(initialStore);
-      }
-
       storeActions.ideLayout.helpSidebar.hideAllContent();
 
       const programKind = content.program.kind;
@@ -907,6 +900,7 @@ export const activeProject: IActiveProject = {
             linkedContentKind: content.linkedContentRef.kind,
           };
           storeActions.jrEditState.bootForProgram(bootData);
+          actions.initialiseBreakpointStore(projectId);
           break;
         }
         case "flat": {
@@ -1333,13 +1327,28 @@ export const activeProject: IActiveProject = {
     state.debugLine = line;
   }),
 
-  breakpointStore: {},
-  setBreakpoints: thunk((actions, newStore, helpers) => {
-    helpers.getState().breakpointStore = newStore;
-    updateBreakpointsInProject(helpers.getState().project.id, newStore);
+  initialiseBreakpointStore: thunk(async (actions, projectId, helpers) => {
+    const initialStore = await breakpoints(projectId);
+      if (!Array.isArray(initialStore)) {
+        actions.setBreakpoints(initialStore);
+      }
+  }),
+  setBreakpoints: thunk((actions, newBreakpoints, helpers) => {
+    const program = PytchProgramOps.ensureKind(
+      "setBreakpoints()",
+      helpers.getState().project.program,
+      "per-method"
+    );
+    program.breakpointStore = newBreakpoints;
   }),
   addBreakpoint: thunk(async (actions, { actorId, handlerId, lineNo }, helpers) => {
-    const newBreakpointStore = JSON.parse(JSON.stringify(helpers.getState().breakpointStore));
+    const program = PytchProgramOps.ensureKind(
+      "addBreakpoint()",
+      helpers.getState().project.program,
+      "per-method"
+    );
+
+    const newBreakpointStore = JSON.parse(JSON.stringify(program.breakpointStore));
     if (!newBreakpointStore[actorId]) {
       newBreakpointStore[actorId] = {};
     }
@@ -1352,7 +1361,13 @@ export const activeProject: IActiveProject = {
     }
   }),
   removeBreakpoint: thunk(async (actions, { actorId, handlerId, lineNo }, helpers) => {
-    const newBreakpointStore = JSON.parse(JSON.stringify(helpers.getState().breakpointStore));
+    const program = PytchProgramOps.ensureKind(
+      "removeBreakpoint()",
+      helpers.getState().project.program,
+      "per-method"
+    );
+    
+    const newBreakpointStore = JSON.parse(JSON.stringify(program.breakpointStore));
     const actorStore = newBreakpointStore[actorId];
     if (!actorStore) return;
 

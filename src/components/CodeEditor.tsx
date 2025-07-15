@@ -15,6 +15,7 @@ import { SingleTab } from "./SingleTab";
 import { Debugger } from "../skulpt-connection/drive-project";
 import { userFile } from "../constants";
 import { resetDebugging } from "./StageControls";
+import { PytchProgramOps } from "../model/pytch-program";
 
 const ReadOnlyOverlay = () => {
   const syncState = useStoreState(
@@ -64,11 +65,15 @@ const CodeAceEditor = () => {
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
   const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
 
-  const previousBreakpoints = useStoreState((state) =>
-    state.activeProject.project.program.kind === "flat"
-      ? state.activeProject.project.program.breakpoints
-      : []
-  );
+  const previousBreakpoints = useStoreState((state) => {
+      const program = state.activeProject.project.program;
+      return PytchProgramOps.ensureKind(
+        "CodeEditor",
+        program,
+        "flat"
+      ).breakpointList;
+    });
+
   // load breakpoints from previous session
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");

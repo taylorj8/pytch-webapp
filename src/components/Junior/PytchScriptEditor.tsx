@@ -37,6 +37,7 @@ import { failIfNull } from "../../utils";
 import { Debugger } from "../../skulpt-connection/drive-project";
 import { userFile } from "../../constants";
 import { BreakpointRecord, BreakpointStore } from "../../model/project";
+import { PytchProgramOps } from "../../model/pytch-program";
 
 // Adapted from https://stackoverflow.com/a/71952718
 const insertElectricFullStop = (editor: AceEditorT) => {
@@ -89,12 +90,20 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
   const debugLine = useStoreState((state) => state.activeProject.debugLine);
 
-  const breakpointStore = useStoreState((state) => state.activeProject.breakpointStore);
+  const breakpointStore = useStoreState((state) => {
+    const program = state.activeProject.project.program;
+    return PytchProgramOps.ensureKind(
+      "PytchScriptEditor",
+      program,
+      "per-method"
+    ).breakpointStore;
+  });
   const { setBreakpoints, addBreakpoint, removeBreakpoint } = useStoreActions((actions) => actions.activeProject);
 
   const [prevMarker, setPrevMarker] = useState<number>(-1);
 
   useEffect(() => {
+    console.log(breakpointStore)
     const scroll = () => scrollCursorRowIntoView(handlerId);
     scroll();
 
@@ -153,11 +162,11 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   }, [aceParentRef, conjoinedResizeObserver]);
 
   function hasBreakpoint(breakpointStore: BreakpointStore, breakpoint: BreakpointRecord) {
-  return (
-    breakpointStore[breakpoint.actorId] && breakpointStore[breakpoint.actorId][breakpoint.handlerId] &&
-    breakpointStore[breakpoint.actorId][breakpoint.handlerId].includes(breakpoint.lineNo)
-  );
-}
+    return (
+      breakpointStore[breakpoint.actorId] && breakpointStore[breakpoint.actorId][breakpoint.handlerId] &&
+      breakpointStore[breakpoint.actorId][breakpoint.handlerId].includes(breakpoint.lineNo)
+    );
+  }
 
   // todo remove duplication with CodeEditor.tsx
   const breakpointStoreRef = useRef(breakpointStore);
@@ -271,17 +280,17 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   }, [debugLine]);
 
   // replaces breakpoints when switching between actors
-  useEffect(() => {
-    // if (debugFeaturesEnabled) return;
-    const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
-    ace.editor.session.clearBreakpoints();
+  // useEffect(() => {
+  //   // if (debugFeaturesEnabled) return;
+  //   const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
+  //   ace.editor.session.clearBreakpoints();
 
-    if (breakpointStore[actorId] && breakpointStore[actorId][handlerId]) {
-      breakpointStore[actorId][handlerId].forEach((lineNo) => {
-        ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint");
-      });
-    }
-  }, [actorId]);
+  //   if (breakpointStore[actorId] && breakpointStore[actorId][handlerId]) {
+  //     breakpointStore[actorId][handlerId].forEach((lineNo) => {
+  //       ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint");
+  //     });
+  //   }
+  // }, [actorId]);
 
   /** Once the editor has loaded, there are a few things we have to do:
    *

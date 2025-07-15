@@ -25,8 +25,8 @@ import { validate as _untypedValidate } from "./pytch-program-json-validation";
 const validatePytchProgramJson = _untypedValidate as any;
 
 export type PytchProgram =
-  | { kind: "flat"; text: string; breakpoints: number[] }
-  | { kind: "per-method"; program: StructuredProgram; breakpoints: BreakpointStore };
+  | { kind: "flat"; text: string; breakpointList: number[] }
+  | { kind: "per-method"; program: StructuredProgram; breakpointStore: BreakpointStore };
 
 export type PytchProgramKind = PytchProgram["kind"];
 
@@ -44,7 +44,7 @@ export class PytchProgramOps {
   /** Return a new `PytchProgram` instance of kind `"flat"` and with the
    * given `text`. */
   static fromPythonCode(text: string): PytchProgram {
-    return { kind: "flat", text, breakpoints: [] };
+    return { kind: "flat", text, breakpointList: [] };
   }
 
   static newEmpty(kind: "flat"): PytchProgramOfKind<"flat">;
@@ -53,9 +53,9 @@ export class PytchProgramOps {
     switch (kind) {
       case "flat":
         // TODO: Extract this to a constant somewhere.
-        return { kind, text: "import pytch\n\n", breakpoints: [] };
+        return { kind, text: "import pytch\n\n", breakpointList: [] };
       case "per-method":
-        return { kind, program: StructuredProgramOps.newEmpty(), breakpoints: {} };
+        return { kind, program: StructuredProgramOps.newEmpty(), breakpointStore: {} };
       default:
         return assertNever(kind);
     }
@@ -64,7 +64,7 @@ export class PytchProgramOps {
   /** Return a new `PytchProgram` instance of kind `"per-method"` and
    * with the given structured `program`. */
   static fromStructuredProgram(program: StructuredProgram): PytchProgram {
-    return { kind: "per-method", program, breakpoints: {} };
+    return { kind: "per-method", program, breakpointStore: {} };
   }
 
   /** Return a flat-text Python equivalent of the given `program` having

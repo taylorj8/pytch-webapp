@@ -86,9 +86,8 @@ const IDE: React.FC<EmptyProps> = () => {
     Sk.pytch.current_live_project =
       Sk.default_pytch_environment.current_live_project;
 
-    ensureSyncFromStorage(projectId);
-    initialiseUserPreferences();
-    // initialiseBreakpointStore(projectId);
+      ensureSyncFromStorage(projectId);
+      initialiseUserPreferences();
 
     return () => {
       Sk.pytch.sound_manager.reset();

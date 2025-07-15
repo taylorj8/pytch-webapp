@@ -226,15 +226,17 @@ async function dbUpgrade_V7_from_V6(txn: Transaction) {
     .table("projectPytchPrograms")
     .toCollection()
     .modify((projectPytchProgram: ProjectPytchProgramRecord) => {
-      if (projectPytchProgram.program.breakpoints == null) {
-        switch (projectPytchProgram.program.kind) {
-          case "flat":
-              projectPytchProgram.program.breakpoints = [];
-              break;
-          case "per-method":
-              projectPytchProgram.program.breakpoints = {};
-              break;
-        }
+      switch (projectPytchProgram.program.kind) {
+        case "flat":
+          if (projectPytchProgram.program.breakpointList == null) {
+            projectPytchProgram.program.breakpointList = [];
+          }
+          break;
+        case "per-method":
+          if (projectPytchProgram.program.breakpointStore == null) {
+            projectPytchProgram.program.breakpointStore = {};
+          }
+          break;
       }
     });
 
@@ -917,25 +919,34 @@ export class DexieStorage extends Dexie {
         `Something went wrong fetching breakpoints for project ${projectId}`
       )
     }
-    return record.program.breakpoints;
+
+    switch(record.program.kind) {
+      case "flat":
+        return record.program.breakpointList;
+      case "per-method":
+        return record.program.breakpointStore;
+    }
   }
 
-  async updateBreakpointsInProject(
-    projectId: ProjectId,
-    updatedBreakpoints: number[] | BreakpointStore,
-  ) {
-    console.log(`ProjectId: ${projectId}`)
-    console.log(updatedBreakpoints)
-    await this.transaction("rw", this.projectPytchPrograms, async () => {
-      await this.projectPytchPrograms.where("projectId").equals(projectId).modify((record: ProjectPytchProgramRecord) => {
-        try {
-          record.program.breakpoints = updatedBreakpoints;
-        } catch {
-          throw new Error(`Type mismatch: Expected ${typeof record.program.breakpoints}, given ${typeof updatedBreakpoints}`)
-        }
-      });
-    });
-  }
+  // async updateBreakpointsInProject(
+  //   projectId: ProjectId,
+  //   updatedBreakpoints: number[] | BreakpointStore,
+  // ) {
+  //   // console.log(`ProjectId: ${projectId}`)
+  //   // console.log(updatedBreakpoints)
+  //   await this.transaction("rw", this.projectPytchPrograms, async () => {
+  //     await this.projectPytchPrograms.where("projectId").equals(projectId).modify((record: ProjectPytchProgramRecord) => {
+  //       try {
+  //         console.log(record.program.breakpoints)
+  //         console.log("updating")
+  //         record.program.breakpoints = updatedBreakpoints;
+  //         console.log(record.program.breakpoints)
+  //       } catch {
+  //         throw new Error(`Type mismatch: Expected ${typeof record.program.breakpoints}, given ${typeof updatedBreakpoints}`)
+  //       }
+  //     });
+  //   });
+  // }
 
   enqueueSyncTask(task: KeyedSyncTask) {
     let oldIndex = this.queuedSyncTasks.findIndex(
@@ -1007,4 +1018,4 @@ export const enqueueSyncTask = _db.enqueueSyncTask.bind(_db);
 export const userPreference = _db.userPreference.bind(_db);
 export const updateUserPreference = _db.updateUserPreference.bind(_db);
 export const breakpoints = _db.breakpoints.bind(_db);
-export const updateBreakpointsInProject = _db.updateBreakpointsInProject.bind(_db);
+// export const updateBreakpointsInProject = _db.updateBreakpointsInProject.bind(_db);
