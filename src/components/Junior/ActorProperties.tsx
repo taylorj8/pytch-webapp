@@ -17,10 +17,6 @@ import {
 import { useJrEditActions, useJrEditState, useMappedProgram } from "./hooks";
 import { AppearancesTabTitle } from "./AppearancesTabTitle";
 
-import { Debugger } from "../../skulpt-connection/drive-project";
-import { resetDebugging } from "../StageControls";
-import { useStoreActions } from "../../store";
-
 export const ActorProperties = () => {
   const activeTab = useJrEditState((s) => s.actorPropertiesActiveTab);
   const setActiveTab = useJrEditActions((a) => a.setActorPropertiesActiveTab);
@@ -28,7 +24,6 @@ export const ActorProperties = () => {
   const focusedActorId = useJrEditState((s) => s.focusedActor);
   const actionInProgress = useJrEditState((s) => s.assetReorderInProgress);
 
-  const setBreakpoints = useStoreActions((actions) => actions.activeProject.setBreakpoints);
 
   const actorKind = useMappedProgram(
     "<ActorProperties>",
@@ -41,15 +36,6 @@ export const ActorProperties = () => {
   const appearancesTitle = (
     <AppearancesTabTitle value={appearancesTitleText}></AppearancesTabTitle>
   );
-
-  // clean-up when leaving the page - clears breakpoints and resets debugger
-  useEffect(() => {
-    return () => {
-      setBreakpoints(new Set());
-      Debugger.clear_all_breakpoints();
-      resetDebugging(false);
-    };
-  }, []);
 
   const Tab = TabWithTypedKey<TabKey>;
   return (
