@@ -19,8 +19,6 @@ import { aceControllerMap } from "../../skulpt-connection/code-editor";
 import { useNotableChanges } from "../hooks/notable-changes";
 import { ConjoinedResizeObserver } from "../../model/junior/conjoined-resize-observer";
 
-import { Debugger } from "../../skulpt-connection/drive-project";
-import { resetDebugging } from "../StageControls";
 
 const AddHandlerButton: React.FC<EmptyProps> = () => {
   const focusedActorId = useJrEditState((s) => s.focusedActor);
@@ -147,8 +145,7 @@ export const CodeEditor = () => {
   const [dropProps, dropRef] = useHelpHatBlockDrop(actorId);
 
   const setBreakpointStore = useStoreActions((actions) => actions.activeProject.setBreakpointStore);
-
-
+  
   // Normally we'd let the <Tabs> component worry about whether a
   // particular <Tab> is shown or hidden.  But we want the
   // aceControllerMap to accurately represent whether a particular

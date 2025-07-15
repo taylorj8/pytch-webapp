@@ -729,15 +729,21 @@
   }
   
   .ace_gutter-cell {
-    cursor: pointer;
-    &:hover::before {
-      @include breakpoint-dot(rgba(212, 24, 24, 0.4));
-    }
-
+    cursor: default;
+  
     &.ace_breakpoint {
       position: absolute;
+    
       &::before {
         @include breakpoint-dot(rgb(212, 24, 24));
+      }
+    }
+  
+    &:not(.ace_gutter_empty) {
+      cursor: pointer;
+    
+      &:not(.ace_breakpoint):hover::before {
+        @include breakpoint-dot(rgba(212, 24, 24, 0.4));
       }
     }
   }

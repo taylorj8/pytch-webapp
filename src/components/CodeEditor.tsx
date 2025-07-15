@@ -113,14 +113,18 @@ const CodeAceEditor = () => {
       if (!debugFeaturesEnabledRef.current || e.domEvent.target.className.indexOf("ace_gutter-cell") == -1)
         return;
 
-      let row = e.getDocumentPosition().row + 1;
+      const row = e.getDocumentPosition().row + 1;
 
       if (Debugger.check_breakpoints(userFile, row, 0)) {
         Debugger.clear_breakpoint(userFile, row, 0, false);
         ace.editor.session.clearBreakpoint(row - 1);
       } else {
-        Debugger.add_breakpoint(userFile, row, 0, false);
-        ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
+        const lines = ace.editor.session.getDocument().getAllLines();
+        // if a line is empty don't let a breakpoint be set there
+        if (lines[row - 1].trim() !== "") {
+          Debugger.add_breakpoint(userFile, row, 0, false);
+          ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
+        }
       }
       setBreakpointList(Debugger.get_breakpoint_lines());
 
@@ -138,6 +142,34 @@ const CodeAceEditor = () => {
       ace.editor.session.getUndoManager().reset();
     }
   });
+
+  // assign a different class to empty lines so breakpoint hover can be hidden 
+  useEffect(() => {
+    const ace = aceRef.current?.editor;
+    if (!ace) return;
+
+    const updateEmptyDecorations = () => {
+      const lines = ace.session.getDocument().getAllLines();
+
+      lines.forEach((line, row) => {
+        if (line.trim() === "") {
+          ace.session.addGutterDecoration(row, "ace_gutter_empty");
+
+          // remove breakpoint if the line is now empty
+          if (Debugger.check_breakpoints(userFile, row + 1, 0)) {
+            Debugger.clear_breakpoint(userFile, row + 1, 0, false);
+            ace.session.clearBreakpoint(row);
+          }
+        } else {
+          ace.session.removeGutterDecoration(row, "ace_gutter_empty");
+        }
+      });
+    };
+
+    updateEmptyDecorations();
+    ace.getSession().on("change", updateEmptyDecorations);
+    return () => ace.getSession().off("change", updateEmptyDecorations);
+  }, []);
 
   useEffect(() => {
     debugFeaturesEnabledRef.current = debugFeaturesEnabled;

@@ -166,9 +166,10 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     );
   }
 
-  // todo remove duplication with CodeEditor.tsx
   const breakpointStoreRef = useRef(breakpointStore);
   const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
+  
+  // todo remove duplication with CodeEditor.tsx
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "PytchScriptEditor effect: aceRef is null");
 
@@ -201,10 +202,14 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
           Debugger.clear_breakpoint(userFile, globalLineNo, 0, false);
         }
       } else {
-        ace.editor.session.setBreakpoint(row, "ace_breakpoint");
-        addBreakpoint(breakpointRecord);
-        if (globalLineNo !== null) {
-          Debugger.add_breakpoint(userFile, globalLineNo, 0);
+        const lines = ace.editor.session.getDocument().getAllLines();
+        // if a line is empty don't let a breakpoint be set there
+        if (lines[row].trim() !== "") {
+          ace.editor.session.setBreakpoint(row, "ace_breakpoint");
+          addBreakpoint(breakpointRecord);
+          if (globalLineNo !== null) {
+            Debugger.add_breakpoint(userFile, globalLineNo, 0);
+          }
         }
       }
 
@@ -257,9 +262,38 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     });
   }, []);
 
+  // assign a different class to empty lines so breakpoint hover can be hidden 
+  useEffect(() => {
+    const ace = aceRef.current?.editor;
+    if (!ace) return;
+
+    const updateEmptyDecorations = () => {
+      const lines = ace.session.getDocument().getAllLines();
+      
+      lines.forEach((line, row) => {
+        if (line.trim() === "") {
+          ace.session.addGutterDecoration(row, "ace_gutter_empty");
+        
+          // remove breakpoint if the line is now empty
+          if (Debugger.check_breakpoints(userFile, row + 1, 0)) {
+            Debugger.clear_breakpoint(userFile, row + 1, 0, false);
+            ace.session.clearBreakpoint(row);
+          }
+        } else {
+          ace.session.removeGutterDecoration(row, "ace_gutter_empty");
+        }
+      });
+    };
+
+    updateEmptyDecorations();
+    ace.getSession().on("change", updateEmptyDecorations);
+    return () => ace.getSession().off("change", updateEmptyDecorations);
+  }, []);
+
   useEffect(() => {
     breakpointStoreRef.current = breakpointStore;
   }, [breakpointStore]);
+
   useEffect(() => {
     debugFeaturesEnabledRef.current = debugFeaturesEnabled;
   }, [debugFeaturesEnabled]);
