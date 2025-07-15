@@ -296,6 +296,16 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
   useEffect(() => {
     debugFeaturesEnabledRef.current = debugFeaturesEnabled;
+
+    const ace = aceRef.current?.editor;
+    if (!ace) return;
+
+    const gutter = (ace.renderer as any).$gutterLayer.element as HTMLElement;
+    if (debugFeaturesEnabled) {
+      gutter.classList.add("debug_enabled");
+    } else {
+      gutter.classList.remove("debug_enabled");
+    }
   }, [debugFeaturesEnabled]);
 
   useEffect(() => {

@@ -291,6 +291,44 @@ $speech-bubble-max-height: 180px;
   }
 }
 
+@mixin breakpoint-dot($color) {
+  content: "";
+  position: absolute;
+  left: 0.3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background-color: $color;
+  border-radius: 50%;
+}
+  
+.ace_gutter-layer.debug_enabled .ace_gutter-cell {
+  cursor: default;
+
+  &.ace_breakpoint {
+    position: absolute;
+  
+    &::before {
+      @include breakpoint-dot(rgb(212, 24, 24));
+    }
+  }
+  
+  &:not(.ace_gutter_empty) {
+    cursor: pointer;
+  
+    &:not(.ace_breakpoint):hover::before {
+      @include breakpoint-dot(rgba(212, 24, 24, 0.4));
+    }
+  }
+}
+
+.debugLine {
+ position: absolute;
+ background: rgba(204, 35, 35, 0.5);
+ z-index: 20;
+}
+
 .CodeEditor {
   flex-grow: 1;
   flex-shrink: 1;
@@ -305,45 +343,6 @@ $speech-bubble-max-height: 180px;
   */
   .ace_editor {
     font-family: $monospace-fonts;
-  }
-
-  @mixin breakpoint-dot($color) {
-    content: "";
-    position: absolute;
-    left: 0.3rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 12px;
-    height: 12px;
-    background-color: $color;
-    border-radius: 50%;
-    display: var(--show-debug-features, "none");
-  }
-  
-  .ace_gutter-cell {
-    cursor: default;
-  
-    &.ace_breakpoint {
-      position: absolute;
-    
-      &::before {
-        @include breakpoint-dot(rgb(212, 24, 24));
-      }
-    }
-  
-    &:not(.ace_gutter_empty) {
-      cursor: pointer;
-    
-      &:not(.ace_breakpoint):hover::before {
-        @include breakpoint-dot(rgba(212, 24, 24, 0.4));
-      }
-    }
-  }
-
-  .debugLine {
-   position: absolute;
-   background: rgba(204, 35, 35, 0.5);
-   z-index: 20;
   }
 
   .help-sidebar {
