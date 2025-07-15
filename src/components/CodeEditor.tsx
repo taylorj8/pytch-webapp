@@ -153,7 +153,7 @@ const CodeAceEditor = () => {
     }
   });
 
-  // assign a different class to empty lines so breakpoint hover can be hidden 
+  // assign a different class to empty lines so breakpoint hover can be hidden
   useEffect(() => {
     const ace = aceRef.current?.editor;
     if (!ace) return;
@@ -164,12 +164,6 @@ const CodeAceEditor = () => {
       lines.forEach((line, row) => {
         if (line.trim() === "") {
           ace.session.addGutterDecoration(row, "ace_gutter_empty");
-
-          // remove breakpoint if the line is now empty
-          if (Debugger.check_breakpoints(userFile, row + 1, 0)) {
-            Debugger.clear_breakpoint(userFile, row + 1, 0, false);
-            ace.session.clearBreakpoint(row);
-          }
         } else {
           ace.session.removeGutterDecoration(row, "ace_gutter_empty");
         }
@@ -211,45 +205,57 @@ const CodeAceEditor = () => {
 
     // ensures the breakpoint tracks the code rather than the line number
     (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
-      if (delta.end.row == delta.start.row) return;
+      const breakpoints: number[] = Debugger.get_breakpoint_lines();
       const updatedBreakpoints: number[] = [];
-      const breakpoints = Debugger.get_breakpoints_list();
+      
+      let breakpointsOnEmpty = [];
+      const lines = ace.editor.session.getDocument().getAllLines();
+      breakpointsOnEmpty = breakpoints.filter((row) => {
+        const lineIndex = row - 1;
+        return lines[lineIndex] !== undefined && lines[lineIndex].trim() === "";
+      });
+      const breakpointOnEmpty = breakpointsOnEmpty.length > 0;
 
-      let breakpointMoved = false;
-      Object.values(breakpoints).forEach((breakpoint: any) => {
-        const row = breakpoint.lineno;
+      // if there is no breakpoint on an empty line and not change to line numbers
+      // no updates to breakpoints required
+      if (!breakpointOnEmpty && delta.end.row === delta.start.row) return;
 
-        if (delta.start.row >= row) {
+      let breakpointsUpdated = false;
+      breakpoints.forEach((row) => {
+      if (delta.start.row >= row - 1) {
           updatedBreakpoints.push(row);
         } else if (delta.action === "insert") {
-
           const linesAdded = delta.end.row - delta.start.row;
           updatedBreakpoints.push(row + linesAdded)
-          breakpointMoved = true;
-
+          breakpointsUpdated = true;
         } else if (delta.action === "remove") {
-
           const linesRemoved = delta.end.row - delta.start.row;
           const newRow = row - linesRemoved;
           if (newRow >= delta.start.row) {
             updatedBreakpoints.push(newRow);
-            breakpointMoved = true;
+            breakpointsUpdated = true;
           } else {
             updatedBreakpoints.push(row);
           }
-
         }
       });
 
-      if (breakpointMoved) {
+      const filteredBreakpoints = updatedBreakpoints.filter((row) => {
+        return lines[row - 1] !== undefined && lines[row - 1].trim() !== "";
+      });
+      if (filteredBreakpoints.length !== updatedBreakpoints.length) {
+        breakpointsUpdated = true;
+      }
+
+      if (breakpointsUpdated) {
         Debugger.clear_all_breakpoints();
         ace.editor.session.clearBreakpoints();
 
-        updatedBreakpoints.forEach((breakpoint) => {
+        filteredBreakpoints.forEach((breakpoint) => {
           Debugger.add_breakpoint(userFile, breakpoint, 0, false);
           ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint")
         });
-        setBreakpointList(updatedBreakpoints);
+        setBreakpointList(filteredBreakpoints);
       }
     });
   }, [])
