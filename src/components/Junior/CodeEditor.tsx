@@ -144,6 +144,8 @@ export const CodeEditor = () => {
   const actorId = useJrEditState((s) => s.focusedActor);
   const [dropProps, dropRef] = useHelpHatBlockDrop(actorId);
 
+  const setBreakpointStore = useStoreActions((actions) => actions.activeProject.setBreakpointStore);
+  
   // Normally we'd let the <Tabs> component worry about whether a
   // particular <Tab> is shown or hidden.  But we want the
   // aceControllerMap to accurately represent whether a particular
