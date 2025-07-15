@@ -101,6 +101,16 @@ const CodeAceEditor = () => {
       exec: () => build({ focusDestination: "editor", inDebugMode: false }),
     });
     ace.editor.commands.addCommand({
+      name: "buildAndYellowDebug",
+      bindKey: { mac: "Ctrl-Alt-Enter", win: "Ctrl-Alt-Enter" },
+      exec: () => build({ focusDestination: "running-project", inDebugMode: true }),
+    });
+    ace.editor.commands.addCommand({
+      name: "buildAndYellowDebugKeepFocus",
+      bindKey: { mac: "Ctrl-Shift-Alt-Enter", win: "Ctrl-Shift-Alt-Enter" },
+      exec: () => build({ focusDestination: "editor", inDebugMode: true }),
+    });
+    ace.editor.commands.addCommand({
       name: "copySelectionAsHtml",
       bindKey: { mac: "Cmd-Shift-c", win: "Ctrl-Shift-c" },
       exec: async () => {
