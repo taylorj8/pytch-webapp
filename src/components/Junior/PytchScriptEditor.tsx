@@ -91,19 +91,17 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   const debugLine = useStoreState((state) => state.activeProject.debugLine);
 
   const breakpointStore = useStoreState((state) => {
-    const program = state.activeProject.project.program;
     return PytchProgramOps.ensureKind(
       "PytchScriptEditor",
-      program,
+      state.activeProject.project.program,
       "per-method"
     ).breakpointStore;
   });
-  const { setBreakpoints, addBreakpoint, removeBreakpoint } = useStoreActions((actions) => actions.activeProject);
+  const { setBreakpointStore, addBreakpoint, removeBreakpoint } = useStoreActions((actions) => actions.activeProject);
 
   const [prevMarker, setPrevMarker] = useState<number>(-1);
 
   useEffect(() => {
-    console.log(breakpointStore)
     const scroll = () => scrollCursorRowIntoView(handlerId);
     scroll();
 
@@ -219,9 +217,9 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
       const updatedBreakpoints: number[] = [];
 
       let breakpointMoved = false;
-      const tempStore = breakpointStoreRef.current;
-      if (tempStore[actorId] && tempStore[actorId][handlerId]) {
-        tempStore[actorId][handlerId].forEach((lineNo: number) => {
+      const updatedStore = breakpointStoreRef.current;
+      if (updatedStore[actorId] && updatedStore[actorId][handlerId]) {
+        updatedStore[actorId][handlerId].forEach((lineNo: number) => {
           if (delta.start.row >= lineNo) {
             updatedBreakpoints.push(lineNo);
           } else if (delta.action === "insert") {
@@ -247,9 +245,9 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
       }
 
       if (breakpointMoved) {
-        tempStore[actorId][handlerId] = updatedBreakpoints;
+        updatedStore[actorId][handlerId] = updatedBreakpoints;
         
-        setBreakpoints(tempStore);
+        setBreakpointStore(updatedStore);
         ace.editor.session.clearBreakpoints();
         // re-add breakpoints after clearing
         updatedBreakpoints.forEach((lineNo) => {
@@ -280,17 +278,17 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   }, [debugLine]);
 
   // replaces breakpoints when switching between actors
-  // useEffect(() => {
-  //   // if (debugFeaturesEnabled) return;
-  //   const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
-  //   ace.editor.session.clearBreakpoints();
+  useEffect(() => {
+    // if (debugFeaturesEnabled) return;
+    const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
+    ace.editor.session.clearBreakpoints();
 
-  //   if (breakpointStore[actorId] && breakpointStore[actorId][handlerId]) {
-  //     breakpointStore[actorId][handlerId].forEach((lineNo) => {
-  //       ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint");
-  //     });
-  //   }
-  // }, [actorId]);
+    if (breakpointStore[actorId] && breakpointStore[actorId][handlerId]) {
+      breakpointStore[actorId][handlerId].forEach((lineNo) => {
+        ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint");
+      });
+    }
+  }, [actorId]);
 
   /** Once the editor has loaded, there are a few things we have to do:
    *

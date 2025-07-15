@@ -20,6 +20,8 @@ import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-searchbox";
 import "./ace-theme-pytch";
+import { Debugger } from "../skulpt-connection/drive-project";
+import { resetDebugging } from "./StageControls";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -68,9 +70,6 @@ const IDE: React.FC<EmptyProps> = () => {
   const { ensureSyncFromStorage } = useStoreActions(
     (actions) => actions.activeProject
   );
-  const { initialiseUserPreferences } = useStoreActions(
-    (actions) => actions.ideLayout
-  );
 
   if (projectIdString == null) {
     throw Error("missing projectId for IDE");
@@ -86,13 +85,15 @@ const IDE: React.FC<EmptyProps> = () => {
     Sk.pytch.current_live_project =
       Sk.default_pytch_environment.current_live_project;
 
-      ensureSyncFromStorage(projectId);
-      initialiseUserPreferences();
+    ensureSyncFromStorage(projectId);
 
     return () => {
       Sk.pytch.sound_manager.reset();
       Sk.pytch.current_live_project =
         Sk.default_pytch_environment.current_live_project;
+
+      Debugger.clear_all_breakpoints();
+      resetDebugging(false);
     };
   });
 

@@ -428,8 +428,9 @@ export interface IActiveProject {
   debugLine: number;	
   setDebugLine: Action<IActiveProject, number>;
 
+  setBreakpointList: Action<IActiveProject, number[]>;
   initialiseBreakpointStore: Thunk<IActiveProject, ProjectId>;
-  setBreakpoints: Thunk<IActiveProject, BreakpointStore>;
+  setBreakpointStore: Action<IActiveProject, BreakpointStore>;
   addBreakpoint: Thunk<IActiveProject, BreakpointRecord>;
   removeBreakpoint: Thunk<IActiveProject, BreakpointRecord>;
 }
@@ -829,14 +830,15 @@ export const activeProject: IActiveProject = {
       console.log("ensureSyncFromStorage(): already requested; leaving");
       return;
     }
-
+    
     const ourSeqnum = previousLoadRequest.seqnum + 1;
     console.log("ensureSyncFromStorage(): starting; seqnum", ourSeqnum);
-
+    
     actions.noteLoadRequest({ projectId, seqnum: ourSeqnum, state: "pending" });
-
+    
     const storeActions = helpers.getStoreActions();
-
+    
+    storeActions.ideLayout.initialiseUserPreferences();
     storeActions.standardOutputPane.clear();
     storeActions.errorReportList.clear();
     actions.noteCodeSaved();
@@ -1327,21 +1329,30 @@ export const activeProject: IActiveProject = {
     state.debugLine = line;
   }),
 
+  setBreakpointList: action((state, newBreakpoints) => {
+    const program = PytchProgramOps.ensureKind(
+      "setBreakpoints()",
+      state.project.program,
+      "flat"
+    );
+    program.breakpointList = newBreakpoints;
+  }),
+
   initialiseBreakpointStore: thunk(async (actions, projectId, helpers) => {
     const initialStore = await breakpoints(projectId);
       if (!Array.isArray(initialStore)) {
-        actions.setBreakpoints(initialStore);
+        actions.setBreakpointStore(initialStore);
       }
   }),
-  setBreakpoints: thunk((actions, newBreakpoints, helpers) => {
+  setBreakpointStore: action((state, newBreakpoints) => {
     const program = PytchProgramOps.ensureKind(
       "setBreakpoints()",
-      helpers.getState().project.program,
+      state.project.program,
       "per-method"
     );
     program.breakpointStore = newBreakpoints;
   }),
-  addBreakpoint: thunk(async (actions, { actorId, handlerId, lineNo }, helpers) => {
+  addBreakpoint: thunk((actions, { actorId, handlerId, lineNo }, helpers) => {
     const program = PytchProgramOps.ensureKind(
       "addBreakpoint()",
       helpers.getState().project.program,
@@ -1357,10 +1368,10 @@ export const activeProject: IActiveProject = {
     }
     if (!newBreakpointStore[actorId][handlerId].includes(lineNo)) {
       newBreakpointStore[actorId][handlerId].push(lineNo);
-      actions.setBreakpoints(newBreakpointStore);
+      actions.setBreakpointStore(newBreakpointStore);
     }
   }),
-  removeBreakpoint: thunk(async (actions, { actorId, handlerId, lineNo }, helpers) => {
+  removeBreakpoint: thunk((actions, { actorId, handlerId, lineNo }, helpers) => {
     const program = PytchProgramOps.ensureKind(
       "removeBreakpoint()",
       helpers.getState().project.program,
@@ -1390,7 +1401,7 @@ export const activeProject: IActiveProject = {
     }
 
     if (updated) {
-      actions.setBreakpoints(newBreakpointStore);
+      actions.setBreakpointStore(newBreakpointStore);
     }
   }),
 };

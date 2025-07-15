@@ -56,6 +56,7 @@ const CodeAceEditor = () => {
     (state) => state.activeProject.lastSyncFromStorageSeqNum
   );
   const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
+  const setBreakpointList = useStoreActions((actions) => actions.activeProject.setBreakpointList);
 
   // We don't care about the actual value of the stage display size, but
   // we do need to know when it changes, so we can resize the editor in
@@ -65,27 +66,24 @@ const CodeAceEditor = () => {
   const [prevMarker, setPrevMarker] = useState<number | null>(null);
   const debugFeaturesEnabledRef = useRef(debugFeaturesEnabled);
 
-  const previousBreakpoints = useStoreState((state) => {
-      const program = state.activeProject.project.program;
-      return PytchProgramOps.ensureKind(
-        "CodeEditor",
-        program,
-        "flat"
-      ).breakpointList;
-    });
+  const breakpointList = useStoreState((state) => {
+    return PytchProgramOps.ensureKind(
+      "CodeEditor",
+      state.activeProject.project.program,
+      "flat"
+    ).breakpointList;
+  });
 
   // load breakpoints from previous session
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
-    // Clear all breakpoints first
-    Debugger.clear_all_breakpoints();
     // Add breakpoints from the loaded project
-    if (previousBreakpoints === undefined) return;
-    previousBreakpoints.forEach((lineNo) => {
+    if (breakpointList === undefined) return;
+    breakpointList.forEach((lineNo) => {
       Debugger.add_breakpoint(userFile, lineNo, 0, false);
       ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint")
     });
-  }, [previousBreakpoints]);
+  }, []);
 
   useEffect(() => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
@@ -124,8 +122,7 @@ const CodeAceEditor = () => {
         Debugger.add_breakpoint(userFile, row, 0, false);
         ace.editor.session.setBreakpoint(row - 1, "ace_breakpoint");
       }
-
-      console.log(Debugger.get_breakpoints_list())
+      setBreakpointList(Debugger.get_breakpoint_lines());
 
       e.stop();
     });
@@ -163,7 +160,7 @@ const CodeAceEditor = () => {
     // ensures the breakpoint tracks the code rather than the line number
     (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
       if (delta.end.row == delta.start.row) return;
-      const updatedBreakpoints = new Set<number>();
+      const updatedBreakpoints: number[] = [];
       const breakpoints = Debugger.get_breakpoints_list();
 
       let breakpointMoved = false;
@@ -171,11 +168,11 @@ const CodeAceEditor = () => {
         const row = breakpoint.lineno;
 
         if (delta.start.row >= row) {
-          updatedBreakpoints.add(row);
+          updatedBreakpoints.push(row);
         } else if (delta.action === "insert") {
 
           const linesAdded = delta.end.row - delta.start.row;
-          updatedBreakpoints.add(row + linesAdded)
+          updatedBreakpoints.push(row + linesAdded)
           breakpointMoved = true;
 
         } else if (delta.action === "remove") {
@@ -183,10 +180,10 @@ const CodeAceEditor = () => {
           const linesRemoved = delta.end.row - delta.start.row;
           const newRow = row - linesRemoved;
           if (newRow >= delta.start.row) {
-            updatedBreakpoints.add(newRow);
+            updatedBreakpoints.push(newRow);
             breakpointMoved = true;
           } else {
-            updatedBreakpoints.add(row);
+            updatedBreakpoints.push(row);
           }
 
         }
@@ -200,17 +197,10 @@ const CodeAceEditor = () => {
           Debugger.add_breakpoint(userFile, breakpoint, 0, false);
           ace.editor.session.setBreakpoint(breakpoint - 1, "ace_breakpoint")
         });
+        setBreakpointList(updatedBreakpoints);
       }
     });
   }, [])
-
-  // clean-up when leaving the page - clears breakpoints and debugline
-  useEffect(() => {
-    return () => {
-      Debugger.clear_all_breakpoints();
-      resetDebugging(false);
-    };
-  }, []);
 
   const { build, setCodeText } = useStoreActions(
     (actions) => actions.activeProject
