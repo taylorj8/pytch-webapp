@@ -206,20 +206,18 @@ const CodeAceEditor = () => {
     // ensures the breakpoint tracks the code rather than the line number
     (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
       const breakpoints: number[] = Debugger.get_breakpoint_lines();
-      const updatedBreakpoints: number[] = [];
       
-      let breakpointsOnEmpty = [];
       const lines = ace.editor.session.getDocument().getAllLines();
-      breakpointsOnEmpty = breakpoints.filter((row) => {
+      const breakpointsOnEmpty = breakpoints.filter((row) => {
         const lineIndex = row - 1;
         return lines[lineIndex] !== undefined && lines[lineIndex].trim() === "";
       });
-      const breakpointOnEmpty = breakpointsOnEmpty.length > 0;
-
-      // if there is no breakpoint on an empty line and not change to line numbers
+      
+      // if there is no breakpoint on an empty line and no change to line numbers
       // no updates to breakpoints required
-      if (!breakpointOnEmpty && delta.end.row === delta.start.row) return;
-
+      if (breakpointsOnEmpty.length == 0 && delta.end.row === delta.start.row) return;
+      
+      const updatedBreakpoints: number[] = [];
       let breakpointsUpdated = false;
       breakpoints.forEach((row) => {
       if (delta.start.row >= row - 1) {
