@@ -12,33 +12,18 @@ interface FormattedValueProps {
   var_name: string;
   value: any;
   maxStringWidth: number;
-  isReference?: boolean;
 }
 
 const FormattedValue: React.FC<FormattedValueProps> = ({
   var_name,
   value,
   maxStringWidth,
-  isReference,
 }) => {
   const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
   const toggle = () =>
     setExpandedStrings((prev) => ({ ...prev, [var_name]: !prev[var_name] }));
 
-  
   const variable_name = <span className="variable-name">{var_name}: </span>;
-  
-  if (isReference) {
-    return <span>
-      {variable_name}
-      <span
-        style={{ color: "mediumvioletred" }}
-        title="reference to another instance"
-      >
-        {value}
-      </span>
-    </span>
-  }
 
   const isExpanded = expandedStrings[var_name] ?? false;
   const type = Array.isArray(value) ? "array" : typeof value;
@@ -113,6 +98,20 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   }
 
   if (type === "object") {
+    // if the object is a reference to another instance return just the name
+    if ("info_label" in value || "$pytchActorInstance" in value) {
+      const label = value.info_label ?? value.$pytchActorInstance.info_label;
+      return <span>
+        {variable_name}
+        <span
+          style={{ color: "mediumvioletred" }}
+          title="reference to another instance"
+        >
+          {label}
+        </span>
+      </span>
+    }
+
     const keys = Object.keys(value);
     const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
     return <span>
@@ -160,7 +159,6 @@ const VariableList: React.FC<VariableListProps> = ({variables}) => {
               var_name={variable.key}
               value={variable.val}
               maxStringWidth={maxStringWidth}
-              isReference={variable.isReference}
             />
           </div>
         );
@@ -215,13 +213,12 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
       <div className="monospace-font">
         {Object.entries(globalVars)
           .sort(([a], [b]) => a.localeCompare(b))
-          .map(([key, value, isReference]) => (
+          .map(([key, value]) => (
             <div key={key}>
               <FormattedValue
                 var_name={key}
                 value={extractValue(value)}
                 maxStringWidth={maxStringWidth}
-                isReference
               />
             </div>
           ))}
@@ -337,7 +334,7 @@ export const ActorClassCard: React.FC<{
   );
 };
 
-function extractValue(elem: object): any {
+function extractValue(elem: any): any {
   if (elem && typeof elem === "object") {
     if ("v" in elem) return elem.v;
     if ("entries" in elem) return elem.entries;
