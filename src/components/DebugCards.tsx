@@ -12,21 +12,36 @@ interface FormattedValueProps {
   var_name: string;
   value: any;
   maxStringWidth: number;
+  isReference?: boolean;
 }
 
 const FormattedValue: React.FC<FormattedValueProps> = ({
   var_name,
   value,
-  maxStringWidth
+  maxStringWidth,
+  isReference,
 }) => {
   const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
   const toggle = () =>
     setExpandedStrings((prev) => ({ ...prev, [var_name]: !prev[var_name] }));
 
+  
+  const variable_name = <span className="variable-name">{var_name}: </span>;
+  
+  if (isReference) {
+    return <span>
+      {variable_name}
+      <span
+        style={{ color: "mediumvioletred" }}
+        title="reference to another instance"
+      >
+        {value}
+      </span>
+    </span>
+  }
+
   const isExpanded = expandedStrings[var_name] ?? false;
   const type = Array.isArray(value) ? "array" : typeof value;
-
-  const variable_name = <span className="variable-name">{var_name}: </span>;
 
   if (type === "string") {
     const shouldTruncate = value.length + var_name.length > maxStringWidth;
@@ -145,6 +160,7 @@ const VariableList: React.FC<VariableListProps> = ({variables}) => {
               var_name={variable.key}
               value={variable.val}
               maxStringWidth={maxStringWidth}
+              isReference={variable.isReference}
             />
           </div>
         );
@@ -199,12 +215,13 @@ export const GlobalVariablesCard: React.FC<{ globalVars: any }> = ({ globalVars 
       <div className="monospace-font">
         {Object.entries(globalVars)
           .sort(([a], [b]) => a.localeCompare(b))
-          .map(([key, value]) => (
+          .map(([key, value, isReference]) => (
             <div key={key}>
               <FormattedValue
                 var_name={key}
                 value={extractValue(value)}
                 maxStringWidth={maxStringWidth}
+                isReference
               />
             </div>
           ))}
@@ -320,10 +337,10 @@ export const ActorClassCard: React.FC<{
   );
 };
 
-function extractValue(elem: unknown): unknown {
+function extractValue(elem: object): any {
   if (elem && typeof elem === "object") {
-    if ("v" in elem) return (elem as any).v;
-    if ("entries" in elem) return (elem as any).entries;
+    if ("v" in elem) return elem.v;
+    if ("entries" in elem) return elem.entries;
   }
   return elem;
 }
