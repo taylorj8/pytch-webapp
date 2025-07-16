@@ -11,14 +11,14 @@ export const DebugSidebar: React.FC<EmptyProps> = () => {
     (state) => state.activeProject.inDebugMode
   );
   const [highlightedCard, setHighlightedCard] = useState<string>("");
-  const [localVars, setLocalVars] = useState<any>();
+  const [classVars, setClassVars] = useState<any>();
   const [globalVars, setGlobalVars] = useState<any>();
 
   useEffect(() => {
     const updateCards = () => {
       const project = Sk.pytch.current_live_project;
       if (project && project !== Sk.default_pytch_environment.current_live_project) {
-        setLocalVars(project.extract_local_variables());
+        setClassVars(project.extract_class_variables());
         setGlobalVars(project.extract_global_variables());
 
         const suspendedThread = project.get_stepping_thread();
@@ -34,7 +34,7 @@ export const DebugSidebar: React.FC<EmptyProps> = () => {
       }
     };
 
-    const intervalId = setInterval(updateCards, 100);
+    const intervalId = setInterval(updateCards, 100); // todo change so only updates when needed
     return () => clearInterval(intervalId);
   }, []);
 
@@ -58,7 +58,7 @@ export const DebugSidebar: React.FC<EmptyProps> = () => {
         {globalVars && Object.keys(globalVars).length > 0 && (
           <GlobalVariablesCard globalVars={globalVars} />
         )}
-        {localVars && Object.entries(localVars)
+        {classVars && Object.entries(classVars)
           .filter(([_, classVars]) => (classVars as any).is_stage)
           .map(([name, classVars]) => (
             <ActorClassCard
@@ -68,8 +68,8 @@ export const DebugSidebar: React.FC<EmptyProps> = () => {
               highlightedInstance={highlightedCard}
             />
           ))}
-        {localVars &&
-          Object.entries(localVars)
+        {classVars &&
+          Object.entries(classVars)
           .filter(([_, classVars]) => !(classVars as any).is_stage)
           .map(([name, classVars]: [string, any]) => (
             <ActorClassCard

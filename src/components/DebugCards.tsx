@@ -179,8 +179,10 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
            <span className="variable-name">position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
         </div>
   
+        {actorVars.has_instance_variables() && <hr className="my-2" />}
+        <VariableList variables={actorVars.get_instance_variables()} />
         {actorVars.has_local_variables() && <hr className="my-2" />}
-        <VariableList variables={actorVars.display_local_variables()} />
+        <VariableList variables={actorVars.get_local_variables()} />
       </Card.Body>
     </Card>
   );
@@ -237,15 +239,15 @@ export const UnclonedActorCard: React.FC<{
           <span className="variable-name">{classVars.is_stage ? "backdrop_number" : "costume_number"}: </span>
           <span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
         </div>
-        {/* Static variables */}
+
         <VariableList variables={classVars.display_costumes_and_sounds()} />
         {classVars.has_static_variables() && <hr className="my-2" />}
-        <VariableList variables={classVars.display_static_variables()} />
+        <VariableList variables={classVars.get_static_variables()} />
 
+        {actorVars.has_instance_variables() && <hr className="my-2" />}
+        <VariableList variables={actorVars.get_instance_variables()} />
         {actorVars.has_local_variables() && <hr className="my-2" />}
-
-        {/* Local variables */}
-        <VariableList variables={actorVars.display_local_variables()} />
+        <VariableList variables={actorVars.get_local_variables()} />
       </div>
     </Card.Body>
   </Card>
@@ -298,7 +300,7 @@ export const ActorClassCard: React.FC<{
 
         {/* Static variables */}
         <VariableList variables={classVars.display_costumes_and_sounds()} />
-        <VariableList variables={classVars.display_static_variables()} />
+        <VariableList variables={classVars.get_static_variables()} />
 
         {/* Cloned actor instances */}
         <Collapse in={isExpanded}>
