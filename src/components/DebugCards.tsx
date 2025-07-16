@@ -17,16 +17,16 @@ interface FormattedValueProps {
 const FormattedValue: React.FC<FormattedValueProps> = ({
   var_name,
   value,
-  maxStringWidth
+  maxStringWidth,
 }) => {
   const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
   const toggle = () =>
     setExpandedStrings((prev) => ({ ...prev, [var_name]: !prev[var_name] }));
 
+  const variable_name = <span className="variable-name">{var_name}: </span>;
+
   const isExpanded = expandedStrings[var_name] ?? false;
   const type = Array.isArray(value) ? "array" : typeof value;
-
-  const variable_name = <span className="variable-name">{var_name}: </span>;
 
   if (type === "string") {
     const shouldTruncate = value.length + var_name.length > maxStringWidth;
@@ -53,7 +53,8 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
     return <span>
       {variable_name}
       <span 
-        style={{ color: "blue", cursor: "default"}} 
+        className="variable-value" 
+        style={{ color: "blue" }} 
         title="number">{display}
       </span>
     </span>
@@ -63,7 +64,8 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
     return <span>
       {variable_name}
       <span 
-        style={{ color: "darkorange", cursor: "default"}} 
+        className="variable-value" 
+        style={{ color: "darkorange" }} 
         title="boolean">{value ? "True" : "False"}
       </span>
     </span>
@@ -98,8 +100,26 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
   }
 
   if (type === "object") {
+    // if the object is a reference to another instance return just the name
+    if ("info_label" in value || "$pytchActorInstance" in value) {
+      const label = value.info_label ?? value.$pytchActorInstance.info_label;
+      return <span>
+        {variable_name}
+        <span
+          className="variable-value"
+          style={{ color: "mediumvioletred" }}
+          title="Reference to another instance"
+        >
+          {label}
+        </span>
+      </span>
+    }
+
     const keys = Object.keys(value);
     const collapseOrExpandIcon = isExpanded ? "angle-up" : "angle-down";
+
+    console.log(value)
+
     return <span>
       {variable_name}
       <span
@@ -114,8 +134,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
         <div style={{ paddingLeft: "1rem" }}>
           {keys.map((k) => (
               <div key={k}>
-                {/* // todo - handle non-string keys better */}
-                <span className="variable-name">{`"${k}"`}: </span>
+                {/* // todo - format keys? */}
                 <FormattedValue
                   var_name={k}
                   value={extractValue(value[k][1])}
@@ -173,14 +192,16 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
         </Card.Title>
   
         <div className="monospace-font mb-1">
-          <span className="variable-name">costume_number: </span><span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
+          <span className="variable-name">costume_number: </span><span className="variable-value" style={{ color: "blue" }}>{actorVars.costume_index}</span>
         </div>
         <div className="monospace-font mb-2">
-           <span className="variable-name">position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
+           <span className="variable-name">position: </span><span className="variable-value">{actorVars.position.toString()}</span>
         </div>
   
+        {actorVars.has_instance_variables() && <hr className="my-2" />}
+        <VariableList variables={actorVars.get_instance_variables()} />
         {actorVars.has_local_variables() && <hr className="my-2" />}
-        <VariableList variables={actorVars.display_local_variables()} />
+        <VariableList variables={actorVars.get_local_variables()} />
       </Card.Body>
     </Card>
   );
@@ -229,23 +250,23 @@ export const UnclonedActorCard: React.FC<{
       <div>
         {!classVars.is_stage && (
           <div className="mt-3 monospace-font">
-            <span className="variable-name">position: </span><span style={{cursor: "default"}}>{actorVars.position.toString()}</span>
+            <span className="variable-name">position: </span><span className="variable-value">{actorVars.position.toString()}</span>
           </div>
         )}
         
         <div className="monospace-font">
           <span className="variable-name">{classVars.is_stage ? "backdrop_number" : "costume_number"}: </span>
-          <span style={{ color: "blue", cursor: "default" }}>{actorVars.costume_index}</span>
+          <span className="variable-value" style={{ color: "blue" }}>{actorVars.costume_index}</span>
         </div>
-        {/* Static variables */}
+
         <VariableList variables={classVars.display_costumes_and_sounds()} />
         {classVars.has_static_variables() && <hr className="my-2" />}
-        <VariableList variables={classVars.display_static_variables()} />
+        <VariableList variables={classVars.get_static_variables()} />
 
+        {actorVars.has_instance_variables() && <hr className="my-2" />}
+        <VariableList variables={actorVars.get_instance_variables()} />
         {actorVars.has_local_variables() && <hr className="my-2" />}
-
-        {/* Local variables */}
-        <VariableList variables={actorVars.display_local_variables()} />
+        <VariableList variables={actorVars.get_local_variables()} />
       </div>
     </Card.Body>
   </Card>
@@ -298,7 +319,7 @@ export const ActorClassCard: React.FC<{
 
         {/* Static variables */}
         <VariableList variables={classVars.display_costumes_and_sounds()} />
-        <VariableList variables={classVars.display_static_variables()} />
+        <VariableList variables={classVars.get_static_variables()} />
 
         {/* Cloned actor instances */}
         <Collapse in={isExpanded}>
@@ -318,10 +339,10 @@ export const ActorClassCard: React.FC<{
   );
 };
 
-function extractValue(elem: unknown): unknown {
+function extractValue(elem: any): any {
   if (elem && typeof elem === "object") {
-    if ("v" in elem) return (elem as any).v;
-    if ("entries" in elem) return (elem as any).entries;
+    if ("v" in elem) return elem.v;
+    if ("entries" in elem) return elem.entries;
   }
   return elem;
 }

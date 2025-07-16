@@ -103,7 +103,6 @@ export const build = async (
             const loc = { actorId, handlerId, lineWithinHandler };
             const globalLineNumber = liveSourceMap.globalFromLocal(loc);
             Debugger.add_breakpoint(userFile, globalLineNumber, 0, false);
-            console.log(Debugger.get_breakpoints_list());
           });
         }
       }

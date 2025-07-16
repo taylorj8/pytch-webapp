@@ -218,49 +218,70 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
 
     // ensures the breakpoint tracks the code rather than the line number
     (ace.editor.session as any).on("change", (delta: Ace.Delta) => {
-      if (delta.end.row == delta.start.row) return;
-      const updatedBreakpoints: number[] = [];
+    // Get all breakpoints for this handler
+    const updatedStore = breakpointStoreRef.current;
+    const handlerBreakpoints =
+      updatedStore[actorId] && updatedStore[actorId][handlerId]
+        ? updatedStore[actorId][handlerId]
+        : [];
 
-      let breakpointMoved = false;
-      const updatedStore = breakpointStoreRef.current;
-      if (updatedStore[actorId] && updatedStore[actorId][handlerId]) {
-        updatedStore[actorId][handlerId].forEach((lineNo: number) => {
-          if (delta.start.row >= lineNo) {
-            updatedBreakpoints.push(lineNo);
-          } else if (delta.action === "insert") {
+    const lines = ace.editor.session.getDocument().getAllLines();
+    // find breakpoints on empty lines
+    const breakpointsOnEmpty = handlerBreakpoints.filter((lineNo: number) => {
+      const lineIndex = lineNo - 1;
+      return lines[lineIndex] !== undefined && lines[lineIndex].trim() === "";
+    });
 
-            const linesAdded = delta.end.row - delta.start.row;
-            updatedBreakpoints.push(lineNo + linesAdded)
-            breakpointMoved = true;
+    // if no breakpoints on empty lines and no change to line numbers, skip update
+    if (breakpointsOnEmpty.length === 0 && delta.end.row === delta.start.row) return;
 
-          } else if (delta.action === "remove") {
-
-            const linesRemoved = delta.end.row - delta.start.row;
-            const newRow = lineNo - linesRemoved;
-            if (newRow >= delta.start.row) {
-              updatedBreakpoints.push(newRow);
-              breakpointMoved = true;
-            } else {
-              updatedBreakpoints.push(lineNo);
-            }
-          } else {
-            updatedBreakpoints.push(lineNo);
-          }
-        });
-      }
-
-      if (breakpointMoved) {
-        updatedStore[actorId][handlerId] = updatedBreakpoints;
-        
-        setBreakpointStore(updatedStore);
-        ace.editor.session.clearBreakpoints();
-        // re-add breakpoints after clearing
-        updatedBreakpoints.forEach((lineNo) => {
-          ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint");
-        });
+    const updatedBreakpoints: number[] = [];
+    let breakpointsUpdated = false;
+    handlerBreakpoints.forEach((lineNo: number) => {
+      if (delta.start.row > lineNo - 1) {
+        updatedBreakpoints.push(lineNo);
+      } else if (delta.action === "insert") {
+        // if new line entered at beginning of line, breakpoint should move
+        const beforeCursor = lines[delta.start.row].slice(0, delta.start.column);
+        if (delta.start.row === lineNo - 1 && beforeCursor.trim() !== "") {
+          updatedBreakpoints.push(lineNo);
+        } else {
+          const linesAdded = delta.end.row - delta.start.row;
+          updatedBreakpoints.push(lineNo + linesAdded);
+          breakpointsUpdated = true;
+        }
+      } else if (delta.action === "remove") {
+        const linesRemoved = delta.end.row - delta.start.row;
+        const newRow = lineNo - linesRemoved;
+        if (newRow > delta.start.row) {
+          updatedBreakpoints.push(newRow);
+          breakpointsUpdated = true;
+        } else {
+          updatedBreakpoints.push(lineNo);
+        }
+      } else {
+        updatedBreakpoints.push(lineNo);
       }
     });
-  }, []);
+
+    // filter out breakpoints on empty lines
+    const filteredBreakpoints = updatedBreakpoints.filter((lineNo) => {
+      return lines[lineNo - 1] !== undefined && lines[lineNo - 1].trim() !== "";
+    });
+    if (filteredBreakpoints.length !== updatedBreakpoints.length) {
+      breakpointsUpdated = true;
+    }
+
+    if (breakpointsUpdated) {
+      updatedStore[actorId][handlerId] = filteredBreakpoints;
+      setBreakpointStore(updatedStore);
+      ace.editor.session.clearBreakpoints();
+      filteredBreakpoints.forEach((lineNo) => {
+        ace.editor.session.setBreakpoint(lineNo - 1, "ace_breakpoint");
+      });
+    }
+  });
+}, []);
 
   // assign a different class to empty lines so breakpoint hover can be hidden 
   useEffect(() => {
