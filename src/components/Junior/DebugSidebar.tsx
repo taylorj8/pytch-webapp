@@ -34,7 +34,7 @@ export const DebugSidebar: React.FC<EmptyProps> = () => {
       }
     };
 
-    const intervalId = setInterval(updateCards, 100); // todo change so only updates when needed
+    const intervalId = setInterval(updateCards, 100);
     return () => clearInterval(intervalId);
   }, []);
 
