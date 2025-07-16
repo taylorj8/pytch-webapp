@@ -238,16 +238,22 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
     const updatedBreakpoints: number[] = [];
     let breakpointsUpdated = false;
     handlerBreakpoints.forEach((lineNo: number) => {
-      if (delta.start.row >= lineNo - 1) {
+      if (delta.start.row > lineNo - 1) {
         updatedBreakpoints.push(lineNo);
       } else if (delta.action === "insert") {
-        const linesAdded = delta.end.row - delta.start.row;
-        updatedBreakpoints.push(lineNo + linesAdded);
-        breakpointsUpdated = true;
+        // if new line entered at beginning of line, breakpoint should move
+        const beforeCursor = lines[delta.start.row].slice(0, delta.start.column);
+        if (delta.start.row === lineNo - 1 && beforeCursor.trim() !== "") {
+          updatedBreakpoints.push(lineNo);
+        } else {
+          const linesAdded = delta.end.row - delta.start.row;
+          updatedBreakpoints.push(lineNo + linesAdded);
+          breakpointsUpdated = true;
+        }
       } else if (delta.action === "remove") {
         const linesRemoved = delta.end.row - delta.start.row;
         const newRow = lineNo - linesRemoved;
-        if (newRow >= delta.start.row) {
+        if (newRow > delta.start.row) {
           updatedBreakpoints.push(newRow);
           breakpointsUpdated = true;
         } else {

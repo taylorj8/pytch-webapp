@@ -220,16 +220,22 @@ const CodeAceEditor = () => {
       const updatedBreakpoints: number[] = [];
       let breakpointsUpdated = false;
       breakpoints.forEach((row) => {
-      if (delta.start.row >= row - 1) {
+      if (delta.start.row > row - 1) {
+        updatedBreakpoints.push(row);
+      } else if (delta.action === "insert") {
+        // if new line entered at beginning of line, breakpoint should move
+        const beforeCursor = lines[delta.start.row].slice(0, delta.start.column);
+        if (delta.start.row === row - 1 && beforeCursor.trim() !== "") {
           updatedBreakpoints.push(row);
-        } else if (delta.action === "insert") {
+        } else {
           const linesAdded = delta.end.row - delta.start.row;
-          updatedBreakpoints.push(row + linesAdded)
+          updatedBreakpoints.push(row + linesAdded);
           breakpointsUpdated = true;
+        }
         } else if (delta.action === "remove") {
           const linesRemoved = delta.end.row - delta.start.row;
           const newRow = row - linesRemoved;
-          if (newRow >= delta.start.row) {
+          if (newRow > delta.start.row) {
             updatedBreakpoints.push(newRow);
             breakpointsUpdated = true;
           } else {
