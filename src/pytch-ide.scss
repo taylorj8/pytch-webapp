@@ -491,10 +491,12 @@ $speech-bubble-max-height: 180px;
     font-weight: bold;
     color: black;
     cursor: default;
+    user-select: none;
   }
 
-  .variable-value {
-    cursor: default;
+  .variable-dropdown {
+    cursor: pointer;
+    user-select: none;
   }
 
   .actor-classcard-img-stack {

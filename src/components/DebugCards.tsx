@@ -38,7 +38,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
     return <span>
       {variable_name}
       <span
-        style={{ color: "green", cursor: shouldTruncate ? "pointer" : "default" }}
+        style={{ color: "green", cursor: shouldTruncate ? "pointer" : "text" }}
         onClick={shouldTruncate ? toggle : undefined}
         title={!shouldTruncate ? "string" : isExpanded ? "Click to collapse string" : "Click to expand string"}
       >
@@ -53,7 +53,6 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
     return <span>
       {variable_name}
       <span 
-        className="variable-value" 
         style={{ color: "blue" }} 
         title="number">{display}
       </span>
@@ -64,7 +63,6 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
     return <span>
       {variable_name}
       <span 
-        className="variable-value" 
         style={{ color: "darkorange" }} 
         title="boolean">{value ? "True" : "False"}
       </span>
@@ -76,7 +74,8 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
     return <span>
       {variable_name}
       <span
-        style={{ color: "purple", cursor: "pointer" }}
+        className="variable-dropdown"
+        style={{ color: "purple" }}
         title="array"
         onClick={toggle}
       >
@@ -106,7 +105,6 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
       return <span>
         {variable_name}
         <span
-          className="variable-value"
           style={{ color: "mediumvioletred" }}
           title="Reference to another instance"
         >
@@ -123,7 +121,8 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
     return <span>
       {variable_name}
       <span
-        style={{ color: "brown", cursor: "pointer" }}
+        className="variable-dropdown"
+        style={{ color: "brown" }}
         title="object"
         onClick={toggle}
       >
@@ -152,16 +151,18 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
 
 interface VariableListProps {
   variables: Variable[];
+  prefix?: string;
 }
 
-const VariableList: React.FC<VariableListProps> = ({variables}) => {
+const VariableList: React.FC<VariableListProps> = ({variables, prefix}) => {
   return (
     <div className="monospace-font">
       {variables.map((variable, index) => {
+        const pref = prefix ?? "";
         return (
           <div key={`${index}-${variable.key}`}>
             <FormattedValue
-              var_name={variable.key}
+              var_name={pref + variable.key}
               value={variable.val}
               maxStringWidth={maxStringWidth}
             />
@@ -192,14 +193,14 @@ export const ActorInstanceCard: React.FC<ActorInstanceProps> = ({
         </Card.Title>
   
         <div className="monospace-font mb-1">
-          <span className="variable-name">costume_number: </span><span className="variable-value" style={{ color: "blue" }}>{actorVars.costume_index}</span>
+          <span className="variable-name">costume_number: </span><span style={{ color: "blue" }}>{actorVars.costume_index}</span>
         </div>
         <div className="monospace-font mb-2">
-           <span className="variable-name">position: </span><span className="variable-value">{actorVars.position.toString()}</span>
+           <span className="variable-name">position: </span><span>{actorVars.position.toString()}</span>
         </div>
   
         {actorVars.has_instance_variables() && <hr className="my-2" />}
-        <VariableList variables={actorVars.get_instance_variables()} />
+        <VariableList variables={actorVars.get_instance_variables()} prefix={"self."} />
         {actorVars.has_local_variables() && <hr className="my-2" />}
         <VariableList variables={actorVars.get_local_variables()} />
       </Card.Body>
@@ -250,21 +251,21 @@ export const UnclonedActorCard: React.FC<{
       <div>
         {!classVars.is_stage && (
           <div className="mt-3 monospace-font">
-            <span className="variable-name">position: </span><span className="variable-value">{actorVars.position.toString()}</span>
+            <span className="variable-name">position: </span><span>{actorVars.position.toString()}</span>
           </div>
         )}
         
         <div className="monospace-font">
           <span className="variable-name">{classVars.is_stage ? "backdrop_number" : "costume_number"}: </span>
-          <span className="variable-value" style={{ color: "blue" }}>{actorVars.costume_index}</span>
+          <span style={{ color: "blue" }}>{actorVars.costume_index}</span>
         </div>
 
         <VariableList variables={classVars.display_costumes_and_sounds()} />
         {classVars.has_static_variables() && <hr className="my-2" />}
-        <VariableList variables={classVars.get_static_variables()} />
+        <VariableList variables={classVars.get_static_variables()} prefix={`${name}.`} />
 
         {actorVars.has_instance_variables() && <hr className="my-2" />}
-        <VariableList variables={actorVars.get_instance_variables()} />
+        <VariableList variables={actorVars.get_instance_variables()} prefix="self." />
         {actorVars.has_local_variables() && <hr className="my-2" />}
         <VariableList variables={actorVars.get_local_variables()} />
       </div>
@@ -319,7 +320,7 @@ export const ActorClassCard: React.FC<{
 
         {/* Static variables */}
         <VariableList variables={classVars.display_costumes_and_sounds()} />
-        <VariableList variables={classVars.get_static_variables()} />
+        <VariableList variables={classVars.get_static_variables()} prefix={`${name}.`}  />
 
         {/* Cloned actor instances */}
         <Collapse in={isExpanded}>
