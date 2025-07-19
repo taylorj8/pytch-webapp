@@ -344,15 +344,17 @@ export class ProjectEngine {
     const pytchProgram = store.getState().activeProject.project.program;
     if (project.threads_are_paused()) {
       const globalLineNo = project.get_debug_line();
-      if (globalLineNo !== -1 && globalLineNo !== currentDebugLine) {
+      if (globalLineNo && globalLineNo !== currentDebugLine) {
         setDebugLine(globalLineNo);
-        if (globalLineNo && pytchProgram.kind === "per-method") {
+        if (pytchProgram.kind === "per-method") {
           const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
           goToEditorLocation(contextualLoc, null, false);
         }
       }
     } 
     else {
+      console.log("-------------")
+      console.log(Debugger.step_mode)
       const stepping_thread = project.get_stepping_thread();
       // if thread terminates while stepping, clear debug line and continue
       if (stepping_thread && stepping_thread.state === "zombie") {
