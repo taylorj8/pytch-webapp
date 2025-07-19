@@ -353,14 +353,11 @@ export class ProjectEngine {
       }
     } 
     else {
-      console.log("-------------")
-      console.log(Debugger.step_mode)
-      const stepping_thread = project.get_stepping_thread();
-      // if thread terminates while stepping, clear debug line and continue
-      if (stepping_thread && stepping_thread.state === "zombie") {
-        setDebugLine(-1); // todo move to project.js?
+      // if thread terminates while stepping, disable step mode and clear debug line
+      if (project.stepping_thread_zombified) {
+        setDebugLine(-1);
         Debugger.disable_step_mode();
-        project.continue_on_breakpoint();
+        project.set_stepping_thread_zombified(false);
       }
 
       const maybeQuestionAnswer =
