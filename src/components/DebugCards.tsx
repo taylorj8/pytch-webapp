@@ -79,7 +79,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
         title="array"
         onClick={toggle}
       >
-        [Array({value.length})]
+        [List({value.length})]
         <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
       </span>
       <Collapse in={isExpanded}>
@@ -126,7 +126,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
         title="object"
         onClick={toggle}
       >
-        {"{"}Object({keys.length}){"}"}
+        {"{"}Dict({keys.length}){"}"}
         <FontAwesomeIcon icon={collapseOrExpandIcon} className="collapse-or-expand-icon" />
       </span>
       <Collapse in={isExpanded}>
@@ -340,6 +340,7 @@ export const ActorClassCard: React.FC<{
   );
 };
 
+// todo builtin function for this
 function extractValue(elem: any): any {
   if (elem && typeof elem === "object") {
     if ("v" in elem) return elem.v;

@@ -180,7 +180,11 @@ export const HatBlock: React.FC<HatBlockProps> = ({
   );
   const onDuplicate = () => duplicateHandlerAction({ actorId, handlerId });
   const runDeleteFlow = useJrEditActions((a) => a.deleteHandlerFlow.run);
-  const onDelete = () => runDeleteFlow({ actorId, handlerId });
+  const { removeHandlerBreakpoints } = useStoreActions((actions) => actions.activeProject);
+  const onDelete = () => {
+    removeHandlerBreakpoints({ actorId, handlerId })
+    runDeleteFlow({ actorId, handlerId })
+  };
 
   return (
     <div className="HatBlock" onDoubleClick={onChangeHatBlock}>

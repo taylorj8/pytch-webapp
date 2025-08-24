@@ -928,26 +928,6 @@ export class DexieStorage extends Dexie {
     }
   }
 
-  // async updateBreakpointsInProject(
-  //   projectId: ProjectId,
-  //   updatedBreakpoints: number[] | BreakpointStore,
-  // ) {
-  //   // console.log(`ProjectId: ${projectId}`)
-  //   // console.log(updatedBreakpoints)
-  //   await this.transaction("rw", this.projectPytchPrograms, async () => {
-  //     await this.projectPytchPrograms.where("projectId").equals(projectId).modify((record: ProjectPytchProgramRecord) => {
-  //       try {
-  //         console.log(record.program.breakpoints)
-  //         console.log("updating")
-  //         record.program.breakpoints = updatedBreakpoints;
-  //         console.log(record.program.breakpoints)
-  //       } catch {
-  //         throw new Error(`Type mismatch: Expected ${typeof record.program.breakpoints}, given ${typeof updatedBreakpoints}`)
-  //       }
-  //     });
-  //   });
-  // }
-
   enqueueSyncTask(task: KeyedSyncTask) {
     let oldIndex = this.queuedSyncTasks.findIndex(
       (existingTask) => existingTask.key === task.key
@@ -1018,4 +998,3 @@ export const enqueueSyncTask = _db.enqueueSyncTask.bind(_db);
 export const userPreference = _db.userPreference.bind(_db);
 export const updateUserPreference = _db.updateUserPreference.bind(_db);
 export const breakpoints = _db.breakpoints.bind(_db);
-// export const updateBreakpointsInProject = _db.updateBreakpointsInProject.bind(_db);
