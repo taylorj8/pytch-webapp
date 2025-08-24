@@ -433,6 +433,7 @@ export interface IActiveProject {
   setBreakpointStore: Action<IActiveProject, BreakpointStore>;
   addBreakpoint: Thunk<IActiveProject, BreakpointRecord>;
   removeBreakpoint: Thunk<IActiveProject, BreakpointRecord>;
+  removeHandlerBreakpoints: Thunk<IActiveProject, HandlerDeletionDescriptor>;
 }
 
 const dummyPytchProgram = PytchProgramOps.fromPythonCode(
@@ -1403,5 +1404,27 @@ export const activeProject: IActiveProject = {
     if (updated) {
       actions.setBreakpointStore(newBreakpointStore);
     }
+  }),
+  removeHandlerBreakpoints: thunk((actions, { actorId, handlerId }, helpers) => {
+    const program = PytchProgramOps.ensureKind(
+      "removeHandlerBreakpoints()",
+      helpers.getState().project.program,
+      "per-method"
+    );
+    
+    const newBreakpointStore = JSON.parse(JSON.stringify(program.breakpointStore));
+    const actorStore = newBreakpointStore[actorId];
+    if (!actorStore) return;
+
+    const handlerLines = actorStore[handlerId];
+    if (!handlerLines) return;
+
+    delete actorStore[handlerId];
+    
+    if (Object.keys(actorStore).length === 0) {
+      delete newBreakpointStore[actorId];
+    }
+
+    actions.setBreakpointStore(newBreakpointStore);
   }),
 };

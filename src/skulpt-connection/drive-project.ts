@@ -344,21 +344,20 @@ export class ProjectEngine {
     const pytchProgram = store.getState().activeProject.project.program;
     if (project.threads_are_paused()) {
       const globalLineNo = project.get_debug_line();
-      if (globalLineNo !== -1 && globalLineNo !== currentDebugLine) {
+      if (globalLineNo && globalLineNo !== currentDebugLine) {
         setDebugLine(globalLineNo);
-        if (globalLineNo && pytchProgram.kind === "per-method") {
+        if (pytchProgram.kind === "per-method") {
           const contextualLoc = liveSourceMap.localFromGlobal(globalLineNo);
           goToEditorLocation(contextualLoc, null, false);
         }
       }
     } 
     else {
-      const stepping_thread = project.get_stepping_thread();
-      // if thread terminates while stepping, clear debug line and continue
-      if (stepping_thread && stepping_thread.state === "zombie") {
-        setDebugLine(-1); // todo move to project.js?
+      // if thread terminates while stepping, disable step mode and clear debug line
+      if (project.stepping_thread_zombified) {
+        setDebugLine(-1);
         Debugger.disable_step_mode();
-        project.continue_on_breakpoint();
+        project.set_stepping_thread_zombified(false);
       }
 
       const maybeQuestionAnswer =
