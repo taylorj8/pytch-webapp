@@ -14,7 +14,6 @@ import { eqDisplaySize } from "../model/ui";
 import { SingleTab } from "./SingleTab";
 import { Debugger } from "../skulpt-connection/drive-project";
 import { userFile } from "../constants";
-import { resetDebugging } from "./StageControls";
 import { PytchProgramOps } from "../model/pytch-program";
 
 const ReadOnlyOverlay = () => {
@@ -48,7 +47,7 @@ const CodeAceEditor = () => {
   const saveIsPending = useStoreState(
     (state) => state.activeProject.syncState.loadState === "pending"
   );
-  const { debugLine } = useStoreState(
+  const { debugLine, inDebugMode } = useStoreState(
     (state) => state.activeProject
   )
   const editSeqNum = useStoreState((state) => state.activeProject.editSeqNum);
@@ -56,7 +55,7 @@ const CodeAceEditor = () => {
     (state) => state.activeProject.lastSyncFromStorageSeqNum
   );
   const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
-  const setBreakpointList = useStoreActions((actions) => actions.activeProject.setBreakpointList);
+  const { setBreakpointList } = useStoreActions((actions) => actions.activeProject);
 
   // We don't care about the actual value of the stage display size, but
   // we do need to know when it changes, so we can resize the editor in
@@ -193,6 +192,9 @@ const CodeAceEditor = () => {
     const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
     if (prevMarker !== null)
       ace.editor.session.removeMarker(prevMarker);
+    
+    if (!inDebugMode)
+      return;
 
     if (debugLine !== null) {
       const marker = ace.editor.session.addMarker(new Range(debugLine - 1, 0, debugLine - 1, 1), "debugLine", "fullLine");

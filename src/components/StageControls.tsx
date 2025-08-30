@@ -14,6 +14,7 @@ import { Debugger } from "../skulpt-connection/drive-project";
 import store from "../store";
 import {
   aceControllerMap,
+  getFlatAceController,
   liveSourceMap,
 } from "../skulpt-connection/code-editor";
 
@@ -25,13 +26,18 @@ export const focusStage = () => {
 };
 
 export const resetDebugging = (inDebugMode: boolean) => {
-  const { debugLine } = store.getState().activeProject;
+  const { project, debugLine } = store.getState().activeProject;
   if (debugLine !== -1) {
-    const loc = liveSourceMap.localFromGlobal(debugLine);
-    const controller = aceControllerMap.get(loc.handlerId);
-    console.log(loc.handlerId)
-    if (controller) {
-      controller.clearDebugMarker();
+    if (project.program.kind === "per-method") {
+      const loc = liveSourceMap.localFromGlobal(debugLine);
+      const controller = aceControllerMap.get(loc.handlerId);
+      if (controller) {
+        controller.clearDebugMarker();
+      }
+    } else {
+      // async () => {
+      //   await getFlatAceController()?.clearDebugMarker();
+      // }
     }
   }
   
