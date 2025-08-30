@@ -88,7 +88,7 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   };
 
   const debugFeaturesEnabled = useStoreState((state) => state.ideLayout.debugFeaturesEnabled);
-  const debugLine = useStoreState((state) => state.activeProject.debugLine);
+  const { debugLine, inDebugMode } = useStoreState((state) => state.activeProject);
 
   const breakpointStore = useStoreState((state) => {
     return PytchProgramOps.ensureKind(
@@ -330,21 +330,44 @@ export const PytchScriptEditor: React.FC<PytchScriptEditorProps> = ({
   }, [debugFeaturesEnabled]);
 
   useEffect(() => {
-    // if (debugFeaturesEnabled) return;
-    const ace = failIfNull(aceRef.current, "CodeEditor effect: aceRef is null");
-    ace.editor.session.removeMarker(prevMarker);
-    if (debugLine === -1) return;
+    if (!inDebugMode) {
+      return;
+    }
+    const controller = aceControllerMap.get(handlerId);
+    if (controller == null) {
+      return;
+    }
 
-    const debugLineLoc = liveSourceMap.localFromGlobal(debugLine);
-    if (debugLineLoc.actorId === actorId && debugLineLoc.handlerId === handlerId) {
-      const marker = ace.editor.session.addMarker(new Range(debugLineLoc.lineWithinHandler - 1, 0, debugLineLoc.lineWithinHandler - 1, 1), "debugLine", "fullLine");
-      setPrevMarker(marker);
+    if (debugLine === -1) {
+      controller.clearDebugMarker();
+      return;
+    }
+
+    try {
+      const debugLineLoc = liveSourceMap.localFromGlobal(debugLine);
+      if (
+        debugLineLoc.actorId === actorId &&
+        debugLineLoc.handlerId === handlerId
+      ) {
+        const range = new Range(
+          debugLineLoc.lineWithinHandler - 1,
+          0,
+          debugLineLoc.lineWithinHandler - 1,
+          1
+        );
+        controller.setDebugMarker(range);
+      } else {
+        // The debug line is in another editor.
+        controller.clearDebugMarker();
+      }
+    } catch (err) {
+      // This can happen if the debugLine is not in the source map.
+      controller.clearDebugMarker();
     }
   }, [debugLine]);
 
   // replaces breakpoints when switching between actors
   useEffect(() => {
-    // if (debugFeaturesEnabled) return;
     const ace = failIfNull(aceRef.current, "Ace ref is null in breakpoints sync");
     ace.editor.session.clearBreakpoints();
 

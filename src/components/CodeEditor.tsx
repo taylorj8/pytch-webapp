@@ -48,8 +48,8 @@ const CodeAceEditor = () => {
   const saveIsPending = useStoreState(
     (state) => state.activeProject.syncState.loadState === "pending"
   );
-  const debugLine = useStoreState(
-    (state) => state.activeProject.debugLine
+  const { debugLine } = useStoreState(
+    (state) => state.activeProject
   )
   const editSeqNum = useStoreState((state) => state.activeProject.editSeqNum);
   const lastSyncFromStorageSeqNum = useStoreState(

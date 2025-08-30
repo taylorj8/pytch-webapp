@@ -10,8 +10,7 @@ import {
   lineAsElement,
   lineIntersectsSelection,
 } from "../model/highlight-as-ace";
-import { ActorPropertiesTabKey } from "../model/junior/edit-state";
-import { useJrEditActions } from "../components/Junior/hooks";
+import { Ace } from "ace-builds";;
 import store from "../store";
 
 // Is this defined somewhere I can get at it?
@@ -21,6 +20,8 @@ const kPytchCypressControllerMapKey = "ACE_CONTROLLER_MAP";
 const kFlatEditorId = "flat";
 
 class AceController {
+  private debugMarkerId: number | null = null;
+
   constructor(readonly editor: AceEditorT) {}
 
   gotoLocation(lineNo: number, colNo: number | null, shouldFocus: boolean) {
@@ -42,6 +43,24 @@ class AceController {
     this.editor.gotoLine(lineNo, colNo, true);
     if (shouldFocus) {
       this.focus();
+    }
+  }
+
+  setDebugMarker(range: Ace.Range) {
+    this.clearDebugMarker();
+    this.debugMarkerId = this.editor.session.addMarker(
+      range,
+      "debugLine",
+      "fullLine"
+    );
+    console.log("SET " + this.debugMarkerId)
+  }
+
+  clearDebugMarker() {
+    console.log("marker: " + this.debugMarkerId)
+    if (this.debugMarkerId != null) {
+      this.editor.session.removeMarker(this.debugMarkerId);
+      this.debugMarkerId = null;
     }
   }
 
