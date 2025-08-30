@@ -12,18 +12,36 @@ interface FormattedValueProps {
   var_name: string;
   value: any;
   maxStringWidth: number;
+  ancestors?: { name: string; value: any }[];
 }
 
 const FormattedValue: React.FC<FormattedValueProps> = ({
   var_name,
   value,
   maxStringWidth,
+  ancestors = [],
 }) => {
   const [expandedStrings, setExpandedStrings] = useState<Record<string, boolean>>({});
   const toggle = () =>
     setExpandedStrings((prev) => ({ ...prev, [var_name]: !prev[var_name] }));
 
   const variable_name = <span className="variable-name">{var_name}: </span>;
+
+  // check for a recursive reference among the ancestors
+  const selfRefAncestor = ancestors.find(a => a.value === value);
+  if (value != null && typeof value === "object" && selfRefAncestor) {
+    return (
+      <span>
+        {variable_name}
+        <span
+          style={{ color: "mediumvioletred" }}
+          title="Recursive reference"
+        >
+          {selfRefAncestor.name}
+        </span>
+      </span>
+    );
+  }
 
   const isExpanded = expandedStrings[var_name] ?? false;
   const type = Array.isArray(value) ? "array" : typeof value;
@@ -90,6 +108,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
                 var_name={idx.toString()}
                 value={extractValue(elem)}
                 maxStringWidth={maxStringWidth - 3}
+                ancestors={[...ancestors, { name: var_name, value: value }]}
               />
             </div>
           ))}
@@ -138,6 +157,7 @@ const FormattedValue: React.FC<FormattedValueProps> = ({
                   var_name={k}
                   value={extractValue(value[k][1])}
                   maxStringWidth={maxStringWidth - 3}
+                  ancestors={[...ancestors, { name: var_name, value: value }]}
                 />
               </div>
           ))}
@@ -340,7 +360,7 @@ export const ActorClassCard: React.FC<{
   );
 };
 
-// todo builtin function for this
+// todo (debug) builtin function for this
 function extractValue(elem: any): any {
   if (elem && typeof elem === "object") {
     if ("v" in elem) return elem.v;
