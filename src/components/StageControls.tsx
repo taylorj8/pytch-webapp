@@ -12,6 +12,11 @@ import { useNavigate } from "react-router-dom";
 import { useRunFlow } from "../model";
 import { Debugger } from "../skulpt-connection/drive-project";
 import store from "../store";
+import {
+  aceControllerMap,
+  getFlatAceController,
+  liveSourceMap,
+} from "../skulpt-connection/code-editor";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Sk: any;
@@ -21,14 +26,24 @@ export const focusStage = () => {
 };
 
 export const resetDebugging = (inDebugMode: boolean) => {
+  const { project, debugLine } = store.getState().activeProject;
+  if (debugLine !== -1) {
+    if (project.program.kind === "per-method") {
+      const loc = liveSourceMap.localFromGlobal(debugLine);
+      const controller = aceControllerMap.get(loc.handlerId);
+      if (controller) {
+        controller.clearDebugMarker();
+      }
+    } else {
+      // async () => {
+      //   await getFlatAceController()?.clearDebugMarker();
+      // }
+    }
+  }
+  
   store.getActions().activeProject.setDebugMode(inDebugMode);
   store.getActions().activeProject.setDebugLine(-1);
   Debugger.disable_step_mode();
-
-  const project = Sk.pytch.current_live_project;
-  if (project !== Sk.default_pytch_environment.current_live_project) {
-    Sk.pytch.current_live_project.continue_on_breakpoint();
-  }
 }
 
 const StaticTooltip: React.FC<PropsWithChildren<{ visible: boolean }>> = ({
@@ -54,8 +69,8 @@ const GreenFlag = () => {
   );
   const build = useStoreActions((actions) => actions.activeProject.build);
   const handleClick = () => {
-    build({ focusDestination: "running-project", inDebugMode: false });
     resetDebugging(false);
+    build({ focusDestination: "running-project", inDebugMode: false });
   };
 
   const tooltipIsVisible = buttonTourProgressStage === "green-flag";
@@ -83,8 +98,8 @@ const YellowDebug = () => {
   }
 
   const handleClick = () => {
-    build({ focusDestination: "running-project", inDebugMode: true });
     resetDebugging(true);
+    build({ focusDestination: "running-project", inDebugMode: true });
   };
   return (
     <div className="tooltipped-elt">
